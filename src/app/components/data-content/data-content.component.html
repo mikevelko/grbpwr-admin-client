@@ -1,0 +1,69 @@
+<div>
+    <div role="group" aria-label="Basic example">
+        <!-- Add data button -->
+        <button type="button" data-toggle="modal" data-target="#addDataModal">Add data</button>
+        <button type="button" (click)="getAllData()">Refresh</button>
+    </div>
+    <!-- Modal -->
+    <div id="addDataModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div role="document">
+            <div>
+                <div>
+                    <h5 id="exampleModalLabel">Add data into database</h5>
+                    <button type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                </div>
+                <div>
+                    <!-- Add data form -->
+                    <form>
+                        <!-- Key   -->
+                        <div>
+                            <label for="key">Key</label>
+                            <input type="text" required name="key" [(ngModel)]="newData.key" #key="ngModel">
+                        </div>
+                        <!-- Value -->
+                        <div>
+                            <label for="value">Value</label>
+                            <input type="text" required name="value" [(ngModel)]="newData.value" #value="ngModel">
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <!-- Submit -->
+                    <button type="button" data-dismiss="modal" (click)="addData()">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Existing data -->
+    <h6>
+        Data in DB :
+    </h6>
+    <ul>
+        <li>
+            <div>
+                <div>
+                    <h5>
+                        Key
+                    </h5>
+                </div>
+                <div>
+                    <h5>
+                        Value
+                    </h5>
+                </div>
+            </div>
+        </li>
+        <li *ngFor="let data of dataContent">
+            <div>
+                <div>
+                    {{data.key}}
+                </div>
+                <div>
+                    {{data.value}}
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
