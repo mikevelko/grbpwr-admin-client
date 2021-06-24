@@ -3,11 +3,11 @@
 ## Building the project
 
 ```shell script
-    yarn
-    yarn build
-    yarn link
+    npm i
 ```
+
 ## Run
+
 ```shell script
     make run
 ```
