@@ -1,10 +1,8 @@
-<div>
+<!-- <div>
     <div role="group" aria-label="Basic example">
-        <!-- Add data button -->
         <button type="button" data-toggle="modal" data-target="#addDataModal">Add data</button>
         <button type="button" (click)="getAllData()">Refresh</button>
     </div>
-    <!-- Modal -->
     <div id="addDataModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div role="document">
             <div>
@@ -15,14 +13,11 @@
           </button>
                 </div>
                 <div>
-                    <!-- Add data form -->
                     <form>
-                        <!-- Key   -->
                         <div>
                             <label for="key">Key</label>
                             <input type="text" required name="key" [(ngModel)]="newData.key" #key="ngModel">
                         </div>
-                        <!-- Value -->
                         <div>
                             <label for="value">Value</label>
                             <input type="text" required name="value" [(ngModel)]="newData.value" #value="ngModel">
@@ -30,13 +25,11 @@
                     </form>
                 </div>
                 <div>
-                    <!-- Submit -->
                     <button type="button" data-dismiss="modal" (click)="addData()">Add</button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Existing data -->
     <h6>
         Data in DB :
     </h6>
@@ -66,7 +59,7 @@
             </div>
         </li>
     </ul>
-</div>
+</div> -->
 
 <div class="content">
 
@@ -77,8 +70,20 @@
 
     <section class="input_form">
         <p>main image</p>
+        <div style="text-align:center">
+            <div [innerHtml]='msg' *ngIf="msg"></div>
+            <div><img [src]="url" *ngIf="url"></div>
+            <p>
+                <input type="file" (change)="selectFile($event)">
+            </p>
+        </div>
+    </section>
+
+    <section class="input_form">
+        <p>imageURLs</p>
         <textarea type="e-mail" name=""></textarea>
     </section>
+
 
     <section class="input_form">
         <p>name</p>
@@ -102,14 +107,47 @@
                 <p>RUB</p>
                 <input type="e-mail" name="">
             </div>
+            <div>
+                <p>EUR</p>
+                <input type="e-mail" name="">
+            </div>
         </div>
-       
     </section>
 
     <section class="input_form">
-        <p>avaible size</p>
-        <!-- TO DO -->
-        <textarea type="e-mail" name=""></textarea>
+        <section class="title">
+            <h2>available sizes</h2>
+        </section>
+        <div class="input_form_price">
+            <div>
+                <p>xxs</p>
+                <input type="e-mail" name="">
+            </div>
+            <div>
+                <p>xs</p>
+                <input type="e-mail" name="">
+            </div>
+            <div>
+                <p>s</p>
+                <input type="e-mail" name="">
+            </div>
+            <div>
+                <p>m</p>
+                <input type="e-mail" name="">
+            </div>
+            <div>
+                <p>l</p>
+                <input type="e-mail" name="">
+            </div>
+            <div>
+                <p>xl</p>
+                <input type="e-mail" name="">
+            </div>
+            <div>
+                <p>xxl</p>
+                <input type="e-mail" name="">
+            </div>
+        </div>
     </section>
 
     <section class="input_form">
@@ -119,20 +157,15 @@
 
     <section class="input_form">
         <p>categories</p>
-        <textarea type="e-mail" name=""></textarea>
-    </section>
-
-    <section class="input_form">
-        <p>imageURLs</p>
+        <p>use space as separator</p>
         <textarea type="e-mail" name=""></textarea>
     </section>
 
 
-
-    <section  type="button" data-toggle="modal" data-target="#addDataModal" class="section_next_button">
+    <section type="button" data-toggle="modal" data-target="#addDataModal" class="section_next_button">
 
         <a>
-          <p>add</p>
+            <p>add</p>
         </a>
 
         <figure class="line"></figure>
