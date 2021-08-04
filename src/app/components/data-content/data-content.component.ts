@@ -10,40 +10,31 @@ import { DataService } from '../../services/data.service'
 export class DataContentComponent implements OnInit {
 
 
-  url: any;
-	msg = "";
-
+  mainImage: any;
 	selectFile(event: any) { 
-    
 		var reader = new FileReader();
 		reader.readAsDataURL(event.target.files[0]);
 		
 		reader.onload = (_event) => {
-			this.url = reader.result; 
+			this.mainImage = reader.result; 
 		}
 	}
 
-  selectedFiles?: FileList;
-  message: string[] = [];
-
-  previews: string[] = [];
-
+  productImages: string[] = [];
   selectFiles(event: any): void {
-    this.message = [];
-    this.selectedFiles = event.target.files;
+    let selectedFiles = event.target.files;
   
-    this.previews = [];
-    if (this.selectedFiles && this.selectedFiles[0]) {
-      const numberOfFiles = this.selectedFiles.length;
+    this.productImages = [];
+    if (selectedFiles && selectedFiles[0]) {
+      const numberOfFiles = selectedFiles.length;
       for (let i = 0; i < numberOfFiles; i++) {
         const reader = new FileReader();
   
         reader.onload = (e: any) => {
           console.log(e.target.result);
-          this.previews.push(e.target.result);
+          this.productImages.push(e.target.result);
         };
-  
-        reader.readAsDataURL(this.selectedFiles[i]);
+        reader.readAsDataURL(selectedFiles[i]);
       }
     }
   }

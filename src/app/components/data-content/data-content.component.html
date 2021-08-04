@@ -8,8 +8,7 @@
     <section class="input_form">
         <p>main image</p>
         <div>
-            <div [innerHtml]='msg' *ngIf="msg"></div>
-            <div><img class="preview" [src]="url" *ngIf="url"></div>
+            <div><img class="preview" [src]="mainImage" *ngIf="mainImage"></div>
             <p>
                 <input type="file" accept="image/*" (change)="selectFile($event)">
             </p>
@@ -28,7 +27,7 @@
         </div>
 
         <div>
-            <img *ngFor='let preview of previews' [src]="preview" class="preview">
+            <img *ngFor='let preview of productImages' [src]="preview" class="preview">
         </div>
     </section>
 
