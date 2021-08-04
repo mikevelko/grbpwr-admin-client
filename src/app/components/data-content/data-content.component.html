@@ -1,66 +1,3 @@
-<!-- <div>
-    <div role="group" aria-label="Basic example">
-        <button type="button" data-toggle="modal" data-target="#addDataModal">Add data</button>
-        <button type="button" (click)="getAllData()">Refresh</button>
-    </div>
-    <div id="addDataModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div role="document">
-            <div>
-                <div>
-                    <h5 id="exampleModalLabel">Add data into database</h5>
-                    <button type="button" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-                </div>
-                <div>
-                    <form>
-                        <div>
-                            <label for="key">Key</label>
-                            <input type="text" required name="key" [(ngModel)]="newData.key" #key="ngModel">
-                        </div>
-                        <div>
-                            <label for="value">Value</label>
-                            <input type="text" required name="value" [(ngModel)]="newData.value" #value="ngModel">
-                        </div>
-                    </form>
-                </div>
-                <div>
-                    <button type="button" data-dismiss="modal" (click)="addData()">Add</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <h6>
-        Data in DB :
-    </h6>
-    <ul>
-        <li>
-            <div>
-                <div>
-                    <h5>
-                        Key
-                    </h5>
-                </div>
-                <div>
-                    <h5>
-                        Value
-                    </h5>
-                </div>
-            </div>
-        </li>
-        <li *ngFor="let data of dataContent">
-            <div>
-                <div>
-                    {{data.key}}
-                </div>
-                <div>
-                    {{data.value}}
-                </div>
-            </div>
-        </li>
-    </ul>
-</div> -->
-
 <div class="content">
 
     <section class="title">
@@ -70,24 +7,35 @@
 
     <section class="input_form">
         <p>main image</p>
-        <div style="text-align:center">
+        <div>
             <div [innerHtml]='msg' *ngIf="msg"></div>
-            <div><img [src]="url" *ngIf="url"></div>
+            <div><img class="preview" [src]="url" *ngIf="url"></div>
             <p>
-                <input type="file" (change)="selectFile($event)">
+                <input type="file" accept="image/*" (change)="selectFile($event)">
             </p>
         </div>
     </section>
 
+
     <section class="input_form">
         <p>imageURLs</p>
-        <textarea type="e-mail" name=""></textarea>
+        <div class="row">
+            <div class="col-8">
+                <label class="btn btn-default p-0">
+                    <input type="file" accept="image/*" multiple (change)="selectFiles($event)" />
+                </label>
+            </div>
+        </div>
+
+        <div>
+            <img *ngFor='let preview of previews' [src]="preview" class="preview">
+        </div>
     </section>
 
 
     <section class="input_form">
         <p>name</p>
-        <textarea type="e-mail" name=""></textarea>
+        <textarea type="text" name=""></textarea>
     </section>
 
     <section class="input_form">
@@ -97,19 +45,19 @@
         <div class="input_form_price">
             <div>
                 <p>USD</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
             <div>
                 <p>BYN</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
             <div>
                 <p>RUB</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
             <div>
                 <p>EUR</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
         </div>
     </section>
@@ -121,44 +69,44 @@
         <div class="input_form_price">
             <div>
                 <p>xxs</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
             <div>
                 <p>xs</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
             <div>
                 <p>s</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
             <div>
                 <p>m</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
             <div>
                 <p>l</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
             <div>
                 <p>xl</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
             <div>
                 <p>xxl</p>
-                <input type="e-mail" name="">
+                <input type="text" name="">
             </div>
         </div>
     </section>
 
     <section class="input_form">
         <p>description</p>
-        <textarea type="e-mail" name=""></textarea>
+        <textarea type="text" name=""></textarea>
     </section>
 
     <section class="input_form">
         <p>categories</p>
         <p>use space as separator</p>
-        <textarea type="e-mail" name=""></textarea>
+        <textarea type="text" name=""></textarea>
     </section>
 
 

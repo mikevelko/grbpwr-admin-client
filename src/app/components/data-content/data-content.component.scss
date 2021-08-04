@@ -1,5 +1,10 @@
 @use 'sass:math';
 @import 'src/scss/common.scss';
+.preview,
+.previews {
+    max-width: 400px;
+}
+
 .content {
     width: math.div(950, 1441);
     margin: 80px auto 80px auto;
