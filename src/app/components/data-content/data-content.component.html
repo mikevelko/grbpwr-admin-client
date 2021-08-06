@@ -36,7 +36,7 @@
 
         <section class="input_form">
             <h2>name</h2>
-            <input type="text" formControlName="productName" id="productName">
+            <input type="text" formControlName="name" id="productName">
         </section>
 
         <section class="input_form">
@@ -46,19 +46,19 @@
             <div class="input_form_multiple_row">
                 <div>
                     <p>USD</p>
-                    <input type="number" formControlName="USD" id="USD">
+                    <input type="number" formControlName="usd" id="usd">
                 </div>
                 <div>
                     <p>BYN</p>
-                    <input type="number" formControlName="BYN" id="BYN">
+                    <input type="number" formControlName="byn" id="byn">
                 </div>
                 <div>
                     <p>RUB</p>
-                    <input type="number" formControlName="RUB" id="RUB">
+                    <input type="number" formControlName="rub" id="rub">
                 </div>
                 <div>
                     <p>EUR</p>
-                    <input type="number" formControlName="EUR" id="EUR">
+                    <input type="number" formControlName="eur" id="eur">
                 </div>
             </div>
         </section>
@@ -96,6 +96,10 @@
                     <p>xxl</p>
                     <input type="number" formControlName="xxl" id="xxl">
                 </div>
+                <div>
+                    <p>os</p>
+                    <input type="number" formControlName="os" id="os">
+                </div>
             </div>
         </section>
 
@@ -114,7 +118,7 @@
         <section type="button" data-toggle="modal" data-target="#addDataModal" class="section_next_button">
 
             <a>
-                <p>add</p>
+                <p (click)="OnSubmit()" >add</p>
             </a>
 
             <figure class="line"></figure>
