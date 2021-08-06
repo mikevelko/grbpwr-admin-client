@@ -4,118 +4,123 @@
         <h2>grb admin panel</h2>
     </section>
 
+    {{addProductForm.value|json}}
 
-    <section class="input_form">
-        <p>main image</p>
-        <div>
-            <div><img class="preview" [src]="mainImage" *ngIf="mainImage"></div>
-            <p>
-                <input type="file" accept="image/*" (change)="selectFile($event)">
-            </p>
-        </div>
-    </section>
+    <form [formGroup]="addProductForm">
+        <section class="input_form">
+            <h2>main image</h2>
+            <div>
+                <div><img class="preview" [src]="mainImage" *ngIf="mainImage"></div>
+                <p>
+                    <input type="file" formControlName="mainImage" id="mainImage" accept="image/*" (change)="selectFile($event)">
+                </p>
+            </div>
+        </section>
 
 
-    <section class="input_form">
-        <p>imageURLs</p>
-        <div class="row">
-            <div class="col-8">
-                <label class="btn btn-default p-0">
-                    <input type="file" accept="image/*" multiple (change)="selectFiles($event)" />
+        <section class="input_form">
+            <h2>imageURLs</h2>
+            <div class="row">
+                <div class="col-8">
+                    <label class="btn btn-default p-0">
+                    <input type="file" formControlName="productImages" id="productImages" accept="image/*" multiple (change)="selectFiles($event)" />
                 </label>
+                </div>
             </div>
-        </div>
 
-        <div>
-            <img *ngFor='let preview of productImages' [src]="preview" class="preview">
-        </div>
-    </section>
-
-
-    <section class="input_form">
-        <p>name</p>
-        <textarea type="text" name=""></textarea>
-    </section>
-
-    <section class="input_form">
-        <section class="title">
-            <h2>price</h2>
+            <div>
+                <img *ngFor='let preview of productImages' [src]="preview" class="preview">
+            </div>
         </section>
-        <div class="input_form_price">
-            <div>
-                <p>USD</p>
-                <input type="text" name="">
-            </div>
-            <div>
-                <p>BYN</p>
-                <input type="text" name="">
-            </div>
-            <div>
-                <p>RUB</p>
-                <input type="text" name="">
-            </div>
-            <div>
-                <p>EUR</p>
-                <input type="text" name="">
-            </div>
-        </div>
-    </section>
 
-    <section class="input_form">
-        <section class="title">
-            <h2>available sizes</h2>
+
+        <section class="input_form">
+            <h2>name</h2>
+            <input type="text" formControlName="productName" id="productName">
         </section>
-        <div class="input_form_price">
-            <div>
-                <p>xxs</p>
-                <input type="text" name="">
-            </div>
-            <div>
-                <p>xs</p>
-                <input type="text" name="">
-            </div>
-            <div>
-                <p>s</p>
-                <input type="text" name="">
-            </div>
-            <div>
-                <p>m</p>
-                <input type="text" name="">
-            </div>
-            <div>
-                <p>l</p>
-                <input type="text" name="">
-            </div>
-            <div>
-                <p>xl</p>
-                <input type="text" name="">
-            </div>
-            <div>
-                <p>xxl</p>
-                <input type="text" name="">
-            </div>
-        </div>
-    </section>
 
-    <section class="input_form">
-        <p>description</p>
-        <textarea type="text" name=""></textarea>
-    </section>
+        <section class="input_form">
+            <section class="title">
+                <h2>price</h2>
+            </section>
+            <div class="input_form_multiple_row">
+                <div>
+                    <p>USD</p>
+                    <input type="number" formControlName="USD" id="USD">
+                </div>
+                <div>
+                    <p>BYN</p>
+                    <input type="number" formControlName="BYN" id="BYN">
+                </div>
+                <div>
+                    <p>RUB</p>
+                    <input type="number" formControlName="RUB" id="RUB">
+                </div>
+                <div>
+                    <p>EUR</p>
+                    <input type="number" formControlName="EUR" id="EUR">
+                </div>
+            </div>
+        </section>
 
-    <section class="input_form">
-        <p>categories</p>
-        <p>use space as separator</p>
-        <textarea type="text" name=""></textarea>
-    </section>
+        <section class="input_form">
+            <section class="title">
+                <h2>available sizes</h2>
+            </section>
+            <div class="input_form_multiple_row">
+                <div>
+                    <p>xxs</p>
+                    <input type="number" formControlName="xxs" id="xxs">
+                </div>
+                <div>
+                    <p>xs</p>
+                    <input type="number" formControlName="xs" id="xs">
+                </div>
+                <div>
+                    <p>s</p>
+                    <input type="number" formControlName="s" id="s">
+                </div>
+                <div>
+                    <p>m</p>
+                    <input type="number" formControlName="m" id="m">
+                </div>
+                <div>
+                    <p>l</p>
+                    <input type="number" formControlName="l" id="l">
+                </div>
+                <div>
+                    <p>xl</p>
+                    <input type="number" formControlName="xl" id="xl">
+                </div>
+                <div>
+                    <p>xxl</p>
+                    <input type="number" formControlName="xxl" id="xxl">
+                </div>
+            </div>
+        </section>
+
+        <section class="input_form">
+            <h2>description</h2>
+            <input type="text" formControlName="description" id="description">
+        </section>
+
+        <section class="input_form">
+            <h2>categories</h2>
+            <p>use space as separator</p>
+            <input type="text" formControlName="categories" id="categories">
+        </section>
 
 
-    <section type="button" data-toggle="modal" data-target="#addDataModal" class="section_next_button">
+        <section type="button" data-toggle="modal" data-target="#addDataModal" class="section_next_button">
 
-        <a>
-            <p>add</p>
-        </a>
+            <a>
+                <p>add</p>
+            </a>
 
-        <figure class="line"></figure>
+            <figure class="line"></figure>
 
-    </section>
+        </section>
+
+    </form>
+
 </div>
