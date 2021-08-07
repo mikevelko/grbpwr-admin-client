@@ -47,4 +47,4 @@ jobs:
       - name: Delete previous version
         run: sudo sshpass -v -p '${{ secrets.SSH_PASS }}' -v  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -rf /var/www/admin.grbpwr.com/html/*'
       - name: Deploy production
-        run: sshpass -v -p '${{ secrets.SSH_PASS }}' scp -v -o stricthostkeychecking=no -r ./dist/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/admin.grbpwr.com/html
+        run: sshpass -v -p '${{ secrets.SSH_PASS }}' scp -v -o stricthostkeychecking=no -r ./dist/grb-admin/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/admin.grbpwr.com/html
