@@ -3,18 +3,21 @@ import {  FormBuilder, FormGroup,  Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import {AddProductRequest ,AvailableSizes ,Price,Convert} from 'src/app/models/products';
 // Services
-import { DataService } from '../../services/data.service'
+import { DataService } from '../../services/data.service';
 
 @Component({
   selector: 'app-data-content',
   templateUrl: './data-content.component.html',
   styleUrls: ['./data-content.component.scss']
 })
-export class DataContentComponent implements OnInit {
 
+export class DataContentComponent implements OnInit {
   sizes : AvailableSizes 
   price : Price
-  requestBody: AddProductRequest 
+  requestBody: AddProductRequest
+
+  add = 'ADD';
+
 
   addProductForm: FormGroup;
   user:any;
@@ -81,8 +84,9 @@ export class DataContentComponent implements OnInit {
 
   resp: any
   OnSubmit(event: any): void {
+    this.add = 'DONE';
     alert( JSON.stringify(Convert.ProductFormToAddProductRequest(this.addProductForm.value,this.productImages,this.mainImage)))
-
+    
     // this.http.post<any>('http://localhost:8080/product', this.requestBody).subscribe(data => {
     //   this.resp= data.id;
     // })

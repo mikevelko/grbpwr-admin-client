@@ -1,0 +1,17 @@
+@import '../main.scss';
+header {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: solid 2px #000;
+    a {
+        padding: 0px 40px;
+        color: #000;
+        p {
+            font-size: 22px;
+            font-weight: 500;
+        }
+    }
+}

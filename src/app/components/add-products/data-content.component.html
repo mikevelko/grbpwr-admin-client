@@ -4,7 +4,7 @@
         <h2>grb admin panel</h2>
     </section>
 
-    {{addProductForm.value|json}}
+    <!-- {{addProductForm.value|json}} -->
 
     <form [formGroup]="addProductForm">
         <section class="input_form">
@@ -16,7 +16,6 @@
                 </p>
             </div>
         </section>
-
 
         <section class="input_form">
             <h2>imageURLs</h2>
@@ -44,22 +43,22 @@
                 <h2>price</h2>
             </section>
             <div class="input_form_multiple_row">
-                <div>
-                    <p>USD</p>
+                <section>
+                    <label for="usd"><p>USD</p></label>
                     <input type="number" formControlName="usd" id="usd">
-                </div>
-                <div>
+                </section>
+                <section>
                     <p>BYN</p>
                     <input type="number" formControlName="byn" id="byn">
-                </div>
-                <div>
+                </section>
+                <section>
                     <p>RUB</p>
                     <input type="number" formControlName="rub" id="rub">
-                </div>
-                <div>
+                </section>
+                <section>
                     <p>EUR</p>
                     <input type="number" formControlName="eur" id="eur">
-                </div>
+                </section>
             </div>
         </section>
 
@@ -118,7 +117,7 @@
         <section type="button" data-toggle="modal" data-target="#addDataModal" class="section_next_button">
 
             <a>
-                <p (click)="OnSubmit()" >add</p>
+                <p (click)="OnSubmit()">{{add}}</p>
             </a>
 
             <figure class="line"></figure>
