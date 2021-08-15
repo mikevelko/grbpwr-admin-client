@@ -23,7 +23,6 @@ const AppRoutes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    // NavbarComponent,
     DataContentComponent,
     ProductComponent,
     HeaderComponent

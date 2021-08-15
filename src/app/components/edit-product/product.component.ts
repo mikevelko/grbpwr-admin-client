@@ -11,15 +11,16 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./product.scss']
 })
 export class ProductComponent implements OnInit {
-  
 
-  constructor(
-) {
+
+  constructor() {
 
   }
+  
 
   ngOnInit() {
-    
+
   }
 
 }
+
