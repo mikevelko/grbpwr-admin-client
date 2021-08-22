@@ -1,3 +1,33 @@
 <div class="content">
-  <p>KEK</p>
+  <div class="product-content" *ngFor="let product of products">
+    <section class="row-conteiner">
+      <div>
+        <p class="header">{{product.name}}</p>
+        <p class="description"><strong>Description</strong> : {{product.description}}</p>
+      </div>
+      <img class="product-main-img" src={{product.mainImage}} alt="">
+    </section>
+    <section class="product-img-container">
+      <img class="product-img" src={{product.productImages}} alt="">
+    </section>
+    <p class="categories"><strong>Categories</strong> : {{product.categories}}</p>
+      <div class="row-conteiner">
+        <section class="product-price">
+          <p>USD : {{product.price.usd}}</p>
+          <p>BYN : {{product.price.byn}}</p>
+          <p>EUR : {{product.price.eur}}</p>
+          <p>RUB : {{product.price.rub}}</p>
+        </section>
+        <section class="product-size">
+          <p>XXS : {{product.availableSizes.xxs || 0}}</p>
+          <p>XS : {{product.availableSizes.xs || 0}}</p>
+          <p>S : {{product.availableSizes.s || 0}}</p>
+          <p>M : {{product.availableSizes.m || 0}}</p>
+          <p>L : {{product.availableSizes.l || 0}}</p>
+          <p>XL : {{product.availableSizes.xl || 0}}</p>
+          <p>XXL : {{product.availableSizes.xxl || 0}}</p>
+          <p>OX : {{product.availableSizes.os || 0}}</p>
+        </section>
+      </div>
+  </div>
 </div>

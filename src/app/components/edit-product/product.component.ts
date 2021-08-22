@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { APIResponse } from '../../models/APIResponse'
-import { environment } from '../../../environments/environment';
+import { ApiService } from '../../services/api.service'
+import { Products } from "../../models/products"
+
 
 @Component({
   selector: 'app-product',
@@ -11,16 +9,20 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./product.scss']
 })
 export class ProductComponent implements OnInit {
-
-
-  constructor() {
-
-  }
+  public products: Products[];
+    
   
-
-  ngOnInit() {
-
-  }
-
+  
+    constructor(private apiServer : ApiService) {
+      
+    }
+  
+    ngOnInit() {
+      this.apiServer.getProduct().subscribe(res => {
+           this.products = res;
+       });
+    
+    }
+  
 }
 

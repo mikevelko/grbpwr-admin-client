@@ -1,2 +1,57 @@
-@import '../main.scss'
+@import '../main.scss';
 
+
+.product-content {
+    margin-bottom: 40px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+    padding: 20px 0px;
+    position: relative;
+    border-bottom: black solid 2px;
+
+    .header {
+        font-size: 36px;
+        font-weight: 600;
+        padding: 10px 0px;
+    }
+    .row-conteiner {
+        display: flex;
+        justify-content: space-between;
+        .product-price {
+            p {
+                padding: 5px 0px;
+            }
+        }
+        .product-size {
+            p {
+                padding: 5px 0px;
+            }
+        }
+    }
+    
+    .description {
+        padding: 10px 0px;
+    }
+    
+    .product-main-img {
+        width:200px;
+    }
+    
+    .product-img-container {
+        display: flex;
+    
+    }
+    
+    .product-img {
+        width: 100px;
+    }
+    
+    .categories {
+        padding: 20px 0px;
+    }
+    
+    .product-price {
+    
+    }
+}
