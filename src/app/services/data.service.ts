@@ -47,7 +47,7 @@ export class DataService {
     return this.http.get<APIResponse>(this.serverURL+'/product')
   }
 
-  modifyProductsById(data:any, size):Observable<APIResponse> {
+  modifyProductsById(data:any):Observable<APIResponse> {
     return this.http.put<APIResponse>(this.serverURL+'/product',data,httpOptions)
   }
 

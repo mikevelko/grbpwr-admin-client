@@ -11,6 +11,7 @@ import { Products } from "../../models/products"
 export class ProductComponent implements OnInit {
   public products: Products[];
   public search: string;
+  confirmDelete : boolean = false;
 
   constructor(private apiServer : ApiService, private dataServer : DataService) {
   }
@@ -21,12 +22,23 @@ export class ProductComponent implements OnInit {
     });
   }
 
-  incremetn(item : Products, size) {
-    this.apiServer.modifyProductsById(item, size + 1)
+  setConfirmDelete() {
+    this.confirmDelete = !this.confirmDelete
   }
-  decrement(item : Products, size) {
+
+  deleteProduct(id) {
+    console.log(id)
+    //раскомитить что бы удалить
+    //this.dataServer.deleteProductById(id)
+  }
+
+  //wip
+  incremetn(id, size) {
+    this.apiServer.modifyProductsById(id, size + 1)
+  }
+  decrement(id : Products, size) {
     if (size > 0)
-    this.apiServer.modifyProductsById(item, size - 1)
+    this.apiServer.modifyProductsById(id, size - 1)
   }
 
 }

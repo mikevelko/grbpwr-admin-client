@@ -6,6 +6,12 @@ import { environment } from '../../../src/environments/environment';
 import { Products } from '../models/products'
 
 
+const httpOptions = {
+  headers: new HttpHeaders({
+    'Content-Type':  'application/json'
+  })
+};
+
 @Injectable({providedIn:'root'})
 export class ApiService {
 
@@ -21,8 +27,11 @@ export class ApiService {
   return this.http.get<Products[]>(this.baseURL + 'product')
   }
 
-  modifyProductsById(data:any, size):Observable<Products[]> {
-    return this.http.put<Products[]>(this.baseURL+'/product',data)
+  modifyProductsById(id, size):Observable<Products[]> {
+    return this.http.put<Products[]>(this.baseURL+'/product' + id, size)
+  }
+  deleteProductById(id:string):Observable<Products> {
+    return this.http.delete<Products>(this.baseURL+'/product/'+id,httpOptions)
   }
  
   public AddProduct(product:AddProductRequest): Observable<any> {

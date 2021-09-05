@@ -48,6 +48,20 @@
             }
         }
     }
+
+    .delete-button {
+        p {
+            cursor: pointer;
+        }
+    }
+    .delete-confirm {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        p {
+            cursor: pointer;
+        }
+    }
     
     .description {
         padding: 10px 0px;
