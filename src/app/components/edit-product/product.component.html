@@ -22,14 +22,34 @@
           <p>RUB : {{product.price.rub}}</p>
         </section>
         <section class="product-size">
-          <p>XXS : {{product.availableSizes.xxs || 0}}</p>
-          <p>XS : {{product.availableSizes.xs || 0}}</p>
-          <p>S : {{product.availableSizes.s || 0}}</p>
-          <p>M : {{product.availableSizes.m || 0}}</p>
-          <p>L : {{product.availableSizes.l || 0}}</p>
-          <p>XL : {{product.availableSizes.xl || 0}}</p>
-          <p>XXL : {{product.availableSizes.xxl || 0}}</p>
-          <p>OX : {{product.availableSizes.os || 0}}</p>
+          <div class="row">
+            <p (click)="decrement(product, product.availableSizes.xxs)" class="change-amound">-</p>
+            <p>XXS : {{product.availableSizes.xxs || 0}}</p>
+            <p (click)="incremetn(product, product.availableSizes.xxs)" class="change-amound">+</p>
+          </div>
+          <div class="row">
+            <p>XS : {{product.availableSizes.xs || 0}}</p>
+          </div>
+          <div class="row">
+            <p>S : {{product.availableSizes.s || 0}}</p>
+          </div>
+          <div class="row">
+            <p>M : {{product.availableSizes.m || 0}}</p>
+          </div>
+          <div class="row">
+            <p>L : {{product.availableSizes.l || 0}}</p>
+          </div>
+          <div class="row">
+            <p>XL : {{product.availableSizes.xl || 0}}</p>
+          </div>
+          <div class="row">
+            <p>XXL : {{product.availableSizes.xxl || 0}}</p>
+          </div>
+          <div class="row">
+            <p onclick="decremetn(product.availableSizes.os)" class="change-amound">-</p>
+            <p>OX : {{product.availableSizes.os || 0}}</p>
+            <p onclick="incremetn(product.availableSizes.os)" class="change-amound">+</p>
+          </div>
         </section>
       </div>
     </div>

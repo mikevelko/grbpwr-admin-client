@@ -33,6 +33,16 @@
             }
         }
         .product-size {
+            .row {
+                width: 170px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .change-amound {
+                    font-size: 30px;
+                    cursor: pointer;
+                }
+            }
             p {
                 padding: 5px 0px;
             }

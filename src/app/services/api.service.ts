@@ -4,9 +4,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../src/environments/environment';
 import { Products } from '../models/products'
- 
+
+
 @Injectable({providedIn:'root'})
 export class ApiService {
+
+  
  
   baseURL = environment.API_SERVER_URL ? environment.API_SERVER_URL :  "http://localhost:8081/"
  
@@ -16,6 +19,10 @@ export class ApiService {
   getProduct(): Observable<Products[]> {
   console.log('getProduct '+this.baseURL + 'product')
   return this.http.get<Products[]>(this.baseURL + 'product')
+  }
+
+  modifyProductsById(data:any, size):Observable<Products[]> {
+    return this.http.put<Products[]>(this.baseURL+'/product',data)
   }
  
   public AddProduct(product:AddProductRequest): Observable<any> {
