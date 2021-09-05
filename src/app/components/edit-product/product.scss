@@ -1,6 +1,15 @@
 @import '../main.scss';
 
 
+.input-search {
+    outline-offset: none;
+    outline: none;
+    border: 1px solid #000;
+    width: 40%;
+    height: 10px;
+    padding: 12px;
+}
+
 .product-content {
     margin-bottom: 40px;
     margin-left: auto;
@@ -49,9 +58,5 @@
     
     .categories {
         padding: 20px 0px;
-    }
-    
-    .product-price {
-    
     }
 }

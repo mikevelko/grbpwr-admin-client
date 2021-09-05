@@ -1,16 +1,19 @@
 <div class="content">
-  <div class="product-content" *ngFor="let product of products">
-    <section class="row-conteiner">
-      <div>
-        <p class="header">{{product.name}}</p>
-        <p class="description"><strong>Description</strong> : {{product.description}}</p>
-      </div>
-      <img class="product-main-img" src={{product.mainImage}} alt="">
-    </section>
-    <section class="product-img-container">
-      <img class="product-img" src={{product.productImages}} alt="">
-    </section>
-    <p class="categories"><strong>Categories</strong> : {{product.categories}}</p>
+  <label for="search"><p>Search</p></label>
+  <input [(ngModel)]="search" class="input-search" id="search" type="text">
+  <div *ngFor="let product of products" >
+    <div class="product-content" *ngIf="product.name.toLowerCase().match(search)">
+      <section class="row-conteiner">
+        <div>
+          <p class="header">{{product.name}}</p>
+          <p class="description"><strong>Description</strong> : {{product.description}}</p>
+        </div>
+        <img class="product-main-img" src={{product.mainImage}} alt="">
+      </section>
+      <section class="product-img-container">
+        <img class="product-img" src={{product.productImages}} alt="">
+      </section>
+      <p class="categories"><strong>Categories</strong> : {{product.categories}}</p>
       <div class="row-conteiner">
         <section class="product-price">
           <p>USD : {{product.price.usd}}</p>
@@ -29,5 +32,6 @@
           <p>OX : {{product.availableSizes.os || 0}}</p>
         </section>
       </div>
+    </div>
   </div>
 </div>
