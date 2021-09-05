@@ -122,6 +122,7 @@ export class DataContentComponent implements OnInit {
         this.addResponse = JSON.stringify(data)
         console.log(data)
       })   
+      this.add = "DONE"
     }
   }
 

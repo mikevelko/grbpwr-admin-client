@@ -117,14 +117,13 @@
         <section type="button" data-toggle="modal" data-target="#addDataModal" class="section_next_button">
 
             <a>
-                <button (click)="addProduct()">add</button>
+                <p (click)="addProduct()">{{add}}</p>
             </a>
 
             <figure class="line"></figure>
 
         </section>
         {{addResponse|json}}
-
     </form>
 
 </div>
