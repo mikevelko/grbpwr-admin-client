@@ -32,13 +32,13 @@ export class ProductComponent implements OnInit {
     //this.dataServer.deleteProductById(id)
   }
 
-  //wip
-  incremetn(id, size) {
-    this.apiServer.modifyProductsById(id, size + 1)
-  }
-  decrement(id : Products, size) {
-    if (size > 0)
-    this.apiServer.modifyProductsById(id, size - 1)
-  }
+  // //wip
+  // incremetn(id, size) {
+  //   this.apiServer.modifyProductsById(id, size + 1)
+  // }
+  // decrement(id : Products, size) {
+  //   if (size > 0)
+  //   this.apiServer.modifyProductsById(id, size - 1)
+  // }
 
 }

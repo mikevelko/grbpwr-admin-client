@@ -14,10 +14,16 @@ import { DataContentComponent } from './components/add-products/data-content.com
 import { DataService } from './services/data.service';
 import { ProductComponent } from './components/edit-product/product.component';
 import { HeaderComponent } from './components/header/header.component'
+import { LoginComponent } from './components/login/login.component';
+
+// Helpers
+import { AuthGuard } from './helpers/auth.guard';
+
 
 const AppRoutes: Routes = [
-  {path: '', component:DataContentComponent},
-  {path: 'product', component:ProductComponent},
+  {path: '', component:DataContentComponent, canActivate: [AuthGuard] },
+  {path: 'product', component: ProductComponent, canActivate: [AuthGuard] },
+  {path: 'login', component:LoginComponent},
 ]
  
 @NgModule({
@@ -25,6 +31,7 @@ const AppRoutes: Routes = [
     AppComponent,
     DataContentComponent,
     ProductComponent,
+    LoginComponent,
     HeaderComponent
   ],
   imports: [
