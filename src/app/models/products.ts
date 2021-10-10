@@ -1,3 +1,25 @@
+export class Products{
+    constructor(
+        public name:           string = '',
+        public description:    string = '',
+        public mainImage:      string = '',
+        public productImages:  string[] = [],
+        public categories:     string[] = [],
+        public price:          Price= new Price(),
+        public availableSizes: AvailableSizes = new AvailableSizes()
+    ) {}
+}
+
+export interface Products{
+    name:           string;
+    description:    string;
+    mainImage:      string;
+    productImages:  string[];
+    categories:     string[];
+    price:          Price;
+    availableSizes: AvailableSizes;
+    
+}
 export class AddProductRequest {
     constructor(
       public name: string = '',
@@ -9,6 +31,7 @@ export class AddProductRequest {
       public availableSizes: AvailableSizes = new AvailableSizes(),
     ) { }
 }
+
 
 export interface AddProductRequest {
     name:           string;

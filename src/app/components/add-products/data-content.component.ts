@@ -1,24 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import {  FormBuilder, FormGroup,  Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {AddProductRequest ,AvailableSizes ,Price,Convert} from 'src/app/models/products';
 // Services
-import { DataService } from '../../services/data.service'
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-data-content',
   templateUrl: './data-content.component.html',
   styleUrls: ['./data-content.component.scss']
 })
-export class DataContentComponent implements OnInit {
 
+export class DataContentComponent implements OnInit {
   sizes : AvailableSizes 
   price : Price
-  requestBody: AddProductRequest 
+  requestBody: AddProductRequest
+
+  add = 'ADD';
+
 
   addProductForm: FormGroup;
+  
   user:any;
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private apiService: ApiService) {
    this.addProductForm = fb.group({
       mainImage : ['', Validators.required],
       productImages: ['', Validators.required],
@@ -78,13 +81,50 @@ export class DataContentComponent implements OnInit {
     }
   }
 
-
-  resp: any
-  OnSubmit(event: any): void {
-    alert( JSON.stringify(Convert.ProductFormToAddProductRequest(this.addProductForm.value,this.productImages,this.mainImage)))
-
-    // this.http.post<any>('http://localhost:8080/product', this.requestBody).subscribe(data => {
-    //   this.resp= data.id;
-    // })
+  addResponse: string = ""
+  getRequestFromForm() {
+    return Convert.ProductFormToAddProductRequest(this.addProductForm.value,this.productImages,this.mainImage)
   }
+  validateAddProductRequest(prd :AddProductRequest) {
+    if (prd.mainImage == "") {
+      alert("set main image")
+      return false
+    }
+    if (prd.productImages.length == 0) {
+      alert("set product images")
+      return false
+    }
+    if (prd.name.length == 0) {
+      alert("set name")
+      return false
+    }
+    if (prd.price.usd == 0 || prd.price.byn == 0 || prd.price.eur == 0 || prd.price.rub == 0 ) {
+      alert("set correct prices for product")
+      return false
+    }
+    if (prd.categories.length == 0) {
+      alert("set categories")
+      return false
+    }
+    if (prd.categories.length == 0) {
+      alert("set categories")
+      return false
+    }
+    return true
+
+  }
+
+  addProduct() {
+    let prd = this.getRequestFromForm()
+    if (this.validateAddProductRequest(prd)) {
+      this.apiService.AddProduct(prd)
+      .subscribe(data => {
+        this.addResponse = JSON.stringify(data)
+        console.log(data)
+      })   
+      this.add = "DONE"
+    }
+  }
+
+
 }

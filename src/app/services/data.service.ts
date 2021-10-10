@@ -21,6 +21,8 @@ export class DataService {
     private http : HttpClient
   ) { }
 
+
+
   // getAllData():Observable<APIResponse> {
   //   return this.http.get<APIResponse>(this.serverURL+'/getAllData')
   // }
