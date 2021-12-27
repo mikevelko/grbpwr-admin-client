@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  API_SERVER_URL: "https://backend.grbpwr.com/api/",
+  API_SERVER_URL: "https://backend.grbpwr.com/",
 };
 
 /*
