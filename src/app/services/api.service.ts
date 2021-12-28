@@ -52,7 +52,7 @@ export class ApiService {
     }  
     const body=JSON.stringify(product);
     console.log(body)
-    return this.http.post(this.baseURL + 'product', body,{'headers':headers})
+    return this.http.post(this.apiURL+'/product', body,{'headers':headers})
   }
  
 }
