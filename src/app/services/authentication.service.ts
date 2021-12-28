@@ -25,6 +25,13 @@ export class AuthenticationService {
 
     }
 
+    public  getTokenHeader() :string {
+        let t = this.getTokenWithExpiry()
+        let tokenHeader = "Bearer " + t.accessToken 
+        return tokenHeader
+     }
+
+
     public get currentSessionValue(): Token {
         return this.currentSessionSubject.value;
     }
@@ -91,6 +98,7 @@ export class AuthenticationService {
         let token: Token = {accessToken:item.value.accessToken, refreshToken:item.value.refreshToken};
         return token
     }
+
     addMinutes(minutes: number) {
         const now = new Date()
         return new Date(now.getTime() + minutes*60000);
