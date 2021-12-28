@@ -39,10 +39,10 @@ export class ApiService {
   }
 
   modifyProductsById(id, size):Observable<Products[]> {
-    return this.http.put<Products[]>(this.apiURL+'/product' + id, size,httpOptions)
+    return this.http.put<Products[]>(this.apiURL+'product' + id, size,httpOptions)
   }
   deleteProductById(id:string):Observable<Products> {
-    return this.http.delete<Products>(this.apiURL+'/product/'+id, httpOptions)
+    return this.http.delete<Products>(this.apiURL+'product/'+id, httpOptions)
   }
  
   public AddProduct(product:AddProductRequest): Observable<any> {
@@ -52,7 +52,7 @@ export class ApiService {
     }  
     const body=JSON.stringify(product);
     console.log(body)
-    return this.http.post(this.apiURL+'/product', body,{'headers':headers})
+    return this.http.post(this.apiURL+'product', body,{'headers':headers})
   }
  
 }
