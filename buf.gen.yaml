@@ -1,0 +1,6 @@
+version: v1beta1
+plugins:
+  - name: typescript-http
+    out: src/api/proto-http
+    opt:
+      - paths=source_relative
