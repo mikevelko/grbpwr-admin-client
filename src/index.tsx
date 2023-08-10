@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ContextProvider } from 'context';
 
 import { ROUTES } from 'constants/routes';
-import { NftListPage } from 'pages/NftListPage';
+// import { NftListPage } from 'pages/NftListPage';
 import Test2 from 'pages/Test2';
 // import { Sidebar } from 'components/Sidebar';
 import { LoginBlock } from 'components/LoginBlock';
@@ -19,7 +19,7 @@ const root = createRoot(container!);
 const queryClient = new QueryClient();
 const location = new ReactLocation();
 const routes: Route<DefaultGenerics>[] = [
-  { path: ROUTES.home, element: <NftListPage /> },
+  // { path: ROUTES.home, element: <NftListPage /> },
   { path: ROUTES.nftRequests, element: <Test2 /> },
 ];
 
@@ -43,7 +43,7 @@ root.render(
             {/* </div> */}
           </section>
           <footer className={styles.footer}>
-            Copyright © 2022 - {new Date().getFullYear()}. All Rights Reserved
+            {/* Copyright © 2022 - {new Date().getFullYear()}. All Rights Reserved */}
           </footer>
           {process.env.NODE_ENV === 'development' ? (
             <div style={{ padding: 0 }}>
