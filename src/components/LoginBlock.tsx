@@ -1,10 +1,13 @@
 import { FC, useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
-
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { login } from 'api';
+import { ROUTES } from 'constants/routes';
+
 import styles from 'styles/login-block.module.scss';
 
+
 export const LoginBlock: FC = () => {
+  const queryClient = useQueryClient();
   const [isModalOpen, setModalVisability] = useState(false);
   const [password, setPassword] = useState('');
   const { mutate, data } = useMutation(login);
@@ -19,10 +22,22 @@ export const LoginBlock: FC = () => {
     setModalVisability((v) => !v);
   };
 
-  const handlePasswordSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handlePasswordSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    mutate(password);
-    toggleModal();
+    try {
+      await mutate(password, {
+        onSuccess: (data) => {
+          if (data.authToken) {
+            localStorage.setItem('authToken', data.authToken);
+            // Redirect to the main page
+            location.href = ROUTES.main;
+          }
+        },
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      // Handle login error, e.g., display an error message to the user
+    }
   };
 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -30,22 +45,24 @@ export const LoginBlock: FC = () => {
   };
 
   return (
-    <div className={styles.loginBlock}>
-      <button onClick={toggleModal}>Login</button>
-      {isModalOpen && (
+    <div>
+      {/* <button onClick={toggleModal}>Login</button> */}
+      {/* {isModalOpen && ( */}
         <>
-          <div className={styles.loginModal}>
-            <div className={styles.close} onClick={toggleModal}>
-              close modal
+          {/* <div className={styles.loginModal}> */}
+            <h4 className='card_header'>login</h4>
+            <div className="card_body">
+              <form onSubmit={handlePasswordSubmit}>
+                <div>
+                  <label htmlFor="pswrd">Password</label>
+                  <input onChange={handlePasswordChange} type='password' name='pswrd' />
+                </div>
+                <button type='submit'>login</button>
+              </form>
             </div>
-            <form onSubmit={handlePasswordSubmit}>
-              <input onChange={handlePasswordChange} type='password' placeholder='password' />
-              <button type='submit'>login</button>
-            </form>
-          </div>
-          <div className={styles.overlay}></div>
+          {/* </div> */}
         </>
-      )}
+      {/* )} */}
     </div>
   );
 };
