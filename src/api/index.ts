@@ -23,14 +23,14 @@ const getAuthHeaders = (authToken: string) => ({
   'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
 });
 
-export function login(password: string): Promise<LoginResponse> {
+export function login(username: string, password: string): Promise<LoginResponse> {
   const authClient = createAuthClient(({ path, body }: RequestType): Promise<LoginResponse> => {
     return axios
       .post<LoginRequest, AxiosResponse<LoginResponse>>(path, body && JSON.parse(body))
       .then((response) => response.data);
   });
 
-  return authClient.Login({ password });
+  return authClient.Login({ username, password });
 }
 
 // TODO: investigate
