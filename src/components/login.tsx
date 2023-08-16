@@ -25,36 +25,39 @@ export const LoginBlock: FC = () => {
       password: password,
     };
 
-  //   try {
-  //     const response = await axios.post('http://backend.grbpwr.com/auth/login', requestData);
-  //     console.log('Login response:', response.data);
-  //     // Handle the response data here
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //     // Handle error
-  //   }
-  // };
+    //   try {
+    //     const response = await axios.post('http://backend.grbpwr.com/auth/login', requestData);
+    //     console.log('Login response:', response.data);
+    //     // Handle the response data here
+    //   } catch (error) {
+    //     console.error('Error:', error);
+    //     // Handle error
+    //   }
+    // };
 
-  try {
-    const response = await fetch('http://backend.grbpwr.com:8081/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestData)
-    });
+    try {
+      const response = await fetch('http://backend.grbpwr.com:8081/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      })
 
-   
-    if (response.ok) {
-      alert(JSON.stringify(response))
-      // Do something with the successful response
-    } else {
-      // Handle error cases
+      if (!response.ok) {
+        // if the response status is not in the 200-299 range, throw an error
+        throw new Error('Network response was not ok');
+      }
+
+      // Convert the response to JSON and print it
+      const jsonResponse = await response.json();
+      console.log(jsonResponse);
+
+
+    } catch (error) {
+      // Handle network or other errors
     }
-  } catch (error) {
-    // Handle network or other errors
   }
-}
 
 
 
