@@ -1,9 +1,9 @@
 // components/login.tsx
-import { FC, useState, ChangeEvent, FormEvent } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { login } from 'api';
+import { FC, useState, useEffect, ChangeEvent, FormEvent } from 'react';
+// import { useMutation } from '@tanstack/react-query';
+// import { login } from 'api';
 import { ROUTES } from 'constants/routes';
-import axios from 'axios';
+import { useNavigate} from '@tanstack/react-location';
 import styles from 'styles/login-block.module.scss';
 
 interface LoginResponse {
@@ -13,9 +13,24 @@ interface LoginResponse {
 export const LoginBlock: FC = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      // Redirect to main screen if authToken exists
+      navigate({ to: ROUTES.main, replace: true });
+    }
+  }, [navigate]);
+
+  function unathorizedError() {
+    localStorage.removeItem('authToken');
+    navigate({to: ROUTES.login, replace: true})
+  }
 
   // Use the login function from the api
-  const { mutate } = useMutation<LoginResponse, any, { username: string, password: string }>(['login', login]);
+  // const { mutate } = useMutation<LoginResponse, any, { username: string, password: string }>(['login', login]);
 
   const handlePasswordSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,16 +39,6 @@ export const LoginBlock: FC = () => {
       username: username,
       password: password,
     };
-
-    //   try {
-    //     const response = await axios.post('http://backend.grbpwr.com/auth/login', requestData);
-    //     console.log('Login response:', response.data);
-    //     // Handle the response data here
-    //   } catch (error) {
-    //     console.error('Error:', error);
-    //     // Handle error
-    //   }
-    // };
 
     try {
       const response = await fetch('http://backend.grbpwr.com:8081/api/auth/login', {
@@ -46,31 +51,29 @@ export const LoginBlock: FC = () => {
 
       if (!response.ok) {
         // if the response status is not in the 200-299 range, throw an error
-        throw new Error('Network response was not ok');
+        if (response.status === 401) {
+          unathorizedError();
+        } else if (response.status >= 500) {
+          setErrorMessage('server is down');
+        } else if (response.status >= 400 && response.status < 500) {
+          setErrorMessage('incorrect password');
+        }
+        return;
       }
 
       // Convert the response to JSON and print it
       const jsonResponse = await response.json();
-      console.log(jsonResponse);
+      const authToken = jsonResponse.authToken;
 
+      localStorage.setItem('authToken', authToken);
+
+      navigate({to: ROUTES.main, replace: true});
 
     } catch (error) {
       // Handle network or other errors
+      setPassword('')
     }
   }
-
-
-
-  const handleAdditionalRequest = () => {
-    axios.get('http://164.90.186.151:8081')
-      .then(response => {
-        // Handle the response as needed
-        console.log('Response from additional request:', response.data);
-      })
-      .catch(error => {
-        console.error('Error making additional request:', error);
-      });
-  };
 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
@@ -84,6 +87,7 @@ export const LoginBlock: FC = () => {
     <div className={styles.LoginBlock}>
       <h4 className='card_header'>Login</h4>
       <div className="card_body">
+        {errorMessage && <p className={styles.error}>{errorMessage}</p>}
         <form onSubmit={handlePasswordSubmit}>
           <div>
             <label htmlFor="username">Username</label>
@@ -92,7 +96,6 @@ export const LoginBlock: FC = () => {
           <div>
             <label htmlFor="password">Password</label>
             <input className={styles.input} onChange={handlePasswordChange} type='password' name='password' />
-            <button type='button' onClick={handleAdditionalRequest}>Make Additional Request</button>
           </div>
           <button type='submit'>Login</button>
         </form>
