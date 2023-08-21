@@ -84,17 +84,17 @@ export const LoginBlock: FC = () => {
   };
 
   return (
-    <div className={styles.LoginBlock}>
-      <h4 className='card_header'>Login</h4>
+    <div className={styles.loginBlock}>
+      <h4 className={styles.card_header}>Login</h4>
       <div className="card_body">
         {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-        <form onSubmit={handlePasswordSubmit}>
-          <div>
-            <label htmlFor="username">Username</label>
+        <form className={styles.form} onSubmit={handlePasswordSubmit}>
+          <div className={styles.user_container}>
+            <label className={styles.user_data} htmlFor="username">Username</label>
             <input onChange={handleUsernameChange} type='text' name='username' />
           </div>
-          <div>
-            <label htmlFor="password">Password</label>
+          <div className={styles.user_container}>
+            <label className={styles.user_data} htmlFor="password">Password</label>
             <input className={styles.input} onChange={handlePasswordChange} type='password' name='password' />
           </div>
           <button type='submit'>Login</button>

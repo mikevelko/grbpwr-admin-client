@@ -1,8 +1,20 @@
 import { FC } from "react";
+import { useNavigate } from "@tanstack/react-location";
+import { ROUTES } from "constants/routes";
 
 const MainContent: FC = () => {
+    const navigate = useNavigate();
+
+
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        navigate({to: ROUTES.login, replace: true})
+    }
     return (
-        <h4>HELLO</h4>
+        <div>
+            <h4>HELLO</h4>
+            <button onClick={handleLogout}>Logout</button>
+        </div>
     )
 }
 
