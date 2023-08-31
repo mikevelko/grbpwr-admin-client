@@ -1,6 +1,7 @@
 import { FC } from "react";
-import { useNavigate } from "@tanstack/react-location";
+import { useNavigate, Link } from "@tanstack/react-location";
 import { ROUTES } from "constants/routes";
+import { Route } from "react-router";
 
 const MainContent: FC = () => {
     const navigate = useNavigate();
@@ -12,8 +13,8 @@ const MainContent: FC = () => {
     }
     return (
         <div>
-            <h4>HELLO</h4>
-            <button onClick={handleLogout}>Logout</button>
+            <Link to={ROUTES.mediaManager}>MEDIA MANAGER</Link>
+            <button onClick={handleLogout}>LOG OUT</button>
         </div>
     )
 }

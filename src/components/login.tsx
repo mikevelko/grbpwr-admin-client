@@ -24,10 +24,10 @@ export const LoginBlock: FC = () => {
     }
   }, [navigate]);
 
-  function unathorizedError() {
-    localStorage.removeItem('authToken');
-    navigate({to: ROUTES.login, replace: true})
-  }
+  // function unathorizedError() {
+  //   localStorage.removeItem('authToken');
+  //   navigate({to: ROUTES.login, replace: true})
+  // }
 
   // Use the login function from the api
   // const { mutate } = useMutation<LoginResponse, any, { username: string, password: string }>(['login', login]);
@@ -52,7 +52,8 @@ export const LoginBlock: FC = () => {
       if (!response.ok) {
         // if the response status is not in the 200-299 range, throw an error
         if (response.status === 401) {
-          unathorizedError();
+          // unathorizedError();
+          alert('ERROR');
         } else if (response.status >= 500) {
           setErrorMessage('server is down');
         } else if (response.status >= 400 && response.status < 500) {

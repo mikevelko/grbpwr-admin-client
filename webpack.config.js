@@ -31,6 +31,10 @@ module.exports = merge([
           use: 'ts-loader',
         },
         {
+          test: /\.(png|jpg|jpeg|gif)$/i,
+          type: 'asset/resource',
+        },
+        {
           test: /\.scss$/,
           use: [
             { loader: MiniCssExtractPlugin.loader },

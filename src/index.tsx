@@ -8,6 +8,7 @@ import { ContextProvider } from 'context';
 import { ROUTES } from 'constants/routes';
 import { LoginBlock } from 'components/login';
 import MainContent from 'pages/MainContent';
+import MediaManager from 'pages/mediaManager/mediaManager';
 import 'styles/global.scss';
 import styles from 'styles/index.module.scss';
 
@@ -20,6 +21,7 @@ const location = new ReactLocation();
 const routes: Route<DefaultGenerics>[] = [
   { path: ROUTES.login, element: <LoginBlock /> },
   { path: ROUTES.main, element: <MainContent /> },
+  { path: ROUTES.mediaManager, element: <MediaManager />}
 ];
 
 root.render(
