@@ -13,9 +13,9 @@ import styles from 'styles/login-block.module.scss';
 //   authToken: string;
 // }
 
-export enum MUTATIONS {
-  login = 'login',
-}
+// enum MUTATIONS {
+//   login = 'login',
+// }
 
 // copy of type inside generated file (no export, need to define explicitly)
 type RequestType = {
@@ -73,15 +73,15 @@ export const LoginBlock: FC = () => {
 
     try {
       if (!username || !password) {
-        throw new Error('Пожалуйста, заполните все поля');
+        throw new Error('empty fields');
       }
 
-      // Вызываем функцию login, которая отправляет запрос на сервер
+      //request to server 
       const response: LoginResponse = await login(username, password);
 
       if (!response.authToken) {
-        // Обработка случая, если токен не был получен
-        setErrorMessage('Токен не получен');
+        // if the token was not receivedif
+        setErrorMessage('token not received');
         return;
       }
 
@@ -90,17 +90,18 @@ export const LoginBlock: FC = () => {
       localStorage.setItem('authToken', authToken);
 
       navigate({ to: ROUTES.main, replace: true });
+      
     } catch (error: any) {
       if (error.response) {
         if (error.response.status === 401) {
-          setErrorMessage('Неверное имя пользователя или пароль');
+          setErrorMessage('wrong login or password');
         } else if (error.response.status >= 500) {
-          setErrorMessage('Сервер недоступен');
+          setErrorMessage('Сserver is not available');
         } else {
-          setErrorMessage('Произошла ошибка');
+          setErrorMessage('error');
         }
       } else {
-        setErrorMessage('Произошла ошибка');
+        setErrorMessage('error');
       }
     }
   };
