@@ -4,9 +4,9 @@ import { createAuthClient, LoginRequest, LoginResponse } from './proto-http/auth
 // NFTMintRequestListArray -> NFTMintResponseListArray should rename in GO part ?
 // import { createNftClient, NFTMintRequestListArray } from './proto-http/nft';
 
-export enum QUERIES {
-  getNftRequests = 'getNftRequests',
-}
+// export enum QUERIES {
+//   getNftRequests = 'getNftRequests',
+// }
 
 export enum MUTATIONS {
   login = 'login',
@@ -27,10 +27,13 @@ type RequestType = {
 //   login: 'http://backend.grbpwr.com:8081/api/login', // Replace with the actual backend URL
 // };
 
+
+
 export function login(username: string, password: string): Promise<LoginResponse> {
   const authClient = createAuthClient(({ path, body }: RequestType): Promise<LoginResponse> => {
+    const url = 'http://backend.grbpwr.com:8081/api/auth/login';
     return axios
-      .post<LoginRequest, AxiosResponse<LoginResponse>>(path, body && JSON.parse(body))
+      .post<LoginRequest, AxiosResponse<LoginResponse>>(url, body && JSON.parse(body))
       .then((response) => response.data);
   });
 

@@ -6,7 +6,7 @@ import { Outlet, ReactLocation, Router, Route, DefaultGenerics, Navigate } from 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ContextProvider } from 'context';
 import { ROUTES } from 'constants/routes';
-import { LoginBlock } from 'components/login';
+import {LoginBlock} from 'components/login';
 import MainContent from 'pages/MainContent';
 import MediaManager from 'pages/mediaManager/mediaManager';
 import 'styles/global.scss';

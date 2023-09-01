@@ -7,6 +7,7 @@ const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { BundleStatsWebpackPlugin } = require('bundle-stats-webpack-plugin');
 
 const webpackDev = require('./webpack.dev');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = merge([
   {
@@ -52,6 +53,7 @@ module.exports = merge([
         filename: '[name].[contenthash].css',
       }),
       new BundleStatsWebpackPlugin(),
+      new Dotenv(),
     ],
   },
   process.env.NODE_ENV !== 'production' ? webpackDev : {},
