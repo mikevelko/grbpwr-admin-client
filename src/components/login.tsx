@@ -1,7 +1,7 @@
 // components/login.tsx
 // import axios, { AxiosResponse, AxiosError } from 'axios';
 import { FC, useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { LoginResponse } from '/home/oak/Desktop/grbpwr/grbpwr-admin-client/src/api/proto-http/auth';
+import { LoginResponse } from 'api/proto-http/auth';
 // import { useMutation } from '@tanstack/react-query';
 // import { MUTATIONS } from 'api';
 import { login } from 'api';
@@ -9,38 +9,6 @@ import { ROUTES } from 'constants/routes';
 import { useNavigate} from '@tanstack/react-location';
 import styles from 'styles/login-block.module.scss';
 
-// interface LoginResponse {
-//   authToken: string;
-// }
-
-// enum MUTATIONS {
-//   login = 'login',
-// }
-
-// copy of type inside generated file (no export, need to define explicitly)
-type RequestType = {
-  path: string;
-  method: string;
-  body: string | null;
-};
-
-
-const getAuthHeaders = (authToken: string) => ({
-  'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-});
-
-// export function login(password: string,username: string): Promise<LoginResponse> {
-//   const authClient = createAuthClient(({ path, body }: RequestType): Promise<LoginResponse> => {
-//     return axios
-//       .post<LoginRequest, AxiosResponse<LoginResponse>>(path, body && JSON.parse(body))
-//       .then((response) => response.data);
-//   });
-
-//   return authClient.Login({ 
-//     username: username,
-//     password: password,
-//   });
-// }
 
 export const LoginBlock: FC = () => {
   const [password, setPassword] = useState('');
@@ -56,17 +24,6 @@ export const LoginBlock: FC = () => {
     }
   }, [navigate]);
 
-  // function unathorizedError() {
-  //   localStorage.removeItem('authToken');
-  //   navigate({to: ROUTES.login, replace: true})
-  // }
-
-  // Use the login function from the api
-  // const { mutate } = useMutation<LoginResponse, any, { username: string, password: string }>(['login', login]);
-
-
-
-  
   
   const handlePasswordSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -90,7 +47,7 @@ export const LoginBlock: FC = () => {
       localStorage.setItem('authToken', authToken);
 
       navigate({ to: ROUTES.main, replace: true });
-      
+
     } catch (error: any) {
       if (error.response) {
         if (error.response.status === 401) {

@@ -23,17 +23,12 @@ type RequestType = {
 //   'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
 // });
 
-// export const API_ENDPOINTS = {
-//   login: 'http://backend.grbpwr.com:8081/api/login', // Replace with the actual backend URL
-// };
-
 
 
 export function login(username: string, password: string): Promise<LoginResponse> {
   const authClient = createAuthClient(({ path, body }: RequestType): Promise<LoginResponse> => {
-    const url = 'http://backend.grbpwr.com:8081/api/auth/login';
     return axios
-      .post<LoginRequest, AxiosResponse<LoginResponse>>(url, body && JSON.parse(body))
+      .post<LoginRequest, AxiosResponse<LoginResponse>>(path, body && JSON.parse(body))
       .then((response) => response.data);
   });
 
