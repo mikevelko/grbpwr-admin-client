@@ -24,15 +24,15 @@ type RequestType = {
 // });
 
 
-
 export function login(username: string, password: string): Promise<LoginResponse> {
-  const authClient = createAuthClient(({ path, body }: RequestType): Promise<LoginResponse> => {
+  const authClient = createAuthClient(({ body }: RequestType): Promise<LoginResponse> => {
     return axios
-      .post<LoginRequest, AxiosResponse<LoginResponse>>(path, body && JSON.parse(body))
+      .post<LoginRequest, AxiosResponse<LoginResponse>>(`${process.env.REACT_APP_API_URL}`, body && JSON.parse(body))
       .then((response) => response.data);
   });
 
   return authClient.Login({ username, password });
+
 }
 
 
