@@ -1,0 +1,24 @@
+.layout {
+    margin: 20px;
+    
+    .layout_logo {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+    }
+
+    .layout_logout {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+    }
+
+    .logout_btn {
+        background-color: black;
+        color: #FFF;
+        font-size: 29px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+    }
+}

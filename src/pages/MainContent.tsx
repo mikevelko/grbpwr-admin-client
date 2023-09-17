@@ -1,22 +1,20 @@
 import { FC } from "react";
-import { useNavigate, Link } from "@tanstack/react-location";
+import { useNavigate } from "@tanstack/react-location";
 import { ROUTES } from "constants/routes";
-import { Route } from "react-router";
+import { Layout } from "components/layout";
 
-const MainContent: FC = () => {
+
+export const MainContent: FC = () => {
     const navigate = useNavigate();
 
-
-    const handleLogout = () => {
-        localStorage.removeItem('authToken');
-        navigate({to: ROUTES.login, replace: true})
+    const navigateMediaManager = () => {
+        navigate({to: ROUTES.mediaManager, replace: true})
     }
+
     return (
-        <div>
-            <Link to={ROUTES.mediaManager}>MEDIA MANAGER</Link>
-            <button onClick={handleLogout}>LOG OUT</button>
-        </div>
+        <Layout>
+            <button onClick={navigateMediaManager}>MEDIA MANAGER</button>
+        </Layout>
     )
 }
 
-export default MainContent;

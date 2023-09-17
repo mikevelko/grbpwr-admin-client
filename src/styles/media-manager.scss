@@ -1,34 +1,10 @@
 .media_wrapper {
+    width: 100%;
     margin: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-// logo & log out positions
-
-    .logo {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-    }
-
-    .loggout {
-        position: absolute;
-        right: 20px;
-        bottom: 20px;
-    }
-
-    .loggout_btn {
-        background-color: black;
-        color: #FFF;
-        font-size: 29px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: normal;
-    }
-
-// logo and log out 
-
 // MEDIA MANAGER STYLES
 
     .files {

@@ -1,5 +1,6 @@
 export enum ROUTES {
   login= '/',
   main = '/main',
-  mediaManager = '/mediaManager'
+  mediaManager = '/mediaManager',
+  all = '/uploaded'
 }
