@@ -4,11 +4,11 @@ import { ROUTES } from "constants/routes";
 import { Layout } from "components/layout";
 
 
-export const MainContent: FC = () => {
+export const Main: FC = () => {
     const navigate = useNavigate();
 
     const navigateMediaManager = () => {
-        navigate({to: ROUTES.mediaManager, replace: true})
+        navigate({to: ROUTES.media, replace: true})
     }
 
     return (

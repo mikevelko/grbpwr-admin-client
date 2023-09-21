@@ -85,30 +85,29 @@ export function uploadImage(rawB64Image: string, folder: string, imageName: stri
   return adminService.UploadContentImage({ rawB64Image, folder, imageName });
 }
 
-export function uploadVideo(raw: string, folder: string, videoName: string, contentType: string): Promise<common_Media> {
-  // Retrieve the authentication token from local storage
+export function uploadVideo(raw: string, folder: string, videoName: string, contentType: string ): Promise<common_Media> {
   const authToken = localStorage.getItem('authToken');
 
   if (!authToken) {
-    alert('lol');
-    // Handle the case when the authentication token is not available
-    return Promise.reject(new Error('Authentication token not found'));
+    return Promise.reject(new Error('no auth'));
   }
 
   const adminService = createAdminServiceClient(({ body }: RequestType) => {
     return axios
-      .post<UploadContentVideoRequest, AxiosResponse<common_Media>>('http://backend.grbpwr.com:8081/api/admin/content/video', body && JSON.parse(body),
+      .post<UploadContentVideoRequest, AxiosResponse<common_Media>>(`${process.env.REACT_APP_API_V}`, body && JSON.parse(body),
         {
           headers: {
             'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
           },
         }
       )
-      .then((response) => response.data);
   });
 
   return adminService.UploadContentVideo({ raw, folder, videoName, contentType });
+
 }
+
+
 
 
 export function deleteFiles(objectKeys: string[] | undefined) {
@@ -150,4 +149,6 @@ export function deleteFiles(objectKeys: string[] | undefined) {
       throw error;
     });
 }
+
+
 

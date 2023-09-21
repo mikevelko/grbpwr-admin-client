@@ -8,7 +8,7 @@ import { ContextProvider } from 'context';
 import { ROUTES } from 'constants/routes';
 import { LoginBlock } from 'components/login';
 import { UploadPage } from 'pages/mediaManager/upload'
-import { MainContent } from 'pages/MainContent';
+import { Main } from 'pages/MainContent';
 import { MediaManager } from 'pages/mediaManager/mediaManager'
 import 'styles/global.scss';
 
@@ -20,8 +20,8 @@ const location = new ReactLocation();
 
 const routes: Route<DefaultGenerics>[] = [
   { path: ROUTES.login, element: <LoginBlock /> },
-  { path: ROUTES.main, element: <MainContent /> },
-  { path: ROUTES.mediaManager, element: <MediaManager />},
+  { path: ROUTES.main, element: <Main /> },
+  { path: ROUTES.media, element: <MediaManager />},
   { path: ROUTES.all, element: <UploadPage /> }
 ];
 

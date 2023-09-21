@@ -5,7 +5,33 @@ import { ROUTES } from "constants/routes";
 import { useNavigate } from "@tanstack/react-location";
 import { uploadImage, getAllUploadedFiles, uploadVideo } from "api";
 import { Layout } from "components/layout";
+import { common_Media } from "api/proto-http/admin";
 
+
+const fileExtensionToContentType: { [key: string]: string } = {
+    '.jpg': 'image/jpeg',
+    '.png': 'image/png',
+    '.webm': 'video/webm',
+    '.mp4': 'video/mp4',
+    // Add more mappings as needed
+  };
+
+  function base64ToUint8Array(base64String: string) {
+    const binaryString = window.atob(base64String);
+    const length = binaryString.length;
+    const uint8Array = new Uint8Array(length);
+  
+    for (let i = 0; i < length; i++) {
+      uint8Array[i] = binaryString.charCodeAt(i);
+    }
+  
+    return uint8Array;
+  }  
+
+  function uint8ArrayToString(array: Uint8Array): string {
+    const decoder = new TextDecoder();
+    return decoder.decode(array);
+  }
 
 
 export const MediaManager: FC = () => {
@@ -45,10 +71,16 @@ export const MediaManager: FC = () => {
           console.error("Error fetching uploaded files:", error);
         }
     }
+    function trimBeforeBase64(input: string): string {
+        const parts = input.split("base64,");
+        if (parts.length > 1) {
+          return parts[1];
+        }
+        return input;
+      }
       
-
     
-    const handleUpload = async () => {
+      const handleUpload = async () => {
         // Check if there are selected files and a name entered
         if (selectedFiles.length === 0) {
             alert("Please select a file to upload.");
@@ -77,22 +109,32 @@ export const MediaManager: FC = () => {
                 const base64Data = event.target.result as string;
     
                 try {
-                    let contentType = "image"; // Default content type
+                    let contentType: string;
     
                     // Check the file extension to determine the content type
-                    if (["svg", "png", "jpg"].includes(fileExtension)) {
-                        contentType = "image";
-                    } else if (["webm", "mp4"].includes(fileExtension)) {
-                        contentType = "video";
+                    switch (fileExtension) {
+                        case "jpg":
+                        case "png":
+                            contentType = "image/jpeg"; // Set image content type for jpg and png
+                            break;
+                        case "webm":
+                            contentType = "video/webm"; // Set video content type for webm
+                            break;
+                        case "mp4":
+                            contentType = "video/mp4"; // Set video content type for mp4
+                            break;
+                        default:
+                            alert("Unsupported file format.");
+                            return;
                     }
     
-                    if (contentType === "image") {
-                        // Call the uploadImage function with the Base64 data, folder, and image name
+                    // Call the uploadImage or uploadVideo function based on the content type
+                    if (contentType.startsWith("image")) {
                         const response = await uploadImage(base64Data, "your-folder-name", fileName);
                         console.log("Image uploaded:", response);
-                    } else if (contentType === "video") {
-                        // Call the uploadVideo function with the Base64 data, folder, video name, and content type
-                        const response = await uploadVideo(base64Data, "your-folder-name", fileName, "video");
+                    } else if (contentType.startsWith("video")) {
+                        let raw = trimBeforeBase64(base64Data);
+                        const response = await uploadVideo(raw, "your-folder-name", fileName, contentType);
                         console.log("Video uploaded:", response);
                     }
     
@@ -106,8 +148,8 @@ export const MediaManager: FC = () => {
     
         reader.readAsDataURL(selectedFile);
     };
-
-
+    
+    
     return (
         <Layout>
             <div className={styles.media_wrapper}>
@@ -115,7 +157,7 @@ export const MediaManager: FC = () => {
                 <h2 className={styles.media_title}>MEDIA MANAGER</h2>
                 <div className={styles.drop_container}>
                     <label htmlFor="files" className={styles.drop_title}>DRAG AND DROP</label>
-                    <input type="file" multiple onChange={handleFileChange} id="files" className={styles.files} />
+                    <input type="file" accept="image/*, video/*" multiple onChange={handleFileChange} id="files" className={styles.files} />
                 </div>
                 <div className={styles.name_upload}>
                     <div className={styles.name_container} >
@@ -135,4 +177,8 @@ export const MediaManager: FC = () => {
        
     );
 };
+
+function readFileAsUint8Array(file: File) {
+    throw new Error("Function not implemented.");
+}
 
