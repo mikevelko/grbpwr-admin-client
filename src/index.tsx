@@ -12,8 +12,8 @@ import { Main } from 'pages/MainContent';
 import { MediaManager } from 'pages/mediaManager/mediaManager'
 import 'styles/global.scss';
 
-const container = document.getElementById('root');
-const root = createRoot(container!);
+const container = document.getElementById('root') ?? document.body;
+const root = createRoot(container);
 
 const queryClient = new QueryClient();
 const location = new ReactLocation();

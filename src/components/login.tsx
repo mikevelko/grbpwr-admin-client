@@ -2,8 +2,6 @@
 // import axios, { AxiosResponse, AxiosError } from 'axios';
 import { FC, useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { LoginResponse } from 'api/proto-http/auth';
-// import { useMutation } from '@tanstack/react-query';
-// import { MUTATIONS } from 'api';
 import { login } from 'api';
 import { ROUTES } from 'constants/routes';
 import { useNavigate} from '@tanstack/react-location';

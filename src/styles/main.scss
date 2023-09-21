@@ -1,0 +1,13 @@
+.main {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+
+    .btn {
+        margin-bottom: 10px;
+    }
+
+    .btn:last-child {
+        margin-bottom: 0;
+    }
+}

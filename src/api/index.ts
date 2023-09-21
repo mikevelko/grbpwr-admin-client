@@ -33,6 +33,8 @@ export function login(username: string, password: string): Promise<LoginResponse
 
 }
 
+// TODO: media section
+
 export function getAllUploadedFiles() {
   const authToken = localStorage.getItem('authToken');
 
@@ -150,5 +152,7 @@ export function deleteFiles(objectKeys: string[] | undefined) {
     });
 }
 
+
+// TODO: product section
 
 

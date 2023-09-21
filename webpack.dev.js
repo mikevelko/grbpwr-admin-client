@@ -5,6 +5,7 @@ module.exports = {
     mode: 'development',
     devtool: 'source-map',
     devServer: {
+        historyApiFallback: true,
         static: {
             directory: path.join(__dirname, 'public/'),
         },
