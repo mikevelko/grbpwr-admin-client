@@ -12,11 +12,15 @@ export const Main: FC = () => {
         navigate({to: ROUTES.media, replace: true})
     }
 
+    const navigateProductManager = () => {
+        navigate({to: ROUTES.product, replace: true})
+    }
+
     return (
         <Layout>
             <div className={styles.main}>
                 <button onClick={navigateMediaManager} className={styles.btn}>MEDIA MANAGER</button>
-                <button className={styles.btn}>PRODUCTS MANAGER</button>
+                <button onClick={navigateProductManager} className={styles.btn}>PRODUCTS MANAGER</button>
                 <button className={styles.btn}>ORDERS MANAGER</button>
                 <button className={styles.btn}>HERO MANAGER</button>
                 <button className={styles.btn}>ARCHIVE MANAGER</button>

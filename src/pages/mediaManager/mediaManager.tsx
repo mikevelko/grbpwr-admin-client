@@ -16,23 +16,6 @@ const fileExtensionToContentType: { [key: string]: string } = {
     // Add more mappings as needed
   };
 
-  function base64ToUint8Array(base64String: string) {
-    const binaryString = window.atob(base64String);
-    const length = binaryString.length;
-    const uint8Array = new Uint8Array(length);
-  
-    for (let i = 0; i < length; i++) {
-      uint8Array[i] = binaryString.charCodeAt(i);
-    }
-  
-    return uint8Array;
-  }  
-
-  function uint8ArrayToString(array: Uint8Array): string {
-    const decoder = new TextDecoder();
-    return decoder.decode(array);
-  }
-
 
 export const MediaManager: FC = () => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);

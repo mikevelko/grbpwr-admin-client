@@ -2,7 +2,19 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { createAuthClient, LoginRequest, LoginResponse } from './proto-http/auth/index';
 
-import { common_Media, UploadContentImageRequest, UploadContentVideoRequest, createAdminServiceClient, DeleteFromBucketResponse, DeleteFromBucketRequest } from './proto-http/admin';
+import { common_Media, 
+        UploadContentImageRequest, 
+        UploadContentVideoRequest, 
+        createAdminServiceClient, 
+        DeleteFromBucketResponse, 
+        DeleteFromBucketRequest, 
+        common_Order, 
+        common_Product,
+        common_Price,
+        AddProductRequest,
+        AddProductResponse 
+      } from './proto-http/admin';
+import { json } from 'react-router';
 
 
 const getAuthHeaders = (authToken: string) => ({
@@ -154,5 +166,38 @@ export function deleteFiles(objectKeys: string[] | undefined) {
 
 
 // TODO: product section
+
+export function addProduct(product: common_Product): Promise<AddProductResponse> {
+  const authToken = localStorage.getItem('authToken');
+
+  if (!authToken) {
+    console.error('Auth token is null');
+    return Promise.reject('Auth token is null');
+  }
+
+  const adminService = createAdminServiceClient(({ body }: RequestType) => {
+    try {
+      const parsedBody = JSON.parse(body || ''); // Parse the body
+      console.log('Request Body:', parsedBody);
+
+      return axios
+        .post<AddProductRequest, AxiosResponse<AddProductResponse>>(
+          `${process.env.REACT_APP_ADD_PRODUCT}`,
+          parsedBody, // Use the parsed body in the request
+          {
+            headers: {
+              'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
+            },
+          }
+        )
+        .then((response) => response.data);
+    } catch (error) {
+      console.error('Error parsing request body:', error);
+      return Promise.reject('Error parsing request body');
+    }
+  });
+
+  return adminService.AddProduct({ product });
+}
 
 

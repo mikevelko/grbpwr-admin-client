@@ -2,5 +2,7 @@ export enum ROUTES {
   login= '/',
   main = '/main',
   media = '/mediaManager',
-  all = '/uploaded'
+  all = '/uploaded',
+  product = '/product',
+  addProduct = '/addProd'
 }

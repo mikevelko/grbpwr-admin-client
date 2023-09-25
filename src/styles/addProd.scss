@@ -1,0 +1,16 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .media_container {
+        display: flex;
+    }
+}
