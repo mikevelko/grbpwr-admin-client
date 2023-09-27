@@ -18,13 +18,17 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
     }
     return (
         <div className={styles.layout}>
+
             <div className={styles.layout_logo}>
                 <img src={logo} alt="LOGO" style={{width: "40px", height: "40px"}} />
             </div>
+
             <div className={styles.layout_content}>{children}</div>
+            
             <div className={styles.layout_logout}>
                 <button onClick={handleLogout} className={styles.logout_btn}>LOG OUT</button>
             </div>
+            
         </div>
     )
 }

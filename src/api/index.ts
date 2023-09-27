@@ -197,7 +197,7 @@ export function addProduct(product: common_Product): Promise<AddProductResponse>
     }
   });
 
-  return adminService.AddProduct({ product });
+  return adminService.AddProduct({product});
 }
 
 

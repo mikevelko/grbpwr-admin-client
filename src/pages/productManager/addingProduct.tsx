@@ -55,7 +55,7 @@ const addCategory = () => {
                 categories: { $push: [categoryInput] }
             });
         });
-        setCategoryInput(''); 
+        setCategoryInput(''); // Clear the category input field
     }
 }
   
@@ -96,6 +96,7 @@ const addCategory = () => {
     const [subName, subFieldName] = name.split('.');
   
     if (subName && subFieldName) {
+      // Handle price properties as strings
       if (subName === 'price') {
         setProduct((prevProduct: common_Product) => {
           return update(prevProduct, {
@@ -105,6 +106,7 @@ const addCategory = () => {
           });
         });
       } else {
+        // Handle availableSizes properties as numbers
         setProduct((prevProduct: common_Product) => {
           return update(prevProduct, {
             [subName]: {
@@ -128,7 +130,8 @@ const addCategory = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      
+      // Convert the categoryText to an array before submitting
+
       const response = await addProduct(product);
       // Handle the response
       console.log('Product added:', response);
@@ -206,7 +209,7 @@ const addCategory = () => {
                             onChange={handleCategoryChange}
                             placeholder="Enter a category"
                         />
-                        <button type="button" onClick={addCategory}>Add</button>
+                        <button type="button" onClick={addCategory}>OK</button>
                     </div>
                     <ul>
                         {product.categories?.map((category, index) => (

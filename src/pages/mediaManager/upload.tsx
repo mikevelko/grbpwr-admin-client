@@ -8,10 +8,28 @@ interface UploadedFile {
   lastModified: string;
 }
 
+function copyToClipboard(text: string) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textArea);
+}
+
 
 export const UploadPage: FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [order, setOrder] = useState<'plus' | 'minus'>('plus');
+  const [filter, setFilter] = useState<string | null>(null);
+
+  const handlePictures = () => {
+    setFilter("PICTURES");
+  }
+
+  const handleVideo = () => {
+    setFilter("VIDEO");
+  }
 
 
   // DATE 
@@ -110,15 +128,40 @@ const handleDeleteFile = async (fileIndex: number) => {
 
   return (
     <Layout>
-      <h1>MEDIA MANAAGER</h1>
+      <h1 className={styles.media_name}>MEDIA MANAAGER</h1>
       <div className={styles.files_container}>
-        <button onClick={dateSorter} className={styles.sort_btn}>
-          Date {order === 'plus' ? '+' : '-'}
-        </button>
+      <div className={styles.sorter_container}>
+          <p className={styles.sort_btn_title}>SORT</p>
+          <button onClick={dateSorter} className={styles.sort_btn}>
+            DATE {order === 'plus' ? '+' : '-'}
+          </button>
+          <button onClick={handlePictures}  className={styles.sort_btn} >PICTURES</button>
+          <button onClick={handleVideo} className={styles.sort_btn}>VIDEOS</button>
+      </div>
         <ul className={styles.uploaded_files}>
-          {uploadedFiles.map((file, index) => (
+          {uploadedFiles.filter((file) => {
+            if (filter === "PICTURES") {
+              return (
+                file.url.toLowerCase().endsWith('.jpg') ||
+                file.url.toLowerCase().endsWith('.jpeg') ||
+                file.url.toLowerCase().endsWith('.png')
+              );
+            } else if (filter === "VIDEO") {
+              return (
+                file.url.toLowerCase().endsWith('.mp4') ||
+                file.url.toLowerCase().endsWith('.webm')
+              );
+            } else {
+              return true;
+            }
+          }).map((file, index) => (
             <li key={index} className={styles.uploaded_file}>
+              <button onClick={() => handleDeleteFile(index)} className={styles.delete_btn}>X</button>
               <div className={styles.dateFlag}>{formatDate(file.lastModified)}</div>
+              <div className={styles.urlContainer}>
+                <div className={styles.urlText}>{file.url}</div>
+                <button onClick={() => copyToClipboard(file.url)} className={styles.copyLinkBtn}>Copy Link</button>
+              </div>
               {file.url.toLowerCase().endsWith('.jpg') || file.url.toLowerCase().endsWith('.jpeg') || file.url.toLowerCase().endsWith('.png') ? (
                 <a href={file.url} target="_blank" rel="noopener noreferrer">
                   <img 
@@ -127,18 +170,26 @@ const handleDeleteFile = async (fileIndex: number) => {
                     title={`${file.lastModified}`} 
                     className={`${styles.uploaded_img}`} />
                 </a>
+              ) : file.url.toLowerCase().endsWith('.mp4') || file.url.toLowerCase().endsWith('.webm') ? (
+                <a href={file.url} target='_blank' rel='noopener noreferrer'>
+                  <video className={styles.video}>
+                    <source src={file.url} type="video/mp4"  />
+                    {/* Your browser does not support the video tag. */}
+                  </video>
+                </a>
               ) : (
                 <a href={file.url} target="_blank" rel="noopener noreferrer">
                   {file.lastModified}
                 </a>
               )}
-              <button onClick={() => handleDeleteFile(index)} className={styles.delete_btn}>X</button>
             </li>
           ))}
         </ul>
-      </div>
+        </div>
     </Layout>
   );
 };
 
+
+{/* <button onClick={() => handleDeleteFile(index)} className={styles.delete_btn}>X</button> */}
 

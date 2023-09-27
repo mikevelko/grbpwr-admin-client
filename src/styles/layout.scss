@@ -1,19 +1,32 @@
 .layout {
     margin: 20px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
     
     .layout_logo {
         position: sticky;
+        align-self: flex-start;
         top: 20px;
         left: 20px;
     }
 
+    .layout_content {
+        width: 100%;
+    }
+
     .layout_logout {
+        // display: block;
+        width: 157px;
         position: sticky;
         right: 20px;
         bottom: 20px;
+        // text-align: end;
+        align-self: flex-end;
     }
 
     .logout_btn {
+        width: 157px;
         background-color: black;
         color: #FFF;
         font-size: 29px;
