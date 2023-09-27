@@ -157,10 +157,10 @@ const handleDeleteFile = async (fileIndex: number) => {
           }).map((file, index) => (
             <li key={index} className={styles.uploaded_file}>
               <button onClick={() => handleDeleteFile(index)} className={styles.delete_btn}>X</button>
-              <div className={styles.dateFlag}>{formatDate(file.lastModified)}</div>
-              <div className={styles.urlContainer}>
+              <div className={styles.date}>{formatDate(file.lastModified)}</div>
+              <div className={styles.url_container}>
                 <div className={styles.urlText}>{file.url}</div>
-                <button onClick={() => copyToClipboard(file.url)} className={styles.copyLinkBtn}>Copy Link</button>
+                <button onClick={() => copyToClipboard(file.url)} className={styles.copy_btn}>Copy Link</button>
               </div>
               {file.url.toLowerCase().endsWith('.jpg') || file.url.toLowerCase().endsWith('.jpeg') || file.url.toLowerCase().endsWith('.png') ? (
                 <a href={file.url} target="_blank" rel="noopener noreferrer">
