@@ -16,11 +16,16 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
         localStorage.removeItem('authToken');
         navigate({to: ROUTES.login, replace: true})
     }
+
+    const handleMain = () => {
+        navigate({to: ROUTES.main, replace: true})
+    }
+
     return (
         <div className={styles.layout}>
 
             <div className={styles.layout_logo}>
-                <img src={logo} alt="LOGO" style={{width: "40px", height: "40px"}} />
+                <img onClick={handleMain} src={logo} alt="LOGO" style={{width: "40px", height: "40px"}} />
             </div>
 
             <div className={styles.layout_content}>{children}</div>

@@ -1,5 +1,4 @@
 import { FC, useState } from "react";
-// import { useHistory } from "react-router-dom";
 import styles from 'styles/media-manager.scss';
 import { ROUTES } from "constants/routes";
 import { useNavigate } from "@tanstack/react-location";
@@ -9,10 +8,10 @@ import { common_Media } from "api/proto-http/admin";
 
 
 const fileExtensionToContentType: { [key: string]: string } = {
-    '.jpg': 'image/jpeg',
-    '.png': 'image/png',
-    '.webm': 'video/webm',
-    '.mp4': 'video/mp4',
+    'jpg': 'image/jpeg',
+    'png': 'image/png',
+    'webm': 'video/webm',
+    'mp4': 'video/mp4',
     // Add more mappings as needed
   };
 
@@ -76,10 +75,13 @@ export const MediaManager: FC = () => {
             alert("Please enter a name for the file.");
             return;
         }
+
+        localStorage.setItem('name', fileName);
     
         // Read the selected file as Base64 data
         const selectedFile = selectedFiles[0];
-        const fileExtension = selectedFile.name.split(".").pop()?.toLowerCase() || "";
+        const fileExtension = (selectedFile.name.split(".").pop() || "").toLowerCase();
+        console.log("File extension:", fileExtension);
     
         if (!fileExtension) {
             alert("Invalid file format.");
@@ -87,48 +89,36 @@ export const MediaManager: FC = () => {
         }
     
         const reader = new FileReader();
-        reader.onload = async (event) => {
+        reader.onload = async(event) => {
             if (event.target && event.target.result) {
-                const base64Data = event.target.result as string;
-    
+                const baseData64 = event.target.result as string;
+
                 try {
-                    let contentType: string;
-    
-                    // Check the file extension to determine the content type
-                    switch (fileExtension) {
-                        case "jpg":
-                        case "png":
-                            contentType = "image/jpeg"; // Set image content type for jpg and png
-                            break;
-                        case "webm":
-                            contentType = "video/webm"; // Set video content type for webm
-                            break;
-                        case "mp4":
-                            contentType = "video/mp4"; // Set video content type for mp4
-                            break;
-                        default:
-                            alert("Unsupported file format.");
-                            return;
+                    const contentType = fileExtensionToContentType[fileExtension];
+
+                    if (!contentType) {
+                        alert('invalid extension');
+                        alert(contentType)
                     }
-    
-                    // Call the uploadImage or uploadVideo function based on the content type
-                    if (contentType.startsWith("image")) {
-                        const response = await uploadImage(base64Data, "your-folder-name", fileName);
-                        console.log("Image uploaded:", response);
-                    } else if (contentType.startsWith("video")) {
-                        let raw = trimBeforeBase64(base64Data);
+
+                    if (contentType.startsWith('image')) {
+                        const response = await uploadImage(baseData64, "your-folder-name", fileName);
+                        console.log('uploaded:', response);
+                    } else if (contentType.startsWith('video')) {
+                        let raw = trimBeforeBase64(baseData64);
                         const response = await uploadVideo(raw, "your-folder-name", fileName, contentType);
-                        console.log("Video uploaded:", response);
+                        console.log('uploaded:', response)
                     }
-    
+                    
+                    nameInput.value = '';
                     setUploadedFiles([...uploadedFiles, selectedFile]);
                     setSelectedFiles([]);
                 } catch (error) {
-                    alert(`Error uploading file. Please try again.`);
+                    alert('error uploading video');
                 }
             }
-        };
-    
+        }
+
         reader.readAsDataURL(selectedFile);
     };
     
@@ -161,7 +151,4 @@ export const MediaManager: FC = () => {
     );
 };
 
-function readFileAsUint8Array(file: File) {
-    throw new Error("Function not implemented.");
-}
 
