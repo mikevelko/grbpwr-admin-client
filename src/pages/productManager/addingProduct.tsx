@@ -1,11 +1,9 @@
-import React, { FC, FormEvent, useState } from "react";
+import React, { FC, useState, useRef, useEffect } from "react";
 import update from 'immutability-helper';
-import { useNavigate } from "@tanstack/react-location";
-import { ROUTES } from "constants/routes";
 import { Layout } from "components/layout";
 import { common_Media, common_Product} from "api/proto-http/admin";
 import { addProduct } from "api";
-// import { v4 as uuidv4 } from "uuid";
+import { ChromePicker } from 'react-color'
 import styles from 'styles/addProd.scss'
 
 
@@ -38,26 +36,55 @@ const initialProductState: common_Product = {
 
 export const AddProducts: FC = () => {
   
-  const[product, setProduct] = useState<common_Product>(initialProductState);
-  const[imageUrl, setImageUrl] = useState<string>('');
-  const [categoryInput, setCategoryInput] = useState<string>(''); // Step 1
+  const [product, setProduct] = useState<common_Product>(initialProductState);
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [categoryInput, setCategoryInput] = useState<string>(''); 
+  const [color, setColor] = useState('#000000');
+  const [showHex, setShowHex] = useState(false);
+  const colorPickerRef = useRef<any>(null);
+
+
+  useEffect(() => {
+    const handleClickOutside = (e: { target: any; }) => {
+      if (colorPickerRef.current && !colorPickerRef.current.contains(e.target)) {
+        setShowHex(false);
+      }
+    };
+
+    if (showHex) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showHex]);
+
+  const handleColorHexClick = () => {
+    // Toggle the visibility of the color picker
+    setShowHex(!showHex);
+  };
+  
+  const onColorPickerInfoChange = (color: any) => {
+    setColor(color.hex);
+  }
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Step 2
     setCategoryInput(e.target.value);
-}
+  }
 
-const addCategory = () => {
-    // Step 3
-    if (categoryInput.trim() !== '') {
-        setProduct((prevProduct: common_Product) => {
-            return update(prevProduct, {
-                categories: { $push: [categoryInput] }
-            });
-        });
-        setCategoryInput(''); // Clear the category input field
-    }
-}
+  const addCategory = () => {
+      if (categoryInput.trim() !== '') {
+          setProduct((prevProduct: common_Product) => {
+              return update(prevProduct, {
+                  categories: { $push: [categoryInput] }
+              });
+          });
+          setCategoryInput('');
+      }
+  }
   
   
 
@@ -157,6 +184,38 @@ const addCategory = () => {
         <label htmlFor="descrip">DESCRIPTION:</label>
         <input type="text" name="description" value={product.description} onChange={handleChange} id="descrip" />
 
+        <label htmlFor="">Vendor Code</label>
+        <input type="text" name="vendor_code" id="vendor_code"/>
+
+        <label htmlFor="color">Color</label>
+        <input type="text" name="color" id="color" />
+
+        <label htmlFor="color_hex">Color Hex</label>
+        <input type="text" name="color_hex" id="color_hex" onClick={handleColorHexClick}/>
+        <div ref={colorPickerRef} className={styles.color}>
+          {showHex && ( 
+          <ChromePicker
+              className={styles.color_picker}
+              color={ color }
+              onChangeComplete={ onColorPickerInfoChange }
+              disableAlpha={true}
+          />
+         )}
+        </div>
+
+        <label htmlFor="thhumbnail">Thumbnail</label>
+        <div className={styles.thumbnail_container}>
+          <button>By Url</button>
+          <input type="text" className={styles.input_url}/>
+          <button>Media Selector</button>
+          <button>Upload New</button>
+        </div>
+
+        <label htmlFor="category">Category Drop Down</label>
+        <input type="text" name="category" id="category"/>
+
+
+
         <div className={styles.container}>
           <h3>Price:</h3> 
           <label htmlFor="usd">USD:</label>
@@ -200,25 +259,17 @@ const addCategory = () => {
         </div>
 
         <div className={styles.container}>
-                    <h3>Categories:</h3>
-                    <div>
-                        <input
-                            type="text"
-                            name="categoryInput"
-                            value={categoryInput}
-                            onChange={handleCategoryChange}
-                            placeholder="Enter a category"
-                        />
-                        <button type="button" onClick={addCategory}>OK</button>
-                    </div>
-                    <ul>
-                        {product.categories?.map((category, index) => (
-                            <li key={index}>{category}</li>
-                        ))}
-                    </ul>
-                </div>
-
-        
+            <h3>Categories:</h3>
+            <div>
+              <input type="text" name="categoryInput" value={categoryInput} onChange={handleCategoryChange} placeholder="Enter a category"/>
+              <button type="button" onClick={addCategory}>OK</button>
+            </div>
+            <ul>
+              {product.categories?.map((category, index) => (
+              <li key={index}>{category}</li>
+              ))}
+            </ul>
+        </div>
 
         <button type="submit">SUBMIT</button>
 

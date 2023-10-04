@@ -19,6 +19,7 @@ const fileExtensionToContentType: { [key: string]: string } = {
 export const MediaManager: FC = () => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+    const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null)
     const navigate = useNavigate();
 
 
@@ -26,7 +27,12 @@ export const MediaManager: FC = () => {
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         if (files) {
+            const selectedFile = files[0];
             setSelectedFiles(Array.from(files));
+            
+            // Create a URL for the selected file and set it in state
+            const fileUrl = URL.createObjectURL(selectedFile);
+            setSelectedFileUrl(fileUrl);
         }
     };
 
@@ -129,8 +135,15 @@ export const MediaManager: FC = () => {
             <div className={styles.media_container}>
                 <h2 className={styles.media_title}>MEDIA MANAGER</h2>
                 <div className={styles.drop_container}>
-                    <label htmlFor="files" className={styles.drop_title}>DRAG AND DROP</label>
+                    {!selectedFileUrl && (
+                        <label htmlFor="files" className={styles.drop_title}>DRAG AND DROP</label>
+                    )}
                     <input type="file" accept="image/*, video/*" multiple onChange={handleFileChange} id="files" className={styles.files} />
+                    {selectedFileUrl && selectedFileUrl.startsWith("blob:") && (
+                    <div className={styles.preview}>
+                        <img className={styles.media_img} src={selectedFileUrl} alt="Selected Image" />
+                    </div>
+                )}
                 </div>
                 <div className={styles.name_upload}>
                     <div className={styles.name_container} >
