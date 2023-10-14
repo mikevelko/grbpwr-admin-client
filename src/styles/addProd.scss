@@ -1,29 +1,38 @@
 .form {
     display: flex;
     flex-direction: column;
+    border: 1px solid black;
     align-items: center;
     justify-content: center;
-    gap: 10px;
 
-    .container {
-        display: flex;
-        flex-direction: column;
-    }
 
-    .media_container {
-        display: flex;
-    }
-
-    .color {
-        display: flex;
-    }
-
-    .thumbnail_container {
-        display: flex;
-        flex-direction: column;
-
-        .input_url {
-            display: none;
-        }
-    }
+    .media_selector_img_wrapper {
+        display: block;
+        position: relative;
+        cursor: pointer;
+      }
+      
+      .media_selector_img_wrapper:before {
+        background-color: white;
+        color: white;
+        content: " ";
+        display: block;
+        border-radius: 50%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 25px;
+        height: 25px;
+        text-align: center;
+        line-height: 28px;
+        transition-duration: 0.4s;
+        transform: scale(0);
+      }
+        
+      :checked + .media_selector_img_wrapper:before {
+        content: "✓";
+        background-color: grey;
+        transform: scale(1);
+      }
+      
 }

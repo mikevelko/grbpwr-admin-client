@@ -2,9 +2,12 @@ import React, { FC, useState, useRef, useEffect } from "react";
 import update from 'immutability-helper';
 import { Layout } from "components/layout";
 import { common_Media, common_Product} from "api/proto-http/admin";
-import { addProduct } from "api";
+import { addProduct, getAllUploadedFiles, deleteFiles } from "api";
 import { ChromePicker } from 'react-color'
 import styles from 'styles/addProd.scss'
+import { ROUTES } from "constants/routes";
+import { useNavigate } from "@tanstack/react-location";
+
 
 
 const initialProductState: common_Product = {
@@ -35,32 +38,113 @@ const initialProductState: common_Product = {
 };
 
 export const AddProducts: FC = () => {
-  
+  const colorPickerRef = useRef<any>(null);
+  const navigate = useNavigate();
   const [product, setProduct] = useState<common_Product>(initialProductState);
   const [imageUrl, setImageUrl] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<string[]>([]);
+  const [displayedImage, setDisplayedImage] = useState<string>(''); // display img when btn 'OK' clicked in by url
+  const [thumbnailInput, setThumbnailInput] = useState(false);
+  const [filesUrl, setFilesUrl] = useState<string[]>([]);
+  const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [categoryInput, setCategoryInput] = useState<string>(''); 
   const [color, setColor] = useState('#000000');
   const [showHex, setShowHex] = useState(false);
-  const colorPickerRef = useRef<any>(null);
+  const [category, setCategory] = useState('');
+
+  
+
+
+  const SELECT = (imageUrl: string) => {
+    if (selectedImage.includes(imageUrl)) {
+      setSelectedImage((prevSelectedImage) => (
+        prevSelectedImage.filter((image) => image !== imageUrl)
+      ));
+    } else {
+      setSelectedImage([...selectedImage,imageUrl]);
+    }
+  }
+
+  function generateStringArray(input: string): string[] {
+    // Define a regular expression pattern to match the relevant part of the URL
+    const pattern = /https:\/\/files\.grbpwr\.com\/(.+?)(-og\.(jpg|mp4|webm))?$/;
+    
+    // Use the regular expression to extract the matched parts of the URL
+    const match = input.match(pattern);
+    
+    if (!match) {
+      // Return an empty array if the input doesn't match the expected pattern
+      return [];
+    }
+    
+    const [, path, , extension] = match; // Note the additional comma to skip the second capturing group
+    const resultArray: string[] = [`${path}-og.${extension}`];
+    
+    if (extension === 'jpg') {
+      // If the extension is 'jpg', add the '-compressed.jpg' version to the array
+      resultArray.push(`${path}-compressed.jpg`);
+    }
+    console.log(resultArray)
+    return resultArray;
+  }
+
+  const handleDeleteFile = async (fileIndex: number) => {
+    try {
+      const fileToDelete = filesUrl[fileIndex]; // Assuming filesUrl is an array of file URLs
+      const objectKeys = generateStringArray(fileToDelete);
+
+      if (objectKeys.length > 0) {
+        await deleteFiles(objectKeys);
+        const updatedFiles = [...filesUrl];
+        updatedFiles.splice(fileIndex, 1);
+        setFilesUrl(updatedFiles);
+      } else {
+        console.error('Invalid file URL:', fileToDelete);
+      }
+    } catch (error) {
+      console.error('Error deleting file:', error);
+    }
+  };
+  
+
+  const filterUploadedFiles = (files: string[]) => {
+    return files.filter((file) => /\.(jpg|jpeg|png)$/i.test(file))
+  }
+
+  const handleViewAll = () => {
+    setShowMediaSelector(!showMediaSelector)
+  }
 
 
   useEffect(() => {
-    const handleClickOutside = (e: { target: any; }) => {
-      if (colorPickerRef.current && !colorPickerRef.current.contains(e.target)) {
-        setShowHex(false);
+    const fetchUploadedFiles = async () => {
+      try {
+        const response = await getAllUploadedFiles();
+        const filesArray = response.entities || [];
+        const urls = filesArray.map((file: { url: any; }) => file.url)
+        
+       setFilesUrl(urls);
+
+      } catch (error) {
+        console.error("Error fetching uploaded files:", error);
       }
     };
 
-    if (showHex) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
+    fetchUploadedFiles();
+  }, []);
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showHex]);
+  const handleThumbnail = () => {
+    setThumbnailInput(!thumbnailInput);
+  }
+
+  const handleMediaManager = () => {
+    navigate({to: ROUTES.media, replace: true});
+  }
+
+  const handleCategorySelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCategory(e.target.value);
+  };
+  
 
   const handleColorHexClick = () => {
     // Toggle the visibility of the color picker
@@ -89,14 +173,12 @@ export const AddProducts: FC = () => {
   
 
   const handleImage = () => {
-    if (imageUrl.trim() !== '') {
-
-      const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
-
-
-      setProduct((prevProduct: common_Product) => {
-        const updatedMedia: common_Media[] = [...(prevProduct.productMedia || [])];
-
+    if (selectedImage.length > 0) {
+      const updatedMedia: common_Media[] = [...(product.productMedia || [])];
+  
+      selectedImage.forEach((imageUrl) => {
+        const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
+  
         updatedMedia.push({
           success: undefined,
           error: function (arg0: string, error: any): unknown {
@@ -105,17 +187,45 @@ export const AddProducts: FC = () => {
           fullSize: imageUrl,
           thumbnail: imageUrl,
           compressed: compressedUrl,
-          objectIds: [imageUrl, compressedUrl]
-        })
+          objectIds: [imageUrl]
+        });
+      });
+  
+      setProduct((prevProduct: common_Product) => ({
+        ...prevProduct,
+        productMedia: updatedMedia
+      }));
+  
+      setSelectedImage([]); // Clear the selected images after adding them
+    } else if (imageUrl.trim() !== '') {
+      // If no selected images, use the single URL input
+      setDisplayedImage(imageUrl);
+      const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
+  
+      setProduct((prevProduct: common_Product) => {
+        const updatedMedia: common_Media[] = [...(prevProduct.productMedia || [])];
+  
+        updatedMedia.push({
+          success: undefined,
+          error: function (arg0: string, error: any): unknown {
+            throw Error("Function not implemented.");
+          },
+          fullSize: imageUrl,
+          thumbnail: imageUrl,
+          compressed: compressedUrl,
+          objectIds: [imageUrl]
+        });
+  
         return {
           ...prevProduct,
           productMedia: updatedMedia
-        }
-      })
-
+        };
+      });
+  
       setImageUrl('');
     }
-  }
+  };
+  
 
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -158,7 +268,6 @@ export const AddProducts: FC = () => {
     e.preventDefault();
     try {
       // Convert the categoryText to an array before submitting
-
       const response = await addProduct(product);
       // Handle the response
       console.log('Product added:', response);
@@ -191,7 +300,7 @@ export const AddProducts: FC = () => {
         <input type="text" name="color" id="color" />
 
         <label htmlFor="color_hex">Color Hex</label>
-        <input type="text" name="color_hex" id="color_hex" onClick={handleColorHexClick}/>
+        <input type="text" name="color_hex" value={color} id="color_hex" onClick={handleColorHexClick}/>
         <div ref={colorPickerRef} className={styles.color}>
           {showHex && ( 
           <ChromePicker
@@ -203,16 +312,64 @@ export const AddProducts: FC = () => {
          )}
         </div>
 
-        <label htmlFor="thhumbnail">Thumbnail</label>
-        <div className={styles.thumbnail_container}>
-          <button>By Url</button>
-          <input type="text" className={styles.input_url}/>
-          <button>Media Selector</button>
-          <button>Upload New</button>
-        </div>
+          <label htmlFor="thhumbnail">Thumbnail</label>
+          <div className={styles.thumbnail_container}>
+            <button type="button" onClick={handleThumbnail}>By Url</button>
+            {thumbnailInput && (
+              <div>
+                <input type="text" name="productMedia" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+                <button type="button" onClick={handleImage}>OK</button>
+              </div>
+            )}
+            {displayedImage && (
+              <div>
+                <img src={displayedImage} alt="lll" style={{width: '40px', height: '40px'}} />
+              </div>
+            )}
+            <button type="button" onClick={handleViewAll}>Media Selector</button>
+            {showMediaSelector && (
+              <>
+              <ul>
+                {filterUploadedFiles(filesUrl).map((url, index) => (
+                  <li key={index}>
+                      <button type="button" onClick={() => handleDeleteFile(index)}>X</button>
+                      <input
+                      type="checkbox"
+                      checked={selectedImage.includes(url)}
+                      onChange={() => SELECT(url)}
+                      id={`${index}`}
+                      style={{display: 'none'}}
+                    />
+                    <label htmlFor={`${index}`} className={styles.media_selector_img_wrapper}>
+                      <img
+                        key={index}
+                        src={url}
+                        alt={url}
+                        // className={styles.uploaded_img} 
+                        style={{ width: '100px', height: '100px' }} />
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              <button type="button" onClick={handleImage}>add</button>
+              </>
+              )}
+            <button onClick={handleMediaManager}>Upload New</button>
+          </div>
+
 
         <label htmlFor="category">Category Drop Down</label>
-        <input type="text" name="category" id="category"/>
+        <select
+          name="category"
+          id="category"
+          value={category}
+          onChange={handleCategorySelectChange}
+        >
+          <option value="">Select a category</option>
+          <option value="t-shirt">T-Shirt</option>
+          <option value="jeans">Jeans</option>
+          <option value="dress">Dress</option>
+        </select>
 
 
 
@@ -234,29 +391,52 @@ export const AddProducts: FC = () => {
 
         <div className={styles.container}>
           <h3>AVAILABLE SIZES:</h3>
-          <label htmlFor="xxs">XXS:</label>
-          <input type="number" name="availableSizes.xxs" value={product.availableSizes?.xxs} onChange={handleChange} id="xxs" />
-          <label htmlFor="xs">XS:</label>
-          <input type="number" name="availableSizes.xs" value={product.availableSizes?.xs} onChange={handleChange} id="xs" />
-          <label htmlFor="s">s:</label>
-          <input type="number" name="availableSizes.s" value={product.availableSizes?.s} onChange={handleChange} id="s" />
-          <label htmlFor="m">M:</label>
-          <input type="number" name="availableSizes.m" value={product.availableSizes?.m} onChange={handleChange} id="m" />
-          <label htmlFor="l">L:</label>
-          <input type="number" name="availableSizes.l" value={product.availableSizes?.l} onChange={handleChange} id="l" />
-          <label htmlFor="xl">XL:</label>
-          <input type="number" name="availableSizes.xl" value={product.availableSizes?.xl} onChange={handleChange} id="xl" />
-          <label htmlFor="xxl">XXL:</label>
-          <input type="number" name="availableSizes.xxl" value={product.availableSizes?.xxl} onChange={handleChange} id="xxl" />
-          <label htmlFor="os">OS:</label>
-          <input type="number" name="availableSizes.os" value={product.availableSizes?.os} onChange={handleChange} id="os" />
+          {Object.entries(product.availableSizes as Record<string, number | undefined>).map(([size, value]) => (
+              <div key={size}>
+                <label htmlFor={size}>{size.toUpperCase()}:</label>
+                  <input
+                    type="number"
+                    name={`availableSizes.${size}`}
+                    value={value ?? 0} // Use 0 as the default value when value is undefined
+                    onChange={handleChange}
+                    id={size}
+                  />
+                  {value && value > 0 ? (
+                      <select name={`${size}Type`} id={`${size}Type`}>
+                        <option value="waist">waist</option>
+                        <option value="height">height</option>
+                      </select>
+                  ) : null}
+              </div>
+          ))}
         </div>
 
-        <div className={styles.media_container}>
-          <label htmlFor="media">MEDIA:</label>
-          <input type="text" name="productMedia" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-          <button type="button" onClick={handleImage}>OK</button>
-        </div>
+
+        {/* <label htmlFor="media">MEDIA:</label>
+        <div className={styles.thumbnail_container}>
+          <button type="button" onClick={handleThumbnail}>By Url</button>
+          {thumbnailInput && (
+            <div>
+              <input type="text" name="productMedia" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+              <button type="button" onClick={handleImage}>OK</button>
+            </div>
+          )}
+          <button type="button" onClick={handleViewAll}>Media Selector</button>
+          {showMediaSelector && (
+            <div>
+              {filterUploadedFiles(filesUrl).map((url, index) => (
+                <img 
+                  key={index}
+                  src={url} 
+                  alt={url} 
+                  title={`Image ${index}`} 
+                  className={styles.uploaded_img} 
+                />
+              ))}
+            </div>
+          )}
+          <button onClick={handleMediaManager}>Upload New</button>
+        </div> */}
 
         <div className={styles.container}>
             <h3>Categories:</h3>
@@ -277,5 +457,3 @@ export const AddProducts: FC = () => {
     </Layout>
   );
 };
-
-

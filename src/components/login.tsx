@@ -51,7 +51,7 @@ export const LoginBlock: FC = () => {
         if (error.response.status === 401) {
           setErrorMessage('wrong login or password');
         } else if (error.response.status >= 500) {
-          setErrorMessage('Сserver is not available');
+          setErrorMessage('server is not available');
         } else {
           setErrorMessage('error');
         }

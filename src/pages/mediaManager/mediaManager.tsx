@@ -59,6 +59,7 @@ export const MediaManager: FC = () => {
           console.error("Error fetching uploaded files:", error);
         }
     }
+    
     function trimBeforeBase64(input: string): string {
         const parts = input.split("base64,");
         if (parts.length > 1) {
