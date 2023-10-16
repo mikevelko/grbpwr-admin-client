@@ -8,7 +8,7 @@ import styles from 'styles/addProd.scss'
 import { ROUTES } from "constants/routes";
 import { useNavigate } from "@tanstack/react-location";
 
-
+const LOCAL_STORAGE_KEY = "categoryInput";
 
 const initialProductState: common_Product = {
     name: '',
@@ -47,14 +47,37 @@ export const AddProducts: FC = () => {
   const [thumbnailInput, setThumbnailInput] = useState(false);
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
   const [showMediaSelector, setShowMediaSelector] = useState(false);
-  const [categoryInput, setCategoryInput] = useState<string>(''); 
+  const [categoryInput, setCategoryInput] = useState<string>('');
+  const [savedCategories, setSavedCategories] = useState<string[]>([]); 
+  const [isInputFocused, setInputFocused] = useState(false);
+  const [isUlVisible, setUlVisible] = useState(false);
   const [color, setColor] = useState('#000000');
   const [showHex, setShowHex] = useState(false);
   const [category, setCategory] = useState('');
 
+  const deleteCategories = (index: number) => {
+    const copyCategories = [...savedCategories];
+    copyCategories.splice(index, 1);
+    setSavedCategories(copyCategories);
+  }
+
+
+  useEffect(() => {
+    // Load data from local storage when the component mounts
+    const storedCategoryInput = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedCategoryInput) {
+      setCategoryInput(storedCategoryInput);
+    }
+
+    // Load saved categories from local storage
+    const savedCategoriesJson = localStorage.getItem("savedCategories");
+    if (savedCategoriesJson) {
+      setSavedCategories(JSON.parse(savedCategoriesJson));
+    }
+  }, []);
+
   
-
-
+  
   const SELECT = (imageUrl: string) => {
     if (selectedImage.includes(imageUrl)) {
       setSelectedImage((prevSelectedImage) => (
@@ -155,19 +178,44 @@ export const AddProducts: FC = () => {
     setColor(color.hex);
   }
 
+  
   const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCategoryInput(e.target.value);
-  }
+    const inputValue = e.target.value;
+    setCategoryInput(inputValue);
+
+    // Save the input value to local storage
+    localStorage.setItem(LOCAL_STORAGE_KEY, inputValue);
+  };
 
   const addCategory = () => {
-      if (categoryInput.trim() !== '') {
-          setProduct((prevProduct: common_Product) => {
-              return update(prevProduct, {
-                  categories: { $push: [categoryInput] }
-              });
-          });
-          setCategoryInput('');
+    if (categoryInput.trim() !== '') {
+      setProduct((prevProduct: common_Product) => {
+        return update(prevProduct, {
+          categories: { $push: [categoryInput] }
+        });
+      });
+
+      // Clear the input field
+      // setCategoryInput('');
+
+      if (!savedCategories.includes(categoryInput)) {
+        // Save the updated categories to local storage
+        localStorage.setItem(LOCAL_STORAGE_KEY, '');
+
+        // Save the updated categories array
+        setSavedCategories((prevSavedCategories) => {
+          const updatedCategories = [...prevSavedCategories, categoryInput];
+          localStorage.setItem("savedCategories", JSON.stringify(updatedCategories));
+          return updatedCategories;
+        });
       }
+      setUlVisible(false);
+    }
+  }
+
+  const selectCategory = (selectedCategory: string) => {
+    setCategoryInput(selectedCategory);
+    // setUlVisible(!isUlVisible);
   }
   
   
@@ -272,8 +320,10 @@ export const AddProducts: FC = () => {
       // Handle the response
       console.log('Product added:', response);
       // Reset the form state
+      setCategoryInput('');
       setProduct(initialProductState);
     } catch (error) {
+      setCategoryInput('');
       setProduct(initialProductState)
       // Handle errors
       console.error('Error adding product:', error);
@@ -283,98 +333,113 @@ export const AddProducts: FC = () => {
   return (
     <Layout>
       <form onSubmit={handleSubmit} className={styles.form}>
-
-        <label htmlFor="name">NAME:</label>
-        <input type="text" name="name" value={product.name} onChange={handleChange} id="name" />
-
-        <label htmlFor="preorder">PREORDER:</label>
-        <input type="text" name="preorder" value={product.preorder} onChange={handleChange} id="preorder" />
-
-        <label htmlFor="descrip">DESCRIPTION:</label>
-        <input type="text" name="description" value={product.description} onChange={handleChange} id="descrip" />
-
-        <label htmlFor="">Vendor Code</label>
-        <input type="text" name="vendor_code" id="vendor_code"/>
-
-        <label htmlFor="color">Color</label>
-        <input type="text" name="color" id="color" />
-
-        <label htmlFor="color_hex">Color Hex</label>
-        <input type="text" name="color_hex" value={color} id="color_hex" onClick={handleColorHexClick}/>
-        <div ref={colorPickerRef} className={styles.color}>
-          {showHex && ( 
-          <ChromePicker
-              className={styles.color_picker}
-              color={ color }
-              onChangeComplete={ onColorPickerInfoChange }
-              disableAlpha={true}
-          />
-         )}
+        <div className={styles.product_container}>
+        <label htmlFor="name" className={styles.title}>NAME</label>
+        <input type="text" name="name" value={product.name} onChange={handleChange} id="name" className={styles.product_input}/>
         </div>
 
-          <label htmlFor="thhumbnail">Thumbnail</label>
-          <div className={styles.thumbnail_container}>
-            <button type="button" onClick={handleThumbnail}>By Url</button>
-            {thumbnailInput && (
-              <div>
-                <input type="text" name="productMedia" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-                <button type="button" onClick={handleImage}>OK</button>
-              </div>
-            )}
-            {displayedImage && (
-              <div>
-                <img src={displayedImage} alt="lll" style={{width: '40px', height: '40px'}} />
-              </div>
-            )}
-            <button type="button" onClick={handleViewAll}>Media Selector</button>
-            {showMediaSelector && (
-              <>
-              <ul>
-                {filterUploadedFiles(filesUrl).map((url, index) => (
-                  <li key={index}>
-                      <button type="button" onClick={() => handleDeleteFile(index)}>X</button>
-                      <input
-                      type="checkbox"
-                      checked={selectedImage.includes(url)}
-                      onChange={() => SELECT(url)}
-                      id={`${index}`}
-                      style={{display: 'none'}}
-                    />
-                    <label htmlFor={`${index}`} className={styles.media_selector_img_wrapper}>
-                      <img
-                        key={index}
-                        src={url}
-                        alt={url}
-                        // className={styles.uploaded_img} 
-                        style={{ width: '100px', height: '100px' }} />
-                    </label>
-                  </li>
-                ))}
-              </ul>
-              <button type="button" onClick={handleImage}>add</button>
-              </>
-              )}
-            <button onClick={handleMediaManager}>Upload New</button>
+        <div className={styles.product_container}>
+        <label htmlFor="preorder" className={styles.title}>PREORDER</label>
+        <input type="text" name="preorder" value={product.preorder} onChange={handleChange} id="preorder" className={styles.product_input}/>
+        </div>
+
+
+        <div className={styles.product_container}>
+        <label htmlFor="descrip" className={styles.title}>DESCRIPTION</label>
+        <input type="text" name="description" value={product.description} onChange={handleChange} id="descrip" className={styles.product_input}/>
+        </div>
+
+        <div className={styles.product_container}>
+        <label htmlFor="" className={styles.title}>Vendor Code</label>
+        <input type="text" name="vendor_code" id="vendor_code" className={styles.product_input}/>
+        </div>
+
+        <div className={styles.product_container}>
+        <label htmlFor="color" className={styles.title}>Color</label>
+        <input type="text" name="color" id="color" className={styles.product_input}/>
+        </div>
+
+
+        <div className={styles.product_container}>
+          <label htmlFor="color_hex" className={styles.title}>Color Hex</label>
+          <input type="text" name="color_hex" value={color} id="color_hex" onClick={handleColorHexClick} className={styles.product_input}/>
+          <div ref={colorPickerRef} className={styles.color}>
+            {showHex && ( 
+            <ChromePicker
+                className={styles.color_picker}
+                color={ color }
+                onChangeComplete={ onColorPickerInfoChange }
+                disableAlpha={true}
+            />
+          )}
           </div>
+        </div>
 
+        <div className={styles.product_container}>
+          <label htmlFor="thhumbnail" className={styles.title}>Thumbnail</label>
+          <div className={`${styles.thumbnail_container} ${showMediaSelector ? styles.left : ''}`}>
+              <button className={styles.thumbnail_btn} type="button" onClick={handleThumbnail}>By Url</button>
+              {thumbnailInput && (
+                <div>
+                  <input type="text" name="productMedia" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+                  <button type="button" onClick={handleImage}>OK</button>
+                </div>
+              )}
+              {displayedImage && (
+                <div>
+                  <img src={displayedImage} alt="lll" style={{width: '40px', height: '40px'}} />
+                </div>
+              )}
+              <button className={styles.thumbnail_btn} type="button" onClick={handleViewAll}>Media Selector</button>
+              <button className={styles.thumbnail_btn} onClick={handleMediaManager}>Upload New</button>
+          </div>
+          {showMediaSelector && (
+                  <>
+                  <ul className={styles.media_list}>
+                    {filterUploadedFiles(filesUrl).map((url, index) => (
+                      <li key={index}>
+                          <button type="button" onClick={() => handleDeleteFile(index)}>X</button>
+                          <input
+                          type="checkbox"
+                          checked={selectedImage.includes(url)}
+                          onChange={() => SELECT(url)}
+                          id={`${index}`}
+                          style={{display: 'none'}}
+                        />
+                        <label htmlFor={`${index}`} className={styles.media_selector_img_wrapper}>
+                          <img
+                            key={index}
+                            src={url}
+                            alt={url}
+                            // className={styles.uploaded_img} 
+                            style={{ width: '157px', height: '216px' }} />
+                        </label>
+                      </li>
+                    ))}
+                    <button type="button" onClick={handleImage}>add</button>
+                  </ul>
+                  </>
+                  )}
+        </div>  
 
-        <label htmlFor="category">Category Drop Down</label>
-        <select
-          name="category"
-          id="category"
-          value={category}
-          onChange={handleCategorySelectChange}
-        >
-          <option value="">Select a category</option>
-          <option value="t-shirt">T-Shirt</option>
-          <option value="jeans">Jeans</option>
-          <option value="dress">Dress</option>
-        </select>
+        <div className={styles.product_container}>
+          <label htmlFor="category" className={styles.title}>Category Drop Down</label>
+          <select
+            name="category"
+            id="category"
+            value={category}
+            onChange={handleCategorySelectChange}
+            className={styles.product_input}
+          >
+            <option value="">Select a category</option>
+            <option value="t-shirt">T-Shirt</option>
+            <option value="jeans">Jeans</option>
+            <option value="dress">Dress</option>
+          </select>
+        </div>
 
-
-
-        <div className={styles.container}>
-          <h3>Price:</h3> 
+        {/* <div className={styles.product_container}>
+          <h3 className={styles.title}>Price</h3> 
           <label htmlFor="usd">USD:</label>
           <input type="number" name="price.usd" value={product.price?.usd}  onChange={handleChange} id="usd" />
           <label htmlFor="eur">EUR:</label>
@@ -385,12 +450,10 @@ export const AddProducts: FC = () => {
           <input type="number" name="price.sale" value={product.price?.sale}  onChange={handleChange} id="sale" />
           <label htmlFor="eth">ETH:</label>
           <input type="number" name="price.eth" value={product.price?.eth}  onChange={handleChange} id="eth" />
-        </div>
-
+        </div> */}
         
-
-        <div className={styles.container}>
-          <h3>AVAILABLE SIZES:</h3>
+        <div className={styles.product_container}>
+          <h3 className={styles.title}>AVAILABLE SIZES</h3>
           {Object.entries(product.availableSizes as Record<string, number | undefined>).map(([size, value]) => (
               <div key={size}>
                 <label htmlFor={size}>{size.toUpperCase()}:</label>
@@ -400,16 +463,21 @@ export const AddProducts: FC = () => {
                     value={value ?? 0} // Use 0 as the default value when value is undefined
                     onChange={handleChange}
                     id={size}
+                    className={styles.product_input}
                   />
                   {value && value > 0 ? (
-                      <select name={`${size}Type`} id={`${size}Type`}>
-                        <option value="waist">waist</option>
-                        <option value="height">height</option>
-                      </select>
+                  <>
+                    <select className={styles.product_input}>
+                      <option value="waist">waist</option>
+                      <option value="height">height</option>
+                    </select>
+                    <input type="text" className={styles.product_input}/>
+                    <button type="button">ok</button>
+                  </>
                   ) : null}
               </div>
           ))}
-        </div>
+         </div>
 
 
         {/* <label htmlFor="media">MEDIA:</label>
@@ -437,18 +505,24 @@ export const AddProducts: FC = () => {
           )}
           <button onClick={handleMediaManager}>Upload New</button>
         </div> */}
-
-        <div className={styles.container}>
-            <h3>Categories:</h3>
-            <div>
-              <input type="text" name="categoryInput" value={categoryInput} onChange={handleCategoryChange} placeholder="Enter a category"/>
-              <button type="button" onClick={addCategory}>OK</button>
-            </div>
+        <div className={styles.product_container}>  
+          <h3 className={styles.title}>Categories</h3>
+          <div>
+            <input className={styles.product_input} type="text" name="categoryInput" value={categoryInput} onChange={handleCategoryChange} onFocus={() => {setInputFocused(true); setUlVisible(true)}} placeholder="Enter a category"/>
+            <button type="button" onClick={addCategory}>OK</button>
+          </div>
+          <ul>
+          {isInputFocused && isUlVisible &&(
             <ul>
-              {product.categories?.map((category, index) => (
-              <li key={index}>{category}</li>
+              {savedCategories.map((category, index) => (
+                <li key={index} onClick={() => selectCategory(category)}>
+                  <button type="button" onClick={() => deleteCategories(index)}>X</button>
+                  {category}
+                </li>
               ))}
             </ul>
+          )}
+          </ul>
         </div>
 
         <button type="submit">SUBMIT</button>
