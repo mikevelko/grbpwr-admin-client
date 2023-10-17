@@ -25,8 +25,9 @@
         width: 334px;
       }
 
+
       .left {
-        transform: translateX(-100px);
+        transform: translateX(-300px);
       }
 
       .thumbnail_container {
@@ -47,53 +48,127 @@
         }
       }
 
-      .media_list {
-        padding: 30px;
-        border: 1px solid black;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        flex-wrap: wrap;
+      .uploaded_media_container {
+        padding: 10px 20px;
+        border: 2px solid black;
+        display: grid;
+        grid-template-columns: repeat(1);
+        gap: 10px;
         position: absolute;
-        top:37%;
-        left: 65%;
+        top: 43.7%;
+        left: 50%;
 
-        li {
-          border: 1px solid black;
-          width: 157px;
-          height: 216px;
+        .media_selector_add {
+          display: flex;
+          justify-content: center;
+
+          .add_btn {
+            color: #FFF;
+            background-color: black;
+            font-size: 15px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: normal;
+            text-transform: uppercase;
+          }
+        }
+        
+
+        .uploaded_media {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+
+          li {
+            position: relative;
+            border: 1px solid black;
+            width: 157px;
+            height: 216px;
+            text-align: center;
+
+            &:hover .delete_img {
+              display: block;
+            }
+
+            .delete_img {
+              display: none;
+              position: absolute;
+              top: 0;
+              right: 0;
+              border: none;
+              background-color: black;
+              color: #FFF;
+              padding: 5px;
+              text-align: center;
+              z-index: 5;
+            }
+
+            .uploaded_img {
+              width: 150px;
+              height: 216px;
+              object-fit: scale-down;
+            }
+
+            .media_selector_img_wrapper {
+              display: block;
+              position: relative;
+              cursor: pointer;
+            }
+            
+            .media_selector_img_wrapper:before {
+              background-color: white;
+              color: white;
+              content: " ";
+              display: block;
+              border-radius: 50%;
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 25px;
+              height: 25px;
+              text-align: center;
+              line-height: 28px;
+              transition-duration: 0.4s;
+              transform: scale(0);
+            }
+              
+            :checked + .media_selector_img_wrapper:before {
+              content: "✓";
+              background-color: grey;
+              transform: scale(1);
+            }.media_selector_img_wrapper {
+              display: block;
+              position: relative;
+              cursor: pointer;
+            }
+            
+            .media_selector_img_wrapper:before {
+              background-color: white;
+              color: white;
+              content: " ";
+              display: block;
+              border-radius: 50%;
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 25px;
+              height: 25px;
+              text-align: center;
+              line-height: 28px;
+              transition-duration: 0.4s;
+              transform: scale(0);
+            }
+              
+            :checked + .media_selector_img_wrapper:before {
+              content: "✓";
+              background-color: grey;
+              transform: scale(1);
+            }
+          }
         }
       }
-    }
-
-
-    // .media_selector_img_wrapper {
-    //     display: block;
-    //     position: relative;
-    //     cursor: pointer;
-    //   }
-      
-    //   .media_selector_img_wrapper:before {
-    //     background-color: white;
-    //     color: white;
-    //     content: " ";
-    //     display: block;
-    //     border-radius: 50%;
-    //     position: absolute;
-    //     top: 0;
-    //     left: 0;
-    //     width: 25px;
-    //     height: 25px;
-    //     text-align: center;
-    //     line-height: 28px;
-    //     transition-duration: 0.4s;
-    //     transform: scale(0);
-    //   }
-        
-    //   :checked + .media_selector_img_wrapper:before {
-    //     content: "✓";
-    //     background-color: grey;
-    //     transform: scale(1);
-    //   }
-      
+  
+  }
 }
+
+

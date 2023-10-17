@@ -346,7 +346,8 @@ export const AddProducts: FC = () => {
 
         <div className={styles.product_container}>
         <label htmlFor="descrip" className={styles.title}>DESCRIPTION</label>
-        <input type="text" name="description" value={product.description} onChange={handleChange} id="descrip" className={styles.product_input}/>
+        {/* <input type="text" name="description" value={product.description} onChange={handleChange} id="descrip" className={`${styles.product_input} ${styles.description_input}`}/> */}
+        <textarea name="description" id="descrip" value={product.description} cols={30} rows={10} onChange={handleChange}></textarea>
         </div>
 
         <div className={styles.product_container}>
@@ -376,7 +377,7 @@ export const AddProducts: FC = () => {
         </div>
 
         <div className={styles.product_container}>
-          <label htmlFor="thhumbnail" className={styles.title}>Thumbnail</label>
+          <label htmlFor="thhumbnail" className={`${styles.title} ${showMediaSelector ? styles.left : ''}`}>Thumbnail</label>
           <div className={`${styles.thumbnail_container} ${showMediaSelector ? styles.left : ''}`}>
               <button className={styles.thumbnail_btn} type="button" onClick={handleThumbnail}>By Url</button>
               {thumbnailInput && (
@@ -394,31 +395,33 @@ export const AddProducts: FC = () => {
               <button className={styles.thumbnail_btn} onClick={handleMediaManager}>Upload New</button>
           </div>
           {showMediaSelector && (
-                  <>
-                  <ul className={styles.media_list}>
-                    {filterUploadedFiles(filesUrl).map((url, index) => (
-                      <li key={index}>
-                          <button type="button" onClick={() => handleDeleteFile(index)}>X</button>
-                          <input
-                          type="checkbox"
-                          checked={selectedImage.includes(url)}
-                          onChange={() => SELECT(url)}
-                          id={`${index}`}
-                          style={{display: 'none'}}
-                        />
-                        <label htmlFor={`${index}`} className={styles.media_selector_img_wrapper}>
-                          <img
-                            key={index}
-                            src={url}
-                            alt={url}
-                            // className={styles.uploaded_img} 
-                            style={{ width: '157px', height: '216px' }} />
-                        </label>
-                      </li>
-                    ))}
-                    <button type="button" onClick={handleImage}>add</button>
-                  </ul>
-                  </>
+                  <div className={styles.uploaded_media_container}>
+                    <ul className={styles.uploaded_media}>
+                      {filterUploadedFiles(filesUrl).map((url, index) => (
+                        <li key={index}>
+                            <button className={styles.delete_img} type="button" onClick={() => handleDeleteFile(index)}>X</button>
+                            <input
+                            type="checkbox"
+                            checked={selectedImage.includes(url)}
+                            onChange={() => SELECT(url)}
+                            id={`${index}`}
+                            style={{display: 'none'}}
+                          />
+                          <label htmlFor={`${index}`} className={styles.media_selector_img_wrapper}>
+                            <img
+                              key={index}
+                              src={url}
+                              alt={url}
+                              className={styles.uploaded_img} 
+                            />
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className={styles.media_selector_add}>
+                      <button className={styles.add_btn} type="button" onClick={handleImage}>add</button>
+                    </div>
+                  </div>
                   )}
         </div>  
 
