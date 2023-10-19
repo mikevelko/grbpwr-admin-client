@@ -133,7 +133,6 @@
             }
               
             :checked + .media_selector_img_wrapper:before {
-              content: "✓";
               background-color: grey;
               transform: scale(1);
             }.media_selector_img_wrapper {
@@ -160,7 +159,6 @@
             }
               
             :checked + .media_selector_img_wrapper:before {
-              content: "✓";
               background-color: grey;
               transform: scale(1);
             }

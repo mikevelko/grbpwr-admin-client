@@ -47,6 +47,7 @@ export const AddProducts: FC = () => {
   const [thumbnailInput, setThumbnailInput] = useState(false);
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
   const [showMediaSelector, setShowMediaSelector] = useState(false);
+  const [mediaNumber, setMediaNumber] = useState<number[]>([]);
   const [categoryInput, setCategoryInput] = useState<string>('');
   const [savedCategories, setSavedCategories] = useState<string[]>([]); 
   const [isInputFocused, setInputFocused] = useState(false);
@@ -78,13 +79,25 @@ export const AddProducts: FC = () => {
 
   
   
-  const SELECT = (imageUrl: string) => {
-    if (selectedImage.includes(imageUrl)) {
-      setSelectedImage((prevSelectedImage) => (
-        prevSelectedImage.filter((image) => image !== imageUrl)
-      ));
-    } else {
-      setSelectedImage([...selectedImage,imageUrl]);
+  const select = (imageUrl: string | number) => {
+    if (typeof imageUrl === 'string') {
+      
+      if (selectedImage.includes(imageUrl)) {
+        setSelectedImage((prevSelectedImage) => 
+          prevSelectedImage.filter((image) => image !== imageUrl)
+        );
+      } else {
+        setSelectedImage([...selectedImage, imageUrl]);
+      }
+    } else if (typeof imageUrl === 'number') {
+
+      if (mediaNumber.includes(imageUrl)) {
+        setMediaNumber((prevMediaNumber) => 
+          prevMediaNumber.filter((imageIndex) => imageIndex !== imageUrl)
+        );
+      } else {
+        setMediaNumber([...mediaNumber, imageUrl])
+      }
     }
   }
 
@@ -403,11 +416,16 @@ export const AddProducts: FC = () => {
                             <input
                             type="checkbox"
                             checked={selectedImage.includes(url)}
-                            onChange={() => SELECT(url)}
+                            onChange={() => select(url)}
                             id={`${index}`}
                             style={{display: 'none'}}
                           />
-                          <label htmlFor={`${index}`} className={styles.media_selector_img_wrapper}>
+                          <label htmlFor={`${index}`}>
+                          {selectedImage.includes(url) ? (
+                            <span className={styles.media_selector_img_wrapper}>
+                              {selectedImage.indexOf(url) + 1}
+                            </span>
+                          ): null}  
                             <img
                               key={index}
                               src={url}
