@@ -9,6 +9,23 @@
     .product_container {
       display: grid;
 
+      .added_img_wrapper {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        display: flex;
+        border: 1px solid black;
+        z-index: 1;
+
+        .added_img_container {
+          display: flex;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+          padding: 10px 20px;
+          gap: 15px;
+        }
+      }
+
       .title {
         justify-self: flex-start;
         color: #FFF;
@@ -77,7 +94,15 @@
         .uploaded_media {
           display: flex;
           flex-wrap: wrap;
+          justify-content: center;
+          align-items: start;
+          height: 450px;
+          overflow-y: scroll;
           gap: 15px;
+
+          &::-webkit-scrollbar {
+            width: 1px;
+          }
 
           li {
             position: relative;
@@ -107,60 +132,6 @@
               width: 150px;
               height: 216px;
               object-fit: scale-down;
-            }
-
-            .media_selector_img_wrapper {
-              display: block;
-              position: relative;
-              cursor: pointer;
-            }
-            
-            .media_selector_img_wrapper:before {
-              background-color: white;
-              color: white;
-              content: " ";
-              display: block;
-              border-radius: 50%;
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 25px;
-              height: 25px;
-              text-align: center;
-              line-height: 28px;
-              transition-duration: 0.4s;
-              transform: scale(0);
-            }
-              
-            :checked + .media_selector_img_wrapper:before {
-              background-color: grey;
-              transform: scale(1);
-            }.media_selector_img_wrapper {
-              display: block;
-              position: relative;
-              cursor: pointer;
-            }
-            
-            .media_selector_img_wrapper:before {
-              background-color: white;
-              color: white;
-              content: " ";
-              display: block;
-              border-radius: 50%;
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 25px;
-              height: 25px;
-              text-align: center;
-              line-height: 28px;
-              transition-duration: 0.4s;
-              transform: scale(0);
-            }
-              
-            :checked + .media_selector_img_wrapper:before {
-              background-color: grey;
-              transform: scale(1);
             }
           }
         }

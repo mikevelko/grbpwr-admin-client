@@ -1,4 +1,4 @@
-import React, { FC, useState, useRef, useEffect } from "react";
+import React, { FC, useState, useRef, useEffect,} from "react";
 import update from 'immutability-helper';
 import { Layout } from "components/layout";
 import { common_Media, common_Product} from "api/proto-http/admin";
@@ -7,6 +7,7 @@ import { ChromePicker } from 'react-color'
 import styles from 'styles/addProd.scss'
 import { ROUTES } from "constants/routes";
 import { useNavigate } from "@tanstack/react-location";
+
 
 const LOCAL_STORAGE_KEY = "categoryInput";
 
@@ -38,9 +39,10 @@ const initialProductState: common_Product = {
 };
 
 export const AddProducts: FC = () => {
+  const sliderRef = useRef(null);
   const colorPickerRef = useRef<any>(null);
   const navigate = useNavigate();
-  const [product, setProduct] = useState<common_Product>(initialProductState);
+  const [product, setProduct] = useState<common_Product>({...initialProductState, productMedia: []});
   const [imageUrl, setImageUrl] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string[]>([]);
   const [displayedImage, setDisplayedImage] = useState<string>(''); // display img when btn 'OK' clicked in by url
@@ -48,6 +50,7 @@ export const AddProducts: FC = () => {
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
   const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [mediaNumber, setMediaNumber] = useState<number[]>([]);
+  const [imagesAdded, setImagesAdded] = useState(false);
   const [categoryInput, setCategoryInput] = useState<string>('');
   const [savedCategories, setSavedCategories] = useState<string[]>([]); 
   const [isInputFocused, setInputFocused] = useState(false);
@@ -55,6 +58,8 @@ export const AddProducts: FC = () => {
   const [color, setColor] = useState('#000000');
   const [showHex, setShowHex] = useState(false);
   const [category, setCategory] = useState('');
+
+
 
   const deleteCategories = (index: number) => {
     const copyCategories = [...savedCategories];
@@ -258,6 +263,8 @@ export const AddProducts: FC = () => {
       }));
   
       setSelectedImage([]); // Clear the selected images after adding them
+      setShowMediaSelector(false);
+      setImagesAdded(true)
     } else if (imageUrl.trim() !== '') {
       // If no selected images, use the single URL input
       setDisplayedImage(imageUrl);
@@ -284,6 +291,7 @@ export const AddProducts: FC = () => {
       });
   
       setImageUrl('');
+      setImagesAdded(true)
     }
   };
   
@@ -343,6 +351,24 @@ export const AddProducts: FC = () => {
     }
   };
 
+  const handleDeleteMedia = (index: number) => {
+    if (product.productMedia) { // Check if product.productMedia is defined
+      // Create a copy of the product's media array
+      const updatedMedia = [...product.productMedia];
+      
+      // Remove the media item at the specified index
+      updatedMedia.splice(index, 1);
+  
+      // Update the product state with the modified media array
+      setProduct((prevProduct: common_Product) => ({
+        ...prevProduct,
+        productMedia: updatedMedia
+      }));
+    }
+  };
+
+
+  // To move to a specific slide (e.g., slide 2):
   return (
     <Layout>
       <form onSubmit={handleSubmit} className={styles.form}>
@@ -399,11 +425,6 @@ export const AddProducts: FC = () => {
                   <button type="button" onClick={handleImage}>OK</button>
                 </div>
               )}
-              {displayedImage && (
-                <div>
-                  <img src={displayedImage} alt="lll" style={{width: '40px', height: '40px'}} />
-                </div>
-              )}
               <button className={styles.thumbnail_btn} type="button" onClick={handleViewAll}>Media Selector</button>
               <button className={styles.thumbnail_btn} onClick={handleMediaManager}>Upload New</button>
           </div>
@@ -422,7 +443,7 @@ export const AddProducts: FC = () => {
                           />
                           <label htmlFor={`${index}`}>
                           {selectedImage.includes(url) ? (
-                            <span className={styles.media_selector_img_wrapper}>
+                            <span>
                               {selectedImage.indexOf(url) + 1}
                             </span>
                           ): null}  
@@ -440,8 +461,26 @@ export const AddProducts: FC = () => {
                       <button className={styles.add_btn} type="button" onClick={handleImage}>add</button>
                     </div>
                   </div>
-                  )}
-        </div>  
+          )}
+          {showMediaSelector ? null : (
+            <div className={styles.added_img_wrapper}>
+              {imagesAdded && product.productMedia && product.productMedia.length > 0 && (
+                <div className={styles.added_img_wrapper}>
+                  {product.productMedia.map((media, index) => (
+                    <ul key={index} className={styles.added_img_container}>
+                      <li>
+                        <button type="button" onClick={() => handleDeleteMedia(index)}>X</button>
+                        <img src={media.fullSize} alt={`Media ${index}`} style={{ width: '100px', height: '100px' }} />
+                      </li>
+                    </ul>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+ 
 
         <div className={styles.product_container}>
           <label htmlFor="category" className={styles.title}>Category Drop Down</label>

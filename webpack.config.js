@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { BundleStatsWebpackPlugin } = require('bundle-stats-webpack-plugin');
-const webpackDev = require('./webpack.dev')
+const webpackDev = require('./webpack.dev');
 const Dotenv = require('dotenv-webpack');
 
 // Define a variable to check if we're in production mode
@@ -17,17 +17,18 @@ module.exports = {
     path: path.resolve(__dirname, 'dist/'),
     clean: true,
   },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+    plugins: [new TsConfigPathsPlugin()],
+    alias: {
+      'react-slick$': 'react-slick',
+    },
+  },
   module: {
     rules: [
       {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        resolve: {
-          extensions: ['.ts', '.tsx', '.json'],
-          plugins: [
-            new TsConfigPathsPlugin(),
-          ],
-        },
         use: 'ts-loader',
       },
       {
@@ -35,11 +36,11 @@ module.exports = {
         type: 'asset/resource',
       },
       {
-        test: /\.scss$/,
+        test: /\.(scss|css)$/,
         use: [
           { loader: MiniCssExtractPlugin.loader },
-          { loader: "css-loader", options: { modules: true } },
-          { loader: "sass-loader" },
+          { loader: 'css-loader', options: { modules: true } },
+          { loader: 'sass-loader' },
         ],
       },
     ],
