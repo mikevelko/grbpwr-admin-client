@@ -12,6 +12,7 @@ import { Main } from 'pages/MainContent';
 import { MediaManager } from 'pages/mediaManager/mediaManager'
 import { Product } from 'pages/productManager/mainProduct';
 import { AddProducts } from 'pages/productManager/addingProduct';
+import { Thumbnail } from 'pages/productManager/productManagerComponents/thumbnail';
 import 'styles/global.scss';
 
 const container = document.getElementById('root') ?? document.body;
