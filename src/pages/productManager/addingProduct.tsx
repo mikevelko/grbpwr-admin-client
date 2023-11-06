@@ -1,181 +1,198 @@
 import React, { FC, useState, useRef, useEffect,} from "react";
 import update from 'immutability-helper';
 import { Layout } from "components/layout";
-import { common_Product} from "api/proto-http/admin";
+import { common_ProductNew, common_SizeEnum, common_MeasurementNameEnum, common_ProductMeasurementInsert, common_ProductSizeInsert, common_SizeWithMeasurementInsert } from "api/proto-http/admin";
 import { addProduct } from "api";
 import { ChromePicker } from 'react-color'
 import styles from 'styles/addProd.scss'
 import { Thumbnail } from "./productManagerComponents/thumbnail";
+// import { Sizes } from "./productManagerComponents/sizes";
+import { Tags } from "./productManagerComponents/tag";
+
+const availableSizes: common_SizeEnum[] = [
+  "XXS",
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "OS",
+];
+
+
+const selectMeasurement: common_MeasurementNameEnum[] = [
+  "WAIST",
+  "INSEAM",
+  "LENGTH",
+  "RISE",
+  "HIPS",
+  "SHOULDERS",
+  "BUST",
+  "SLEEVE",
+  "WIDTH",
+  "HEIGHT"
+]
 
 
 
-const LOCAL_STORAGE_KEY = "categoryInput";
-
- export const initialProductState: common_Product = {
-    name: '',
+export const initialProductState: common_ProductNew = {
+  product: {
     preorder: '',
+    name: '',
+    brand: '',
+    sku: '',  // VENDOR CODE
+    color: '',
+    colorHex: '',
+    countryOfOrigin: '',
+    thumbnail: '',
+    price: '',
+    salePercentage: '',
+    categoryId: 0,
     description: '',
-    price: {
-        usd: 0,
-        eur: 0,
-        usdc: 0,
-        eth: 0,
-        sale: 0,
-    },
-    availableSizes: {
-        xxs: 0,
-        xs: 0,
-        s: 0,
-        m: 0,
-        l: 0,
-        xl: 0,
-        xxl: 0,
-        os: 0,
-    },
-    categories: [],
-    productMedia: [],
-    id: undefined,
-    created: undefined
+    hidden: false,
+    targetGender: 'MALE',
+  },
+  sizeMeasurements: [],
+  media: [],
+  tags: [],
 };
 
+
 export const AddProducts: FC = () => {
-  const [product, setProduct] = useState<common_Product>({...initialProductState, productMedia: []});
-
-  // Category
+  const [product, setProduct] = useState<common_ProductNew>({
+    ...initialProductState
+  });
   const [categoryInput, setCategoryInput] = useState<string>('');
-  const [savedCategories, setSavedCategories] = useState<string[]>([]); 
-  const [isInputFocused, setInputFocused] = useState(false);
-  const [isUlVisible, setUlVisible] = useState(false);
-  const [color, setColor] = useState('#000000');
-
-  // Color HEX
-  const [showHex, setShowHex] = useState(false);
+  // Category
   const [category, setCategory] = useState('');
+  // Color HEX
+  const [color, setColor] = useState('#000000');
+  const [showHex, setShowHex] = useState(false);
   const colorPickerRef = useRef<any>(null);
 
 
+ 
+  const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>, sizeIndex: number) => {
+    const { name, value } = e.target;
 
-  const deleteCategories = (index: number) => {
-    const copyCategories = [...savedCategories];
-    copyCategories.splice(index, 1);
-    setSavedCategories(copyCategories);
-  }
+    setProduct((prevProduct) => {
+      const updatedSizeMeasurements = [...(prevProduct.sizeMeasurements || [])];
 
+      if (!updatedSizeMeasurements[sizeIndex]) {
+        
+        const sizeId = sizeIndex + 1; 
 
-  useEffect(() => {
-    // Load data from local storage when the component mounts
-    const storedCategoryInput = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (storedCategoryInput) {
-      setCategoryInput(storedCategoryInput);
-    }
+        const productSize: common_ProductSizeInsert = {
+          quantity: value,
+          sizeId: sizeId,
+        };
 
-    // Load saved categories from local storage
-    const savedCategoriesJson = localStorage.getItem("savedCategories");
-    if (savedCategoriesJson) {
-      setSavedCategories(JSON.parse(savedCategoriesJson));
-    }
-  }, []);
+        updatedSizeMeasurements[sizeIndex] = {
+          productSize: productSize,
+          measurements: [],
+        };
+      } else {
+        // Create a copy of the object to ensure type safety
+        updatedSizeMeasurements[sizeIndex] = {
+          productSize: {
+            quantity: value,
+            sizeId: updatedSizeMeasurements[sizeIndex].productSize?.sizeId || sizeIndex,
+          },
+          measurements: [],
+        };
+      }
+
+      return { ...prevProduct, sizeMeasurements: updatedSizeMeasurements };
+    });
+  };
+
+  const handleMeasurementChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    sizeIndex: number,
+    measurementIndex: number
+  ) => {
+    const { name, value } = e.target;
+  
+    setProduct((prevProduct) => {
+      const updatedSizeMeasurements = [...(prevProduct.sizeMeasurements || [])];
+  
+      if (updatedSizeMeasurements[sizeIndex]) {
+        const updatedMeasurements = [...(updatedSizeMeasurements[sizeIndex].measurements || [])];
+  
+        updatedMeasurements[measurementIndex] = {
+          measurementNameId: measurementIndex + 1, // You may adjust this index based on your requirements
+          measurementValue: value,
+        };
+  
+        updatedSizeMeasurements[sizeIndex] = {
+          ...updatedSizeMeasurements[sizeIndex],
+          measurements: updatedMeasurements,
+        };
+  
+        return { ...prevProduct, sizeMeasurements: updatedSizeMeasurements };
+      }
+  
+      return prevProduct;
+    });
+  };
+  
+
 
   
   const handleCategorySelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCategory(e.target.value);
   };
   
-
   const handleColorHexClick = () => {
     // Toggle the visibility of the color picker
     setShowHex(!showHex);
   };
   
   const onColorPickerInfoChange = (color: any) => {
-    setColor(color.hex);
-  }
-
-  
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    setCategoryInput(inputValue);
-
-    // Save the input value to local storage
-    localStorage.setItem(LOCAL_STORAGE_KEY, inputValue);
-  };
-
-  const addCategory = () => {
-    if (categoryInput.trim() !== '') {
-      setProduct((prevProduct: common_Product) => {
-        return update(prevProduct, {
-          categories: { $push: [categoryInput] }
-        });
+    setProduct((prevProduct) => {
+      return update(prevProduct, {
+        product: {
+          colorHex: { $set: color.hex },
+        },
       });
-
-      // Clear the input field
-      // setCategoryInput('');
-
-      if (!savedCategories.includes(categoryInput)) {
-        // Save the updated categories to local storage
-        localStorage.setItem(LOCAL_STORAGE_KEY, '');
-
-        // Save the updated categories array
-        setSavedCategories((prevSavedCategories) => {
-          const updatedCategories = [...prevSavedCategories, categoryInput];
-          localStorage.setItem("savedCategories", JSON.stringify(updatedCategories));
-          return updatedCategories;
-        });
-      }
-      setUlVisible(false);
-    }
-  }
-
-  const selectCategory = (selectedCategory: string) => {
-    setCategoryInput(selectedCategory);
-    // setUlVisible(!isUlVisible);
-  }
-  
+    });
+    setColor(color.hex);
+  };
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const [subName, subFieldName] = name.split('.');
   
-    if (subName && subFieldName) {
-      // Handle price properties as strings
-      if (subName === 'price') {
-        setProduct((prevProduct: common_Product) => {
-          return update(prevProduct, {
-            [subName]: {
-              [subFieldName]: { $set: value }
-            }
-          });
-        });
-      } else {
-        // Handle availableSizes properties as numbers
-        setProduct((prevProduct: common_Product) => {
-          return update(prevProduct, {
-            [subName]: {
-              [subFieldName]: { $set: parseFloat(value) }
-            }
-          });
-        });
-      }
-    } else {
-      setProduct((prevProduct: common_Product) => {
-        // Handle other properties as strings
-        return update(prevProduct, {
+    setProduct((prevProduct) => {
+      return update(prevProduct, {
+        product: {
           [name]: { $set: value },
-        });
+        },
       });
-    }
-  }
-  
-
+    });
+  };
+    
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Filter sizeMeasurements to include only items with non-null quantities
+      const nonEmptySizeMeasurements = product.sizeMeasurements?.filter(
+        (sizeMeasurement) => sizeMeasurement && sizeMeasurement.productSize && sizeMeasurement.productSize.quantity !== null
+      );
+  
+      // Update the product with the filtered sizeMeasurements
+      const productToDisplayInJSON = {
+        ...product,
+        sizeMeasurements: nonEmptySizeMeasurements,
+      };
+  
       // Convert the categoryText to an array before submitting
-      const response = await addProduct(product);
+      const response = await addProduct(productToDisplayInJSON);
       // Handle the response
       console.log('Product added:', response);
       // Reset the form state
+  
       setCategoryInput('');
       setProduct(initialProductState);
     } catch (error) {
@@ -185,6 +202,8 @@ export const AddProducts: FC = () => {
       console.error('Error adding product:', error);
     }
   };
+  
+  
 
   const updateProductMedia = (updatedMedia: any) => {
     setProduct((prevProduct) => ({
@@ -194,40 +213,45 @@ export const AddProducts: FC = () => {
   };
 
 
+  const updateTag = (updatedTag: common_ProductNew) => {
+    setProduct(updatedTag);
+  }
+
+
   return (
     <Layout>
       <form onSubmit={handleSubmit} className={styles.form}>
 
         <div className={styles.product_container}>
         <label htmlFor="name" className={styles.title}>NAME</label>
-        <input type="text" name="name" value={product.name} onChange={handleChange} id="name" className={styles.product_input}/>
+        <input type="text" name="name" value={product.product?.name} onChange={handleChange} id="name" className={styles.product_input}/>
         </div>
 
         <div className={styles.product_container}>
         <label htmlFor="preorder" className={styles.title}>PREORDER</label>
-        <input type="text" name="preorder" value={product.preorder} onChange={handleChange} id="preorder" className={styles.product_input}/>
+        <input type="text" name="preorder" value={product.product?.preorder} onChange={handleChange} id="preorder" className={styles.product_input}/>
         </div>
 
 
         <div className={styles.product_container}>
         <label htmlFor="descrip" className={styles.title}>DESCRIPTION</label>
-        <textarea name="description" id="descrip" value={product.description} cols={30} rows={10} onChange={handleChange}></textarea>
+        <textarea name="description" id="descrip" value={product.product?.description} cols={30} rows={10} onChange={handleChange}></textarea>
         </div>
 
         <div className={styles.product_container}>
-        <label htmlFor="" className={styles.title}>Vendor Code</label>
-        <input type="text" name="vendor_code" id="vendor_code" className={styles.product_input}/>
+        <label htmlFor="sku" className={styles.title}>Vendor Code</label>
+        <input type="text" name="sku" value={product.product?.sku} id="sku" className={styles.product_input} onChange={handleChange}/>
         </div>
 
         <div className={styles.product_container}>
         <label htmlFor="color" className={styles.title}>Color</label>
-        <input type="text" name="color" id="color" className={styles.product_input}/>
+        <input type="text" name="color" value={product.product?.color} id="color" className={styles.product_input} onChange={handleChange}/>
         </div>
 
 
         <div className={styles.product_container}>
           <label htmlFor="color_hex" className={styles.title}>Color Hex</label>
-          <input type="text" name="color_hex" value={color} id="color_hex" onClick={handleColorHexClick} className={styles.product_input}/>
+          <input type="text" name="colorHex" value={product.product?.colorHex} id="color_hex" onClick={handleColorHexClick} className={styles.product_input} onChange={handleChange}/>
           <div ref={colorPickerRef} className={styles.color}>
             {showHex && ( 
             <ChromePicker
@@ -256,63 +280,54 @@ export const AddProducts: FC = () => {
           </select>
         </div>
 
-        <Thumbnail updateProductMedia={updateProductMedia}/>
-
-        {/* <div className={styles.product_container}>
-          <h3 className={styles.title}>Price</h3> 
-          <label htmlFor="usd">USD:</label>
-          <input type="number" name="price.usd" value={product.price?.usd}  onChange={handleChange} id="usd" />
-        </div> */}
-        
-        <div className={styles.product_container}>
-          <h3 className={styles.title}>AVAILABLE SIZES</h3>
-          {Object.entries(product.availableSizes as Record<string, number | undefined>).map(([size, value]) => (
-              <div key={size}>
-                <label htmlFor={size}>{size.toUpperCase()}:</label>
-                  <input
-                    type="number"
-                    name={`availableSizes.${size}`}
-                    value={value ?? 0} // Use 0 as the default value when value is undefined
-                    onChange={handleChange}
-                    id={size}
-                    className={styles.product_input}
-                  />
-                  {value && value > 0 ? (
-                  <>
-                    <select className={styles.product_input}>
-                      <option value="waist">waist</option>
-                      <option value="height">height</option>
-                    </select>
-                    <input type="text" className={styles.product_input}/>
-                    <button type="button">ok</button>
-                  </>
-                  ) : null}
+        <div>
+          <h3>Sizes</h3>
+          <div>
+            {availableSizes.map((size, sizeIndex) => (
+              <div key={sizeIndex}>
+                <label htmlFor={size}>{size}</label>
+                <input
+                  type="number"
+                  id={size}
+                  name="quantity"
+                  onChange={(e) => handleSizeChange(e, sizeIndex)}
+                />
+                <div>
+                {selectMeasurement.map((measurement, measurementIndex) => (
+                  <div key={measurementIndex}>
+                    <label htmlFor={measurement}>{measurement}</label>
+                    <input
+                      type="text"
+                      id={measurement}
+                      name="measurementValue"
+                      // value={sizeMeasurements.measurements[measurementIndex]?.measurementValue || ''}
+                      onChange={(e) => handleMeasurementChange(e, sizeIndex, measurementIndex)}
+                    />
+                  </div>
+                ))}
               </div>
-          ))}
-         </div>
-
-
-        <div className={`${styles.product_container} ${styles.product_container_tags}`}>  
-          <h3 className={styles.title}>TAG</h3>
-          <div className={styles.tag_container}>
-            <input className={styles.product_input} type="text" name="categoryInput" value={categoryInput} onChange={handleCategoryChange} onFocus={() => {setInputFocused(true); setUlVisible(true)}} placeholder="Enter a category"/>
-            <button type="button" onClick={addCategory}>OK</button>
+                
+              </div>
+              
+            ))}
+            
           </div>
-          {isInputFocused && isUlVisible &&(
-            <ul className={styles.tags_board}>
-              {savedCategories.map((category, index) => (
-                <li key={index} onClick={() => selectCategory(category)} className={styles.tag}>
-                  <button type="button" onClick={() => deleteCategories(index)} className={styles.delete_tag}>X</button>
-                  {category}
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
 
+        <Thumbnail updateProductMedia={updateProductMedia}/>
+
+        <Tags updateTag = {updateTag}/>
+
+        <div className={styles.product_container}>
+          <h3 className={styles.title}>Price</h3> 
+          <input type="text" name="price" value={product.product?.price}  onChange={handleChange}/>
+        </div>
+        
         <button type="submit">SUBMIT</button>
 
       </form>
     </Layout>
   );
 };
+
+

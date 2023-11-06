@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 import { createAuthClient, LoginRequest, LoginResponse } from './proto-http/auth/index';
 
@@ -8,11 +8,10 @@ import { common_Media,
         createAdminServiceClient, 
         DeleteFromBucketResponse, 
         DeleteFromBucketRequest, 
-        common_Order, 
         common_Product,
-        common_Price,
         AddProductRequest,
-        AddProductResponse 
+        AddProductResponse, 
+        common_ProductNew
       } from './proto-http/admin';
 import { json } from 'react-router';
 
@@ -167,7 +166,7 @@ export function deleteFiles(objectKeys: string[] | undefined) {
 
 // TODO: product section
 
-export function addProduct(product: common_Product): Promise<AddProductResponse> {
+export function addProduct(product: common_ProductNew): Promise<AddProductResponse> {
   const authToken = localStorage.getItem('authToken');
 
   if (!authToken) {
