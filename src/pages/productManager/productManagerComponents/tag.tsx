@@ -52,7 +52,7 @@ export const Tags: FC<tagProps> = ({ updateTag }) => {
         if (categoryInput.trim() !== '') {
             setProduct((prevProduct: common_ProductNew) => {
                 const updatedProduct = update(prevProduct, {
-                  tags: { $push: [newTag] }
+                  tags: { $push: [{ tag: categoryInput }] }
                 });
     
                 if (!savedCategories.includes(categoryInput)) {

@@ -137,7 +137,7 @@ export const Thumbnail: FC<ThumbnailProps> = ({updateProductMedia}) => {
     
         setProduct((prevProduct: common_ProductNew) => ({
           ...prevProduct,
-          productMedia: updatedMedia
+          media: updatedMedia
         }));
 
         updateProductMedia(updatedMedia); 
@@ -161,7 +161,7 @@ export const Thumbnail: FC<ThumbnailProps> = ({updateProductMedia}) => {
     
           return {
             ...prevProduct,
-            productMedia: updatedMedia
+            media: updatedMedia
           };
         });
         
@@ -181,7 +181,7 @@ export const Thumbnail: FC<ThumbnailProps> = ({updateProductMedia}) => {
         // Update the product state with the modified media array
         setProduct((prevProduct: common_ProductNew) => ({
           ...prevProduct,
-          productMedia: updatedMedia
+          media: updatedMedia
         }));
       }
     };
@@ -194,7 +194,7 @@ export const Thumbnail: FC<ThumbnailProps> = ({updateProductMedia}) => {
               <button className={`${styles.thumbnail_btn} ${thumbnailInput ? styles.by_url_left : ''}`} type="button" onClick={handleThumbnail}>By Url</button>
               {thumbnailInput && (
                 <div className={styles.by_url_container}>
-                  <input className={styles.by_url_input} type="text" name="productMedia" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+                  <input className={styles.by_url_input} type="text" name="media" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
                   <button type="button" onClick={handleImage}>OK</button>
                 </div>
               )}

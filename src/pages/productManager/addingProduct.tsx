@@ -208,7 +208,7 @@ export const AddProducts: FC = () => {
   const updateProductMedia = (updatedMedia: any) => {
     setProduct((prevProduct) => ({
       ...prevProduct,
-      productMedia: updatedMedia,
+      media: updatedMedia,
     }));
   };
 
