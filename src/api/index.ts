@@ -1,19 +1,19 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios';
 
 import { createAuthClient, LoginRequest, LoginResponse } from './proto-http/auth/index';
 
-import { common_Media, 
-        UploadContentImageRequest, 
-        UploadContentVideoRequest, 
-        createAdminServiceClient, 
-        DeleteFromBucketResponse, 
-        DeleteFromBucketRequest, 
-        common_Product,
+import { common_Media,
+        UploadContentImageRequest,
+        UploadContentVideoRequest,
+        createAdminServiceClient,
         AddProductRequest,
-        AddProductResponse, 
-        common_ProductNew
+        AddProductResponse,
+        common_ProductNew,
+        GetProductsPagedResponse,
+        GetProductsPagedRequest,
       } from './proto-http/admin';
 import { json } from 'react-router';
+import { error } from 'jquery';
 
 
 const getAuthHeaders = (authToken: string) => ({
@@ -164,8 +164,6 @@ export function deleteFiles(objectKeys: string[] | undefined) {
 }
 
 
-// TODO: product section
-
 export function addProduct(product: common_ProductNew): Promise<AddProductResponse> {
   const authToken = localStorage.getItem('authToken');
 
@@ -198,5 +196,116 @@ export function addProduct(product: common_ProductNew): Promise<AddProductRespon
 
   return adminService.AddProduct({product});
 }
+
+
+
+// Set base URL globally
+axios.defaults.baseURL = 'http://backend.grbpwr.com:8081';
+
+
+export function getProductsPaged({
+  limit,
+  offset,
+  orderFactor,
+  sortFactors,
+  filterConditions,
+  showHidden,
+}: GetProductsPagedRequest) {
+  const authToken = localStorage.getItem('authToken');
+
+  if (!authToken) {
+    console.error('Auth token is null');
+    return Promise.reject('Auth token is null');
+  }
+
+  const authHeaders = getAuthHeaders(authToken);
+
+  axios.defaults.headers.common = { ...axios.defaults.headers.common, ...authHeaders };
+
+  console.log(authToken);
+  console.log(axios.defaults.headers.common);
+
+  const queryParams: Record<string, string | string[]> = {};
+
+  if (sortFactors) {
+    queryParams.sortFactors = sortFactors.map((x) => encodeURIComponent(x.toString()));
+  }
+
+  if (filterConditions) {
+    const {
+      priceFromTo,
+      onSale,
+      color,
+      categoryId,
+      sizesIds,
+      preorder,
+      byTag,
+    } = filterConditions;
+
+    if (priceFromTo?.from) {
+      queryParams['filterConditions.priceFromTo.from'] = encodeURIComponent(
+        priceFromTo.from.toString()
+      );
+    }
+
+    if (priceFromTo?.to) {
+      queryParams['filterConditions.priceFromTo.to'] = encodeURIComponent(
+        priceFromTo.to.toString()
+      );
+    }
+
+    if (onSale !== undefined) {
+      queryParams['filterConditions.onSale'] = encodeURIComponent(onSale.toString());
+    }
+
+    if (color) {
+      queryParams['filterConditions.color'] = encodeURIComponent(color.toString());
+    }
+
+    if (categoryId) {
+      queryParams['filterConditions.categoryId'] = encodeURIComponent(
+        categoryId.toString()
+      );
+    }
+
+    if (sizesIds) {
+      queryParams['filterConditions.sizesIds'] = sizesIds.map((x) =>
+        encodeURIComponent(x.toString())
+      );
+    }
+
+    if (preorder !== undefined) {
+      queryParams['filterConditions.preorder'] = encodeURIComponent(
+        preorder.toString()
+      );
+    }
+
+    if (byTag) {
+      queryParams['filterConditions.byTag'] = encodeURIComponent(byTag.toString());
+    }
+  }
+
+    if (showHidden) {
+      queryParams.showHidden = encodeURIComponent(showHidden.toString());
+    }
+
+  const url = `/api/admin/product/paged/${limit}/${offset}/${orderFactor}`;
+
+  return axios
+    .get(url, { params: queryParams })
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error('Error fetching products:', error);
+      throw error;
+    });
+}
+
+
+
+
+
+
+
+
 
 

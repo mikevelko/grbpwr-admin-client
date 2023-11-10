@@ -189,7 +189,7 @@ export const Thumbnail: FC<ThumbnailProps> = ({updateProductMedia}) => {
     
     return (
         <div className={styles.thumbnail_wrapper}>
-          <label htmlFor="thhumbnail" className={`${styles.thumbnail_title} ${showMediaSelector  ? styles.left : ''}`}>Thumbnail</label>
+          <label htmlFor="thhumbnail" className={`${styles.thumbnail_title} ${showMediaSelector  ? styles.left : ''}`}>Media</label>
           <div className={`${styles.thumbnail_container} ${showMediaSelector ? styles.left : ''}`}>
               <button className={`${styles.thumbnail_btn} ${thumbnailInput ? styles.by_url_left : ''}`} type="button" onClick={handleThumbnail}>By Url</button>
               {thumbnailInput && (

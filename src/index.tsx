@@ -12,7 +12,7 @@ import { Main } from 'pages/MainContent';
 import { MediaManager } from 'pages/mediaManager/mediaManager'
 import { Product } from 'pages/productManager/mainProduct';
 import { AddProducts } from 'pages/productManager/addingProduct';
-import { Thumbnail } from 'pages/productManager/productManagerComponents/thumbnail';
+import { PageProduct } from 'pages/productManager/pageProduct';
 import 'styles/global.scss';
 
 const container = document.getElementById('root') ?? document.body;
@@ -27,7 +27,8 @@ const routes: Route<DefaultGenerics>[] = [
   { path: ROUTES.media, element: <MediaManager />},
   { path: ROUTES.all, element: <UploadPage /> },
   { path: ROUTES.product, element: <Product /> },
-  { path: ROUTES.addProduct, element: <AddProducts /> }
+  { path: ROUTES.addProduct, element: <AddProducts /> },
+  { path: ROUTES.pagedProduct, element: <PageProduct/> }
 ];
 
 root.render(

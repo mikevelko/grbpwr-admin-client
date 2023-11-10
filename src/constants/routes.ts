@@ -4,5 +4,6 @@ export enum ROUTES {
   media = '/mediaManager',
   all = '/uploaded',
   product = '/product',
-  addProduct = '/addProd'
+  addProduct = '/addProd',
+  pagedProduct = '/pageProd'
 }
