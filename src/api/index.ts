@@ -2,23 +2,27 @@ import axios, { AxiosResponse, AxiosError } from 'axios';
 
 import { createAuthClient, LoginRequest, LoginResponse } from './proto-http/auth/index';
 
-import { common_Media,
-        UploadContentImageRequest,
-        UploadContentVideoRequest,
-        createAdminServiceClient,
-        AddProductRequest,
-        AddProductResponse,
-        common_ProductNew,
-        GetProductsPagedResponse,
-        GetProductsPagedRequest,
-      } from './proto-http/admin';
-import { json } from 'react-router';
+import {
+  common_Media,
+  UploadContentImageRequest,
+  UploadContentVideoRequest,
+  createAdminServiceClient,
+  AddProductRequest,
+  AddProductResponse,
+  common_ProductNew,
+  GetProductsPagedRequest,
+  GetProductByIDRequest,
+  common_ProductFull
+} from './proto-http/admin';
 import { error } from 'jquery';
+
 
 
 const getAuthHeaders = (authToken: string) => ({
   'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
 });
+
+axios.defaults.baseURL = 'http://backend.grbpwr.com:8081';
 
 
 export enum MUTATIONS {
@@ -86,11 +90,11 @@ export function uploadImage(rawB64Image: string, folder: string, imageName: stri
   const adminService = createAdminServiceClient(({ body }: RequestType) => {
     return axios
       .post<UploadContentImageRequest, AxiosResponse<common_Media>>(`${process.env.REACT_APP_API_IMG}`, body && JSON.parse(body),
-        {
-          headers: {
-            'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-          },
-        }
+  {
+    headers: {
+      'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
+    },
+  }
       )
       .then((response) => response.data);
   });
@@ -108,11 +112,11 @@ export function uploadVideo(raw: string, folder: string, videoName: string, cont
   const adminService = createAdminServiceClient(({ body }: RequestType) => {
     return axios
       .post<UploadContentVideoRequest, AxiosResponse<common_Media>>(`${process.env.REACT_APP_API_V}`, body && JSON.parse(body),
-        {
-          headers: {
-            'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-          },
-        }
+  {
+    headers: {
+      'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
+    },
+  }
       )
   });
 
@@ -152,9 +156,9 @@ export function deleteFiles(objectKeys: string[] | undefined) {
     .delete(requestUrl)
     .then((response) => {
       if (response.status === 200) {
-        console.log('Successfully deleted objects');
+  console.log('Successfully deleted objects');
       } else {
-        console.error('Failed to delete objects');
+  console.error('Failed to delete objects');
       }
     })
     .catch((error) => {
@@ -178,16 +182,16 @@ export function addProduct(product: common_ProductNew): Promise<AddProductRespon
       console.log('Request Body:', parsedBody);
 
       return axios
-        .post<AddProductRequest, AxiosResponse<AddProductResponse>>(
-          `${process.env.REACT_APP_ADD_PRODUCT}`,
-          parsedBody, // Use the parsed body in the request
-          {
-            headers: {
-              'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-            },
-          }
-        )
-        .then((response) => response.data);
+  .post<AddProductRequest, AxiosResponse<AddProductResponse>>(
+    `${process.env.REACT_APP_ADD_PRODUCT}`,
+    parsedBody, // Use the parsed body in the request
+    {
+      headers: {
+        'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
+      },
+    }
+  )
+  .then((response) => response.data);
     } catch (error) {
       console.error('Error parsing request body:', error);
       return Promise.reject('Error parsing request body');
@@ -196,11 +200,6 @@ export function addProduct(product: common_ProductNew): Promise<AddProductRespon
 
   return adminService.AddProduct({product});
 }
-
-
-
-// Set base URL globally
-axios.defaults.baseURL = 'http://backend.grbpwr.com:8081';
 
 
 export function getProductsPaged({
@@ -244,13 +243,13 @@ export function getProductsPaged({
 
     if (priceFromTo?.from) {
       queryParams['filterConditions.priceFromTo.from'] = encodeURIComponent(
-        priceFromTo.from.toString()
+  priceFromTo.from.toString()
       );
     }
 
     if (priceFromTo?.to) {
       queryParams['filterConditions.priceFromTo.to'] = encodeURIComponent(
-        priceFromTo.to.toString()
+  priceFromTo.to.toString()
       );
     }
 
@@ -264,19 +263,19 @@ export function getProductsPaged({
 
     if (categoryId) {
       queryParams['filterConditions.categoryId'] = encodeURIComponent(
-        categoryId.toString()
+  categoryId.toString()
       );
     }
 
     if (sizesIds) {
       queryParams['filterConditions.sizesIds'] = sizesIds.map((x) =>
-        encodeURIComponent(x.toString())
+  encodeURIComponent(x.toString())
       );
     }
 
     if (preorder !== undefined) {
       queryParams['filterConditions.preorder'] = encodeURIComponent(
-        preorder.toString()
+  preorder.toString()
       );
     }
 
@@ -300,6 +299,36 @@ export function getProductsPaged({
     });
 }
 
+export function getProdById ({id}: GetProductByIDRequest) {
+  const authToken = localStorage.getItem('authToken');
+
+  if (!authToken) {
+    console.error('Auth token is null');
+    return Promise.reject('Auth token is null');
+  }
+
+  const authHeaders = getAuthHeaders(authToken);
+
+  axios.defaults.headers.common = { ...axios.defaults.headers.common, ...authHeaders };
+
+  console.log(authToken);
+  console.log(axios.defaults.headers.common);
+
+  const queryParams: Record<string, string | string[]> = {};
+
+  const url = `/api/admin/product/${id}`
+
+  return axios
+  .get(url, { params: queryParams })
+  .then((response) => {
+    const product: common_ProductFull = response.data.product;
+    return { product }
+  })
+  .catch((error) => {
+    console.error('Error fetching data:', error);
+    throw error;
+  })
+}
 
 
 
