@@ -5,5 +5,6 @@ export enum ROUTES {
   all = '/uploaded',
   product = '/product',
   addProduct = '/addProd',
-  pagedProduct = '/pageProd'
+  pagedProduct = '/pageProd',
+  singleProduct = '/productById/:productId'
 }

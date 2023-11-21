@@ -4,7 +4,7 @@ import { ROUTES } from "constants/routes";
 import { useNavigate } from "@tanstack/react-location";
 import { uploadImage, getAllUploadedFiles, uploadVideo } from "api";
 import { Layout } from "components/layout";
-import { common_Media } from "api/proto-http/admin";
+import { ListObjectsPagedRequest } from "api/proto-http/admin";
 
 
 const fileExtensionToContentType: { [key: string]: string } = {
@@ -45,15 +45,29 @@ export const MediaManager: FC = () => {
             alert('Authentication token not found');
             return;
           }
+
+          const request: ListObjectsPagedRequest = {
+            limit: 10,
+            offset: 0,
+            orderFactor: 'ORDER_FACTOR_ASC'
+          }
+
+          const response = await getAllUploadedFiles(request);
+
+          const filesFromResponse = response.list?.map((media) => {
+            const fileExtension = (media.media?.fullSize?.split(".").pop() || "").toLowerCase();
+            return new File([/* your content here */], media.media?.fullSize || "", {
+              type: fileExtensionToContentType[fileExtension] || "",
+            });
+          }) || [];
       
-        //   get all uploaded files 
-          const files = await getAllUploadedFiles();
+          setUploadedFiles(filesFromResponse);
 
           const queryParams = new URLSearchParams();
-          queryParams.append('uploadedFiles', JSON.stringify(files));
+          queryParams.append('uploadedFiles', JSON.stringify(response));
           navigate({ to: `${ROUTES.all}?${queryParams.toString()}`, replace: true });
       
-          setUploadedFiles(files);
+          setUploadedFiles(filesFromResponse);
           navigate({ to: ROUTES.all, replace: true })
         } catch (error) {
           console.error("Error fetching uploaded files:", error);

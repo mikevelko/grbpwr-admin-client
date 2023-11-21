@@ -1,7 +1,7 @@
 import React, {FC, useState, useEffect} from "react";
 import styles from 'styles/thumbnail.scss';
 import { deleteFiles, getAllUploadedFiles } from "api";
-import { common_ProductNew, common_ProductMediaInsert } from "api/proto-http/admin";
+import { common_ProductNew, common_ProductMediaInsert, common_Media } from "api/proto-http/admin";
 import { initialProductState } from "../addingProduct";
 import { useNavigate } from "@tanstack/react-location";
 import { ROUTES } from "constants/routes";
@@ -99,17 +99,22 @@ export const Thumbnail: FC<ThumbnailProps> = ({updateProductMedia}) => {
     useEffect(() => {
       const fetchUploadedFiles = async () => {
         try {
-          const response = await getAllUploadedFiles();
-          const filesArray = response.entities || [];
-          const urls = filesArray.map((file: { url: any; }) => file.url)
+          const response = await getAllUploadedFiles({
+            limit: 5,
+            offset: 0,
+            orderFactor: 'ORDER_FACTOR_ASC'
+          });
           
-         setFilesUrl(urls);
-  
+          const filesArray = response.list || [];
+          const urls = filesArray.map((file: common_Media) => file.media?.fullSize || '');
+    
+          setFilesUrl(urls);
+    
         } catch (error) {
           console.error("Error fetching uploaded files:", error);
         }
       };
-  
+    
       fetchUploadedFiles();
     }, []);
 

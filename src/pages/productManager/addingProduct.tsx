@@ -1,5 +1,6 @@
 import React, { FC, useState, useRef, useEffect,} from "react";
 import update from 'immutability-helper';
+import { googletype_Decimal } from "api/proto-http/admin";
 import { Layout } from "components/layout";
 import {
   common_ProductNew,
@@ -16,53 +17,50 @@ import { Thumbnail } from "./productManagerComponents/thumbnail";
 import { Tags } from "./productManagerComponents/tag";
 
 const availableSizes: common_SizeEnum[] = [
-  "XXS",
-  "XS",
-  "S",
-  "M",
-  "L",
-  "XL",
-  "XXL",
-  "OS",
+  "SIZE_ENUM_XXS",
+  "SIZE_ENUM_XS",
+  "SIZE_ENUM_S",
+  "SIZE_ENUM_M",
+  "SIZE_ENUM_L",
+  "SIZE_ENUM_XL",
+  "SIZE_ENUM_XXL",
+  "SIZE_ENUM_OS"
 ];
 
-
 const selectMeasurement: common_MeasurementNameEnum[] = [
-  "WAIST",
-  "INSEAM",
-  "LENGTH",
-  "RISE",
-  "HIPS",
-  "SHOULDERS",
-  "BUST",
-  "SLEEVE",
-  "WIDTH",
-  "HEIGHT"
+  "MEASUREMENT_NAME_ENUM_WAIST",
+  "MEASUREMENT_NAME_ENUM_INSEAM",
+  "MEASUREMENT_NAME_ENUM_LENGTH",
+  "MEASUREMENT_NAME_ENUM_RISE",
+  "MEASUREMENT_NAME_ENUM_HIPS",
+  "MEASUREMENT_NAME_ENUM_SHOULDERS",
+  "MEASUREMENT_NAME_ENUM_BUST",
+  "MEASUREMENT_NAME_ENUM_SLEEVE",
+  "MEASUREMENT_NAME_ENUM_WIDTH",
+  "MEASUREMENT_NAME_ENUM_HEIGHT"
 ]
 
 const categories: common_CategoryEnum[] = [
-  "T_SHIRT",
-  "JEANS",
-  "DRESS",
-  "JACKET",
-  "SWEATER",
-  "PANT",
-  "SKIRT",
-  "SHORT",
-  "BLAZER",
-  "COAT",
-  "SOCKS",
-  "UNDERWEAR",
-  "BRA",
-  "HAT",
-  "SCARF",
-  "GLOVES",
-  "SHOES",
-  "BELT",
-  "OTHER",
+  "CATEGORY_ENUM_T_SHIRT",
+  "CATEGORY_ENUM_JEANS",
+  "CATEGORY_ENUM_DRESS",
+  "CATEGORY_ENUM_JACKET",
+  "CATEGORY_ENUM_SWEATER",
+  "CATEGORY_ENUM_PANT",
+  "CATEGORY_ENUM_SKIRT",
+  "CATEGORY_ENUM_SHORT",
+  "CATEGORY_ENUM_BLAZER",
+  "CATEGORY_ENUM_COAT",
+  "CATEGORY_ENUM_SOCKS",
+  "CATEGORY_ENUM_UNDERWEAR",
+  "CATEGORY_ENUM_BRA",
+  "CATEGORY_ENUM_HAT",
+  "CATEGORY_ENUM_SCARF",
+  "CATEGORY_ENUM_GLOVES",
+  "CATEGORY_ENUM_SHOES",
+  "CATEGORY_ENUM_BELT",
+  "CATEGORY_ENUM_OTHER"
 ]
-
-
 
 export const initialProductState: common_ProductNew = {
   media: [],
@@ -75,12 +73,12 @@ export const initialProductState: common_ProductNew = {
     colorHex: '',
     countryOfOrigin: '',
     thumbnail: '',
-    price: '',
-    salePercentage: '',
+    price: {value: ''},
+    salePercentage: undefined,
     categoryId: 0,
     description: '',
     hidden: false,
-    targetGender: 'MALE',
+    targetGender: 'GENDER_ENUM_MALE',
   },
   sizeMeasurements: [],
   tags: [],
@@ -106,13 +104,13 @@ export const AddProducts: FC = () => {
 
     setProduct((prevProduct) => {
       const updatedSizeMeasurements = [...(prevProduct.sizeMeasurements || [])];
+      const sizeQuantity: googletype_Decimal = { value: value}
 
       if (!updatedSizeMeasurements[sizeIndex]) {
-        
-        const sizeId = sizeIndex + 1; 
+        const sizeId = sizeIndex + 1;
 
         const productSize: common_ProductSizeInsert = {
-          quantity: value,
+          quantity: sizeQuantity,
           sizeId: sizeId,
         };
 
@@ -124,7 +122,7 @@ export const AddProducts: FC = () => {
         // Create a copy of the object to ensure type safety
         updatedSizeMeasurements[sizeIndex] = {
           productSize: {
-            quantity: value,
+            quantity: sizeQuantity,
             sizeId: updatedSizeMeasurements[sizeIndex].productSize?.sizeId || sizeIndex,
           },
           measurements: [],
@@ -148,9 +146,11 @@ export const AddProducts: FC = () => {
       if (updatedSizeMeasurements[sizeIndex]) {
         const updatedMeasurements = [...(updatedSizeMeasurements[sizeIndex].measurements || [])];
 
+        const measurementValue: googletype_Decimal = { value: value};
+
         updatedMeasurements[measurementIndex] = {
           measurementNameId: measurementIndex + 1, // You may adjust this index based on your requirements
-          measurementValue: value,
+          measurementValue: measurementValue,
         };
 
         updatedSizeMeasurements[sizeIndex] = {
@@ -198,7 +198,7 @@ export const AddProducts: FC = () => {
     setProduct((prevProduct) => {
       return update(prevProduct, {
         product: {
-          [name]: { $set: value },
+          [name]: { $set: name === 'price' || name === 'salePercentage' ? { value: value } : value },
         },
       });
     });
@@ -267,13 +267,13 @@ export const AddProducts: FC = () => {
         </div>
 
         <div className={styles.product_container}>
-          <label htmlFor="price" className={styles.title}>Price</label> 
-          <input type="text" name="price" value={product.product?.price}  onChange={handleChange} className={styles.product_input}/>
+          <label htmlFor="price" className={styles.title}>Price</label>
+          <input type="text" name="price" value={product.product?.price?.value}  onChange={handleChange} className={styles.product_input}/>
         </div>
 
         <div className={styles.product_container}>
           <label htmlFor="sale" className={styles.title}>SALES</label>
-          <input type="text" name="salePercentage" value={product.product?.salePercentage} onChange={handleChange} id="sale" className={styles.product_input}/>
+          <input type="text" name="salePercentage" value={product.product?.salePercentage?.value} onChange={handleChange} id="sale" className={styles.product_input}/>
         </div>
 
         <div className={styles.product_container}>

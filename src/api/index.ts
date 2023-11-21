@@ -1,6 +1,6 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
 
-import { createAuthClient, LoginRequest, LoginResponse } from './proto-http/auth/index';
+import { createAuthServiceClient, LoginRequest, LoginResponse } from './proto-http/auth/index';
 
 import {
   common_Media,
@@ -12,9 +12,13 @@ import {
   common_ProductNew,
   GetProductsPagedRequest,
   GetProductByIDRequest,
-  common_ProductFull
+  common_ProductFull,
+  ListObjectsPagedRequest,
+  ListObjectsPagedResponse,
+  UploadContentImageResponse,
+  UploadContentVideoResponse
 } from './proto-http/admin';
-import { error } from 'jquery';
+
 
 
 
@@ -38,7 +42,7 @@ type RequestType = {
 
 
 export function login(username: string, password: string): Promise<LoginResponse> {
-  const authClient = createAuthClient(({ body }: RequestType): Promise<LoginResponse> => {
+  const authClient = createAuthServiceClient(({ body }: RequestType): Promise<LoginResponse> => {
     return axios
       .post<LoginRequest, AxiosResponse<LoginResponse>>(`${process.env.REACT_APP_API_URL}`, body && JSON.parse(body))
       .then((response) => response.data);
@@ -50,12 +54,12 @@ export function login(username: string, password: string): Promise<LoginResponse
 
 // TODO: media section
 
-export function getAllUploadedFiles() {
+export function getAllUploadedFiles(request: ListObjectsPagedRequest): Promise<ListObjectsPagedResponse> {
   const authToken = localStorage.getItem('authToken');
 
   if (authToken === null) {
     console.error('Auth token is null');
-    return Promise.reject('Auth token is null'); 
+    return Promise.reject('Auth token is null');
   }
 
   axios.defaults.baseURL = 'http://backend.grbpwr.com:8081';
@@ -67,9 +71,17 @@ export function getAllUploadedFiles() {
   console.log(authToken);
   console.log(axios.defaults.headers.common);
 
+  const apiRequest ={
+    limit: request.limit,
+    offset: request.offset,
+    order: request.orderFactor
+  }
+
+  const endPoint = 'api/admin/content'
+
   return axios
-    .get('/api/admin/content')
-    .then((response) => response.data)
+    .get(endPoint, {params: apiRequest})
+    .then((response) => response.data as ListObjectsPagedResponse)
     .catch((error) => {
       console.error('Error fetching uploaded files:', error);
       throw error;
@@ -77,7 +89,7 @@ export function getAllUploadedFiles() {
 }
 
 
-export function uploadImage(rawB64Image: string, folder: string, imageName: string): Promise<common_Media> {
+export function uploadImage(rawB64Image: string, folder: string, imageName: string): Promise<UploadContentImageResponse> {
   // Retrieve the authentication token from local storage
   const authToken = localStorage.getItem('authToken');
 
@@ -88,21 +100,23 @@ export function uploadImage(rawB64Image: string, folder: string, imageName: stri
   }
 
   const adminService = createAdminServiceClient(({ body }: RequestType) => {
-    return axios
-      .post<UploadContentImageRequest, AxiosResponse<common_Media>>(`${process.env.REACT_APP_API_IMG}`, body && JSON.parse(body),
-  {
-    headers: {
-      'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-    },
-  }
-      )
-      .then((response) => response.data);
+    return axios.post<UploadContentImageRequest, AxiosResponse<UploadContentImageResponse>>(
+      `${process.env.REACT_APP_API_IMG}`,
+      body && JSON.parse(body),
+      {
+        headers: {
+          'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
+        },
+      }
+    );
   });
 
   return adminService.UploadContentImage({ rawB64Image, folder, imageName });
 }
 
-export function uploadVideo(raw: string, folder: string, videoName: string, contentType: string ): Promise<common_Media> {
+
+
+export function uploadVideo(raw: string, folder: string, videoName: string, contentType: string ): Promise<UploadContentVideoResponse> {
   const authToken = localStorage.getItem('authToken');
 
   if (!authToken) {
@@ -111,7 +125,7 @@ export function uploadVideo(raw: string, folder: string, videoName: string, cont
 
   const adminService = createAdminServiceClient(({ body }: RequestType) => {
     return axios
-      .post<UploadContentVideoRequest, AxiosResponse<common_Media>>(`${process.env.REACT_APP_API_V}`, body && JSON.parse(body),
+      .post<UploadContentVideoRequest, AxiosResponse<UploadContentVideoResponse>>(`${process.env.REACT_APP_API_V}`, body && JSON.parse(body),
   {
     headers: {
       'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
