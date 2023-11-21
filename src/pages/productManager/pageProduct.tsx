@@ -1,65 +1,77 @@
 import React, { FC, useState, useEffect } from "react";
 import { Layout } from "components/layout";
+import { common_Product } from "api/proto-http/admin";
 import { getProductsPaged } from "api";
-import { GetProductsPagedRequest, GetProductsPagedResponse, common_Product } from "api/proto-http/admin";
+import { GetProductsPagedResponse } from "api/proto-http/admin";
 
 
+
+const PAGE_SIZE = 3; // Number of products per page
 
 export const PageProduct: FC = () => {
-  const [products, setProducts] = useState<common_Product[]>([]); // Set initial state to an empty array
-  const [page, setPage] = useState<number>(1);
-  const numberOfProducts = 1;
+  const [products, setProducts] = useState<common_Product[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const fetchData = (page: number) => {
-      const pagedRequest: GetProductsPagedRequest = {
-        limit: numberOfProducts,
-        offset: (page - 1) * numberOfProducts,
-        sortFactors: undefined,
-        orderFactor: "ORDER_FACTOR_ASC",
-        filterConditions: undefined,
-        showHidden: undefined
-      };
-
-      getProductsPaged(pagedRequest)
-          .then((data: GetProductsPagedResponse) => {
-              setProducts(data.products || []);
-          })
-          .catch((error) => {
-              console.error('error fetching data', error);
-          });
-  };
-
+ 
   useEffect(() => {
-      fetchData(page);
-  }, [page]);
+    const fetchData = async () => {
+      try {
+        // Fetch products for the current page
+        const response: GetProductsPagedResponse = await getProductsPaged({
+          limit: PAGE_SIZE,
+          offset: (currentPage - 1) * PAGE_SIZE,
+          sortFactors: undefined,
+          orderFactor: 'ORDER_FACTOR_ASC',
+          filterConditions: undefined,
+          showHidden: true,
+        });
+
+        // Update the products state
+        setProducts((prevProducts) =>
+          currentPage === 1
+            ? response.products?.slice(0, PAGE_SIZE) || []
+            : [...prevProducts, ...(response.products || [])]
+        );
+
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    setProducts([])
+
+    fetchData(); // Fetch data when the component mounts or currentPage changes
+  }, [currentPage]);
+
 
   const handlePageChange = (newPage: number) => {
-      setPage(newPage);
+    setCurrentPage(newPage);
   };
 
   return (
-      <Layout>
-          <div>
-              {products.length > 0 ? ( // Check if the array is not empty before rendering products
-                  products.map((product) => (
-                      <div key={product.id}>
-                          {/* Display product information here */}
-                          <p>{product.productInsert?.name}</p>
-                          <img src={product.productInsert?.thumbnail} alt="" style={{ width: '100px', height: '200px' }} />
-                      </div>
-                  ))
-              ) : (
-                  <p>No products found</p>
-              )}
+    <Layout>
+      {/* Display your products here */}
+      <ul>
+        {products.map((product) => (
+          <li key={product.id}>{product.productInsert?.name}</li>
+        ))}
+      </ul>
 
-              <div>
-                  <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
-                      Previous
-                  </button>
-                  <span> Page {page} </span>
-                  <button onClick={() => handlePageChange(page + 1)}>Next</button>
-              </div>
-          </div>
-      </Layout>
+      {/* Pagination controls */}
+      <div>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span> Page {currentPage}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+        >
+          Next
+        </button>
+      </div>
+    </Layout>
   );
 };
