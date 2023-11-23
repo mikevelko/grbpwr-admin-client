@@ -1,8 +1,10 @@
 import React, { FC, useState, useEffect } from "react";
 import { Layout } from "components/layout";
 import { common_Product } from "api/proto-http/admin";
-import { getProductsPaged } from "api";
-import { GetProductsPagedResponse } from "api/proto-http/admin";
+import { getProductsPaged, getProdById} from "api";
+import { useNavigate } from "@tanstack/react-location";
+import { GetProductsPagedResponse, } from "api/proto-http/admin";
+import { ROUTES } from "constants/routes";
 
 
 
@@ -11,12 +13,11 @@ const PAGE_SIZE = 3; // Number of products per page
 export const PageProduct: FC = () => {
   const [products, setProducts] = useState<common_Product[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const navigate = useNavigate()
 
- 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch products for the current page
         const response: GetProductsPagedResponse = await getProductsPaged({
           limit: PAGE_SIZE,
           offset: (currentPage - 1) * PAGE_SIZE,
@@ -25,8 +26,6 @@ export const PageProduct: FC = () => {
           filterConditions: undefined,
           showHidden: true,
         });
-
-        // Update the products state
         setProducts((prevProducts) =>
           currentPage === 1
             ? response.products?.slice(0, PAGE_SIZE) || []
@@ -40,7 +39,7 @@ export const PageProduct: FC = () => {
 
     setProducts([])
 
-    fetchData(); // Fetch data when the component mounts or currentPage changes
+    fetchData();
   }, [currentPage]);
 
 
@@ -48,30 +47,33 @@ export const PageProduct: FC = () => {
     setCurrentPage(newPage);
   };
 
+  const handleProductId = async (productId: number | undefined) => {
+    try {
+        const response = await getProdById({ id: productId });
+        const queryParams = new URLSearchParams();
+        navigate({
+          to: `${ROUTES.singleProduct}/${productId}?${queryParams.toString()}`,
+          replace: true,
+        });
+      } catch (error) {
+      console.error('Error fetching product details:', error);
+    }
+  }  
+
   return (
     <Layout>
-      {/* Display your products here */}
       <ul>
         {products.map((product) => (
-          <li key={product.id}>{product.productInsert?.name}</li>
+          <li key={product.id} onClick={() => handleProductId(product.id)}>
+            <img src={product.productInsert?.thumbnail} alt="img" style={{width: '100px', height: '100px'}} />
+          </li>
         ))}
       </ul>
-
-      {/* Pagination controls */}
       <div>
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span> Page {currentPage}</span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
-          Next
-        </button>
+        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
+        <span>{currentPage}</span>
+        <button onClick={() => handlePageChange(currentPage + 1)}>Next</button>
       </div>
     </Layout>
   );
-};
+}

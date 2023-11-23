@@ -1,42 +1,42 @@
-// import React, { FC, useEffect, useState } from "react";
-// import { useLocation, useParams } from "react-router-dom";
-// import { common_ProductFull, GetProductByIDRequest } from "api/proto-http/admin";
-// import { getProdById } from "api";
+import React, { FC, useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { common_ProductFull, GetProductByIDRequest } from "api/proto-http/admin";
+import { getProdById } from "api";
+import { Layout } from "components/layout";
+import { useNavigate } from "@tanstack/react-location";
+import { ROUTES } from "constants/routes";
 
-// export const ProductById: FC = () => {
-//   const { productId } = useParams<{ productId: string | undefined }>();
-//   const [selectedProduct, setSelectedProduct] = useState<common_ProductFull>();
 
-//   useEffect(() => {
-//     // Check if productId is defined before proceeding
-//     if (productId !== undefined) {
-//       // Parse productId as needed (e.g., converting it to a number)
-//       const id = parseInt(productId, 10);
-
-//       const requestParams: GetProductByIDRequest = {
-//         id: 5,
-//       };
-
-//       // Call the Axios request to get the details of the product
-//       getProdById(requestParams)
-//         .then((data) => {
-//           // Handle the data returned from the API
-//           setSelectedProduct(data.product);
-//         })
-//         .catch((error) => {
-//           // Handle errors
-//           console.error('Error fetching product details:', error);
-//         });
-//     }
-//   }, [productId]);
-
-//   return (
-//     <div>
-    
-//       {selectedProduct && selectedProduct.product && (
-//         <h2>{selectedProduct.product.id}</h2>
-//       )}
-//       <h3>hello</h3>
-//     </div>
-//   );
-// };
+export const ProductDetails: FC = () => {
+    const { productId } = useParams(); // Get the productId from the URL
+    const [product, setProduct] = useState<common_ProductFull | null>(null);
+  
+    useEffect(() => {
+        console.log('hui')
+        console.log("productId:", productId);
+      const fetchData = async () => {
+        try {
+          const response = await getProdById({ id: productId } as GetProductByIDRequest);
+          setProduct(response.product);
+        } catch (error) {
+          console.error('Error fetching product details:', error);
+        }
+      };
+  
+      fetchData();
+    }, [productId]);
+  
+    return (
+      <Layout>
+        <h1>hello</h1>
+        {product ? (
+          <div>
+            <h2>{product.product?.productInsert?.name}</h2>
+            {/* Display other product details as needed */}
+          </div>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </Layout>
+    );
+  };

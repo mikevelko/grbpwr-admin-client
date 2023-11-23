@@ -118,7 +118,7 @@ export function uploadImage(rawB64Image: string, folder: string, imageName: stri
 
 export function uploadVideo(raw: string, folder: string, videoName: string, contentType: string ): Promise<UploadContentVideoResponse> {
   const authToken = localStorage.getItem('authToken');
-
+// TODO: delete authtoken check
   if (!authToken) {
     return Promise.reject(new Error('no auth'));
   }
