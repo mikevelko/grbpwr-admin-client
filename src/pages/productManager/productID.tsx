@@ -1,42 +1,35 @@
-import React, { FC, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getProdById } from "api";
-import { useLocation } from "react-router-dom";
+import React, { FC, useState, useEffect } from "react";
 import { Layout } from "components/layout";
-import { common_ProductFull, GetOrderByIdResponse } from "api/proto-http/admin";
+import { common_ProductFull, GetProductByIDRequest } from "api/proto-http/admin";
+import { getProdById } from "api";
+import queryString from "query-string";
 
 export const ProductID: FC = () => {
-    const { productId } = useParams<{ productId: string }>();
-    const [productInfo, setProductInfo] = useState<common_ProductFull | undefined>();
-
+    const queryParams = queryString.parse(window.location.search);
+    const productId = queryParams.productId as string;
+    const [product, setProuct] = useState<common_ProductFull | undefined>(undefined)
+  
     useEffect(() => {
-        const fetchProductInfo = async () => {
-            try {
-                console.log('Fetching product info...');
-                const response = await getProdById({ id: productId as number | undefined });
-                console.log('Response:', response);
-                setProductInfo(response.product);
-            } catch (error) {
-                console.error('Error fetching product details:', error);
-            }
-        };
-
-        if (productId) {
-            console.log('Product ID:', productId);
-            fetchProductInfo();
+      const fetchData = async () => {
+        try {
+          const response = await getProdById({ id: Number(productId) });
+          setProuct(response.product)
+        } catch (error) {
+          console.error('Error fetching product data:', error);
         }
+      };
+  
+      fetchData();
     }, [productId]);
-
-    console.log('Product Info (outside useEffect):', productInfo);
-
+  
     return (
-        <Layout>
-            {productInfo ? (
-
-                <p>{productInfo.product?.productInsert?.name}</p>
-            ) : (
-                <p>loanding</p>
-            )}
-        </Layout>
+      <Layout>
+        <p>{product?.product?.productInsert?.name}</p>
+        <p>{product?.product?.productInsert?.color}</p>
+        <p>{product?.product?.createdAt}</p>
+        <img src={product?.product?.productInsert?.thumbnail} alt="thumb"  style={{width: '100px', height: '100px'}}/>
+        <p></p>
+        <p></p>
+      </Layout>
     );
-};
+  };

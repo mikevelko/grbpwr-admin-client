@@ -6,5 +6,5 @@ export enum ROUTES {
   product = '/product',
   addProduct = '/addProd',
   pagedProduct = '/pageProd',
-  singleProduct = '/productById/:productId'
+  singleProduct = '/productById'
 }

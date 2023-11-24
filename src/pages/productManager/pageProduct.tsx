@@ -13,6 +13,7 @@ const PAGE_SIZE = 3; // Number of products per page
 export const PageProduct: FC = () => {
   const [products, setProducts] = useState<common_Product[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [selectedProductIndex, setSelectedProductIndex] = useState<number | undefined>(undefined)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -47,24 +48,18 @@ export const PageProduct: FC = () => {
     setCurrentPage(newPage);
   };
 
-  const handleProductId = async (productId: number | undefined) => {
-    try {
-        const response = await getProdById({ id: productId });
-        const queryParams = new URLSearchParams();
-        navigate({
-          to: `${ROUTES.singleProduct}/${productId}?${queryParams.toString()}`,
-          replace: true,
-        });
-      } catch (error) {
-      console.error('Error fetching product details:', error);
-    }
-  }  
+  const handleProductClick = (index: number | undefined) => {
+    setSelectedProductIndex(index);
+    // Navigate to another page with the selected index
+    navigate({ to: `${ROUTES.singleProduct}?productId=${index}`, replace: true });
+  };
+
 
   return (
     <Layout>
       <ul>
         {products.map((product) => (
-          <li key={product.id} onClick={() => handleProductId(product.id)}>
+          <li key={product.id} onClick={() => handleProductClick(product.id)}>
             <img src={product.productInsert?.thumbnail} alt="img" style={{width: '100px', height: '100px'}} />
           </li>
         ))}
