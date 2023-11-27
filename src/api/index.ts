@@ -1,4 +1,4 @@
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from 'axios';
 
 import { createAuthServiceClient, LoginRequest, LoginResponse } from './proto-http/auth/index';
 
@@ -12,6 +12,7 @@ import {
   common_ProductNew,
   GetProductsPagedRequest,
   GetProductByIDRequest,
+  GetProductByIDResponse,
   common_ProductFull,
   ListObjectsPagedRequest,
   ListObjectsPagedResponse,
@@ -19,26 +20,33 @@ import {
   UploadContentVideoResponse
 } from './proto-http/admin';
 
-
-
-
-const getAuthHeaders = (authToken: string) => ({
-  'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-});
-
-axios.defaults.baseURL = 'http://backend.grbpwr.com:8081';
-
-
-export enum MUTATIONS {
-  login = 'login',
-}
-
-// copy of type inside generated file (no export, need to define explicitly)
 type RequestType = {
   path: string;
   method: string;
   body: string | null;
 };
+
+export enum MUTATIONS {
+  login = 'login',
+}
+
+axios.defaults.baseURL = 'http://backend.grbpwr.com:8081';
+
+
+axios.interceptors.request.use(
+  (config) => {
+    const authToken = localStorage.getItem('authToken');
+
+    if (authToken) {
+      config.headers = config.headers || {};
+      config.headers['Grpc-Metadata-Authorization'] = `Bearer ${authToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 
 export function login(username: string, password: string): Promise<LoginResponse> {
@@ -55,21 +63,6 @@ export function login(username: string, password: string): Promise<LoginResponse
 // TODO: media section
 
 export function getAllUploadedFiles(request: ListObjectsPagedRequest): Promise<ListObjectsPagedResponse> {
-  const authToken = localStorage.getItem('authToken');
-
-  if (authToken === null) {
-    console.error('Auth token is null');
-    return Promise.reject('Auth token is null');
-  }
-
-  axios.defaults.baseURL = 'http://backend.grbpwr.com:8081';
-
-  const authHeaders = getAuthHeaders(authToken);
-
-  axios.defaults.headers.common = { ...axios.defaults.headers.common, ...authHeaders };
-
-  console.log(authToken);
-  console.log(axios.defaults.headers.common);
 
   const apiRequest ={
     limit: request.limit,
@@ -90,24 +83,10 @@ export function getAllUploadedFiles(request: ListObjectsPagedRequest): Promise<L
 
 
 export function uploadImage(rawB64Image: string, folder: string, imageName: string): Promise<UploadContentImageResponse> {
-  // Retrieve the authentication token from local storage
-  const authToken = localStorage.getItem('authToken');
-
-  if (!authToken) {
-    // Handle the case when the authentication token is not available
-    alert('lol');
-    return Promise.reject(new Error('Authentication token not found'));
-  }
 
   const adminService = createAdminServiceClient(({ body }: RequestType) => {
     return axios.post<UploadContentImageRequest, AxiosResponse<UploadContentImageResponse>>(
-      `${process.env.REACT_APP_API_IMG}`,
-      body && JSON.parse(body),
-      {
-        headers: {
-          'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-        },
-      }
+      `${process.env.REACT_APP_API_IMG}`, body && JSON.parse(body),
     );
   });
 
@@ -117,20 +96,10 @@ export function uploadImage(rawB64Image: string, folder: string, imageName: stri
 
 
 export function uploadVideo(raw: string, folder: string, videoName: string, contentType: string ): Promise<UploadContentVideoResponse> {
-  const authToken = localStorage.getItem('authToken');
-// TODO: delete authtoken check
-  if (!authToken) {
-    return Promise.reject(new Error('no auth'));
-  }
 
   const adminService = createAdminServiceClient(({ body }: RequestType) => {
     return axios
       .post<UploadContentVideoRequest, AxiosResponse<UploadContentVideoResponse>>(`${process.env.REACT_APP_API_V}`, body && JSON.parse(body),
-  {
-    headers: {
-      'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-    },
-  }
       )
   });
 
@@ -142,20 +111,6 @@ export function uploadVideo(raw: string, folder: string, videoName: string, cont
 
 
 export function deleteFiles(objectKeys: string[] | undefined) {
-  const authToken = localStorage.getItem('authToken');
-
-  if (!authToken) {
-    console.error('Auth token is null');
-    return Promise.reject('Auth token is null');
-  }
-
-  axios.defaults.baseURL = 'http://backend.grbpwr.com:8081';
-
-  const authHeaders = {
-    'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-  };
-
-  axios.defaults.headers.common = { ...axios.defaults.headers.common, ...authHeaders };
 
   const apiUrl = '/api/admin/content';
 
@@ -163,8 +118,6 @@ export function deleteFiles(objectKeys: string[] | undefined) {
   const queryParams = objectKeys?.map((key) => `objectKeys=${encodeURIComponent(key)}`).join('&');
   const requestUrl = queryParams ? `${apiUrl}?${queryParams}` : apiUrl;
 
-  console.log(authToken);
-  console.log(axios.defaults.headers.common);
 
   return axios
     .delete(requestUrl)
@@ -183,12 +136,6 @@ export function deleteFiles(objectKeys: string[] | undefined) {
 
 
 export function addProduct(product: common_ProductNew): Promise<AddProductResponse> {
-  const authToken = localStorage.getItem('authToken');
-
-  if (!authToken) {
-    console.error('Auth token is null');
-    return Promise.reject('Auth token is null');
-  }
 
   const adminService = createAdminServiceClient(({ body }: RequestType) => {
     try {
@@ -198,12 +145,7 @@ export function addProduct(product: common_ProductNew): Promise<AddProductRespon
       return axios
   .post<AddProductRequest, AxiosResponse<AddProductResponse>>(
     `${process.env.REACT_APP_ADD_PRODUCT}`,
-    parsedBody, // Use the parsed body in the request
-    {
-      headers: {
-        'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
-      },
-    }
+    parsedBody,
   )
   .then((response) => response.data);
     } catch (error) {
@@ -224,19 +166,6 @@ export function getProductsPaged({
   filterConditions,
   showHidden,
 }: GetProductsPagedRequest) {
-  const authToken = localStorage.getItem('authToken');
-
-  if (!authToken) {
-    console.error('Auth token is null');
-    return Promise.reject('Auth token is null');
-  }
-
-  const authHeaders = getAuthHeaders(authToken);
-
-  axios.defaults.headers.common = { ...axios.defaults.headers.common, ...authHeaders };
-
-  console.log(authToken);
-  console.log(axios.defaults.headers.common);
 
   const queryParams: Record<string, string | string[]> = {};
 
@@ -313,36 +242,45 @@ export function getProductsPaged({
     });
 }
 
-export function getProdById ({id}: GetProductByIDRequest) {
-  const authToken = localStorage.getItem('authToken');
+export function getProductByID(request: GetProductByIDRequest): Promise<GetProductByIDResponse> {
 
-  if (!authToken) {
-    console.error('Auth token is null');
-    return Promise.reject('Auth token is null');
-  }
+  const axiosConfig: AxiosRequestConfig = {
+    method: 'GET',
+    url: `/api/admin/product/${request.id}`,
+  };
 
-  const authHeaders = getAuthHeaders(authToken);
-
-  axios.defaults.headers.common = { ...axios.defaults.headers.common, ...authHeaders };
-
-  console.log(authToken);
-  console.log(axios.defaults.headers.common);
-
-  const queryParams: Record<string, string | string[]> = {};
-
-  const url = `/api/admin/product/${id}`
-
-  return axios
-  .get(url, { params: queryParams })
-  .then((response) => {
-    const product: common_ProductFull = response.data.product;
-    return { product }
-  })
-  .catch((error) => {
-    console.error('Error fetching data:', error);
-    throw error;
-  })
+  return axios(axiosConfig)
+    .then((response) => {
+      const product: common_ProductFull = response.data.product;
+      return { product };
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+      throw error;
+    });
 }
+
+// export function getProductByID(request: GetProductByIDRequest): Promise<GetProductByIDResponse> {
+//   const authToken = localStorage.getItem('authToken');
+
+//   if (!authToken) {
+//     return Promise.reject(new Error('no auth'));
+//   }
+
+//   const adminService = createAdminServiceClient(({ path, method }: RequestType) => {
+//     const axiosConfig: AxiosRequestConfig = {
+//       method,
+//       url: `api/admin/product/${request.id}`,
+//       headers: {
+//         'Grpc-Metadata-Authorization': `Bearer ${authToken}`,
+//       },
+//     };
+
+//     return axios(axiosConfig);
+//   });
+
+//   return adminService.GetProductByID(request);
+// }
 
 
 

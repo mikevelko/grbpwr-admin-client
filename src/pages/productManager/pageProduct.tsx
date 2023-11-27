@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { Layout } from "components/layout";
 import { common_Product } from "api/proto-http/admin";
-import { getProductsPaged, getProdById} from "api";
+import { getProductsPaged, getProductByID} from "api";
 import { useNavigate } from "@tanstack/react-location";
 import { GetProductsPagedResponse, } from "api/proto-http/admin";
 import { ROUTES } from "constants/routes";
