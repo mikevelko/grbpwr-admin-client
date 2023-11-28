@@ -6,7 +6,6 @@ import { initialProductState } from "../addingProduct";
 import { useNavigate } from "@tanstack/react-location";
 import { ROUTES } from "constants/routes";
 
-// const { productMedia } = initialProductState;
 
 interface ThumbnailProps {
   updateProductMedia: (updatedMedia: any) => void;
@@ -129,17 +128,17 @@ export const Thumbnail: FC<ThumbnailProps> = ({updateProductMedia}) => {
     const handleImage = () => {
       if (selectedImage.length > 0) {
         const updatedMedia: common_ProductMediaInsert[] = [...(product.media || [])];
-    
+
         selectedImage.forEach((imageUrl) => {
           const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
-    
+
           updatedMedia.push({
             fullSize: imageUrl,
             thumbnail: imageUrl,
             compressed: compressedUrl,
           });
         });
-    
+
         setProduct((prevProduct: common_ProductNew) => ({
           ...prevProduct,
           media: updatedMedia

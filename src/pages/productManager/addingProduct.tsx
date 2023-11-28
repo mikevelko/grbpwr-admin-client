@@ -89,9 +89,6 @@ export const AddProducts: FC = () => {
   const [product, setProduct] = useState<common_ProductNew>({
     ...initialProductState, tags: []
   });
-  const [categoryInput, setCategoryInput] = useState<string>('');
-  // Category
-  const [category, setCategory] = useState('');
   // Color HEX
   const [color, setColor] = useState('#000000');
   const [showHex, setShowHex] = useState(false);

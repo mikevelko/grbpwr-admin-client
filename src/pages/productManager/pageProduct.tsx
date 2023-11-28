@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { Layout } from "components/layout";
 import { common_Product } from "api/proto-http/admin";
-import { getProductsPaged, getProductByID} from "api";
+import { getProductsPaged, deleteProductByID} from "api";
 import { useNavigate } from "@tanstack/react-location";
 import { GetProductsPagedResponse, } from "api/proto-http/admin";
 import { ROUTES } from "constants/routes";
@@ -54,12 +54,22 @@ export const PageProduct: FC = () => {
     navigate({ to: `${ROUTES.singleProduct}?productId=${index}`, replace: true });
   };
 
+  const handleDeleteClick = async (productId: number | undefined) => {
+    try {
+      await deleteProductByID({id: productId});
+
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
+
 
   return (
     <Layout>
       <ul>
         {products.map((product) => (
           <li key={product.id} onClick={() => handleProductClick(product.id)}>
+            <button onClick={() => handleDeleteClick(product.id)}>X</button>
             <img src={product.productInsert?.thumbnail} alt="img" style={{width: '100px', height: '100px'}} />
           </li>
         ))}

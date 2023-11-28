@@ -1,9 +1,8 @@
-import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from 'axios';
+import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 
 import { createAuthServiceClient, LoginRequest, LoginResponse } from './proto-http/auth/index';
 
 import {
-  common_Media,
   UploadContentImageRequest,
   UploadContentVideoRequest,
   createAdminServiceClient,
@@ -17,7 +16,12 @@ import {
   ListObjectsPagedRequest,
   ListObjectsPagedResponse,
   UploadContentImageResponse,
-  UploadContentVideoResponse
+  UploadContentVideoResponse,
+  AddProductMediaRequest,
+  AddProductMediaResponse,
+  DeleteProductByIDRequest,
+  DeleteProductByIDResponse,
+
 } from './proto-http/admin';
 
 type RequestType = {
@@ -38,6 +42,7 @@ axios.interceptors.request.use(
     const authToken = localStorage.getItem('authToken');
 
     if (authToken) {
+      console.log(authToken);
       config.headers = config.headers || {};
       config.headers['Grpc-Metadata-Authorization'] = `Bearer ${authToken}`;
     }
@@ -59,8 +64,6 @@ export function login(username: string, password: string): Promise<LoginResponse
   return authClient.Login({ username, password });
 
 }
-
-// TODO: media section
 
 export function getAllUploadedFiles(request: ListObjectsPagedRequest): Promise<ListObjectsPagedResponse> {
 
@@ -94,7 +97,6 @@ export function uploadImage(rawB64Image: string, folder: string, imageName: stri
 }
 
 
-
 export function uploadVideo(raw: string, folder: string, videoName: string, contentType: string ): Promise<UploadContentVideoResponse> {
 
   const adminService = createAdminServiceClient(({ body }: RequestType) => {
@@ -107,14 +109,11 @@ export function uploadVideo(raw: string, folder: string, videoName: string, cont
 
 }
 
-
-
-
+// TODO: try to generate delete request in gpt
 export function deleteFiles(objectKeys: string[] | undefined) {
 
   const apiUrl = '/api/admin/content';
 
-  // Construct the query parameters
   const queryParams = objectKeys?.map((key) => `objectKeys=${encodeURIComponent(key)}`).join('&');
   const requestUrl = queryParams ? `${apiUrl}?${queryParams}` : apiUrl;
 
@@ -282,6 +281,40 @@ export function getProductByID(request: GetProductByIDRequest): Promise<GetProdu
 //   return adminService.GetProductByID(request);
 // }
 
+export function addMediaByID(request: AddProductMediaRequest): Promise<AddProductMediaResponse> {
+  const { productId, ...rest } = request;
+
+  const apiUrl = `${process.env.REACT_APP_ADD_MEDIA_BY_ID}`.replace('{productId}', productId?.toString() || '');
+
+  const adminService = createAdminServiceClient(({ body }: RequestType) => {
+    return axios
+      .post<AddProductMediaRequest, AxiosResponse<AddProductMediaResponse>>(apiUrl, body && JSON.parse(body))
+      .then((response) => {
+        console.log('Response:', response);
+        return response.data;
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        throw error;
+      });
+  });
+
+  return adminService.AddProductMedia(request);
+}
+
+
+export function deleteProductByID(request: DeleteProductByIDRequest): Promise<DeleteProductByIDResponse> {
+  const {id, ...rest} = request;
+
+  const apiUrl = `http://backend.grbpwr.com:8081/api/admin/product/${id}`;
+
+  return axios
+    .delete(apiUrl)
+    .then(response => response.data as DeleteProductByIDResponse)
+    .catch(error => {
+      throw error;
+  });
+}
 
 
 

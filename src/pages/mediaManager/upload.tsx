@@ -1,7 +1,8 @@
+
+import React, { FC, useEffect, useState, useRef } from 'react';
 import { getAllUploadedFiles, deleteFiles} from 'api';
 import { common_Media } from 'api/proto-http/admin';
 import { Layout } from 'components/layout';
-import React, { FC, useEffect, useState, useRef } from 'react';
 import styles from 'styles/upload.scss';
 
 interface UploadedFile {
@@ -20,12 +21,12 @@ function copyToClipboard(text: string | undefined) {
 
 
 export const UploadPage: FC = () => {
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[] | undefined>([]);
   const [order, setOrder] = useState<'plus' | 'minus'>('plus');
   const [filter, setFilter] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const isFetchingData = useRef(false);
-  const filesOnPage = 5
+  const filesOnPage = 10
 
 
   const handlePictures = () => {
@@ -49,7 +50,7 @@ export const UploadPage: FC = () => {
   }
 
   const sortByDate = () => {
-    const sortedFiles = [...uploadedFiles];
+    const sortedFiles = [...uploadedFiles!];
     sortedFiles.sort((a, b) => {
       const dateA = a.lastModified ? new Date(a.lastModified).getTime() : 0;
       const dateB = b.lastModified ? new Date(b.lastModified).getTime() : 0;
@@ -67,8 +68,6 @@ export const UploadPage: FC = () => {
     setOrder(order === 'plus' ? 'minus' : 'plus');
     sortByDate(); // Sort when the order changes
   }
-
-
 
   function generateStringArray(input: string | undefined): string[] {
     // Define a regular expression pattern to match the relevant part of the URL
@@ -97,17 +96,19 @@ export const UploadPage: FC = () => {
 // DELETE FUNCTION
 
 const handleDeleteFile = async (fileIndex: number) => {
-
   try {
-    const fileToDelete = uploadedFiles[fileIndex];
+    const fileToDelete = uploadedFiles![fileIndex];
     const url = fileToDelete.url;
-    
+
     const objectKeys = generateStringArray(url);
 
     // Check if objectKeys is not empty (i.e., the URL matched the pattern)
     if (objectKeys.length > 0) {
+      // Ensure deleteFiles is asynchronous and returns a Promise
       await deleteFiles(objectKeys);
-      const updatedFiles = [...uploadedFiles];
+
+      // Update the state only after successful deletion
+      const updatedFiles = [...uploadedFiles!];
       updatedFiles.splice(fileIndex, 1);
       setUploadedFiles(updatedFiles);
     } else {
@@ -116,31 +117,17 @@ const handleDeleteFile = async (fileIndex: number) => {
   } catch (error) {
     console.error('Error deleting file:', error);
   }
-}
-
-// ....
-
-const handleNextPage = () => {
-  // Update the current page using the callback form
-  setCurrentPage((prevPage) => prevPage + 1);
 };
 
-// ...
 
 useEffect(() => {
   const fetchData = async () => {
-    // If data is already being fetched, return early
-    if (isFetchingData.current) {
-      return;
-    }
 
     try {
-      // Set the ref to true to indicate that data is being fetched
-      isFetchingData.current = true;
 
       const response = await getAllUploadedFiles({
-        limit: filesOnPage,
-        offset: (currentPage - 1) * filesOnPage,
+        limit: 20,
+        offset: 0,
         orderFactor: undefined,
       });
 
@@ -151,17 +138,17 @@ useEffect(() => {
         lastModified: media.createdAt,
       }));
 
-      setUploadedFiles((prevFiles) => [...prevFiles, ...mapedFiles]);
+      setUploadedFiles(mapedFiles);
     } catch (error) {
       console.error('Error fetching uploaded files:', error);
     } finally {
-      // Set the ref back to false when the fetch is completed
       isFetchingData.current = false;
     }
   };
 
   fetchData();
 }, [currentPage]);
+
 
 
 
@@ -185,7 +172,7 @@ return (
       </div>
       <ul className={styles.uploaded_files}>
         {uploadedFiles
-          .slice((currentPage - 1) * filesOnPage, currentPage * filesOnPage)
+          ?.slice((currentPage - 1) * filesOnPage, currentPage * filesOnPage)
           .filter((file) => {
             if (filter === 'PICTURES') {
               return (
@@ -240,14 +227,11 @@ return (
             </li>
           ))}
       </ul>
-      <button onClick={handleNextPage} className={styles.next_page_btn}>
-        Next Page
-      </button>
     </div>
   </Layout>
 );
 };
 
 
-{/* <button onClick={() => handleDeleteFile(index)} className={styles.delete_btn}>X</button> */}
+
 
