@@ -11,7 +11,10 @@ import styles from 'styles/paged.scss'
 
 const PAGE_SIZE = 3; // Number of products per page
 
+
+// TODO: remove nepravilno blyat'
 const sortFactorOptions: common_SortFactor[] = [
+  "SORT_FACTOR_UNKNOWN",
   "SORT_FACTOR_CREATED_AT",
   "SORT_FACTOR_UPDATED_AT",
   "SORT_FACTOR_NAME",
@@ -28,7 +31,7 @@ export const PageProduct: FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(PAGE_SIZE);
   const [offset, setOffset] = useState<number>(0);
-  const [sortFactors, setSortFactors] = useState<common_SortFactor | undefined>(undefined);
+  // const [sortFactors, setSortFactors] = useState<common_SortFactor[] | undefined>(sortFactorOptions);
   const [orderFactor, setOrderFactor] = useState<common_OrderFactor | undefined>(undefined)
   const [selectedProductIndex, setSelectedProductIndex] = useState<number | undefined>(undefined);
   const navigate = useNavigate();
@@ -57,7 +60,7 @@ export const PageProduct: FC = () => {
   useEffect(() => {
     setProducts([]);
     fetchData();
-  }, [currentPage, sortFactors, orderFactor ]);
+  }, [currentPage, orderFactor ]);
 
 
   const handlePageChange = (newPage: number) => {
@@ -84,15 +87,6 @@ export const PageProduct: FC = () => {
     <Layout>
       <div className={styles.product_container}>
       <div>
-
-          {/* <label>
-            Sort:
-            <select value={sortFactors || ''} onChange={(e) => setSortFactors(e.target.value as common_SortFactor)}>
-              {sortFactorOptions?.map((factor, index) => (
-                <option key={index} value={factor}>{factor}</option>
-              ))}
-            </select>
-          </label> */}
 
           <label htmlFor="">
             order
