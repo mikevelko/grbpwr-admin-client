@@ -1,0 +1,39 @@
+.product_container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+    margin: 40px 0;
+
+    .product_list {
+        display: grid;
+
+        li {
+            width: 157px;
+            height: 216px;
+            border: 2px solid black;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+
+            button {
+                position: absolute;
+                right: 0;
+                background-color: white;
+                border: none;
+            }
+
+            img {
+                width: 155px;
+                height: 216px;
+                object-fit: scale-down;
+            }
+
+            h5 {
+                text-align: center;
+                border: 1px solid red;
+            }
+        }
+    }
+}
