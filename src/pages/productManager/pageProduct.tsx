@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { Layout } from "components/layout";
 import { common_OrderFactor, common_Product, common_SortFactor } from "api/proto-http/admin";
-import { getProductsPaged, deleteProductByID} from "api";
+import { getProductsPaged, deleteProductByID } from "api";
 import { useNavigate } from "@tanstack/react-location";
 import { GetProductsPagedResponse, } from "api/proto-http/admin";
 import { ROUTES } from "constants/routes";
@@ -60,7 +60,7 @@ export const PageProduct: FC = () => {
   useEffect(() => {
     setProducts([]);
     fetchData();
-  }, [currentPage, orderFactor ]);
+  }, [currentPage, orderFactor]);
 
 
   const handlePageChange = (newPage: number) => {
@@ -75,7 +75,7 @@ export const PageProduct: FC = () => {
 
   const handleDeleteClick = async (productId: number | undefined) => {
     try {
-      await deleteProductByID({id: productId});
+      await deleteProductByID({ id: productId });
 
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -86,18 +86,18 @@ export const PageProduct: FC = () => {
   return (
     <Layout>
       <div className={styles.product_container}>
-      <div>
+        <div>
 
           <label htmlFor="">
             order
             <select value={orderFactor || ''} onChange={(e) => setOrderFactor(e.target.value as common_OrderFactor)}>
-             {orderFactorOptions.map((order, index) => (
-              <option key={index} value={order}>{order}</option>
-             ))}
+              {orderFactorOptions.map((order, index) => (
+                <option key={index} value={order}>{order}</option>
+              ))}
             </select>
           </label>
           <button onClick={() => fetchData()}>Apply</button>
-      </div>
+        </div>
         <ul className={styles.product_list}>
           {products.map((product) => (
             <li key={product.id} onClick={() => handleProductClick(product.id)}>

@@ -1,6 +1,5 @@
 import React, { FC, useState, useRef, useEffect } from 'react';
 import update from 'immutability-helper';
-import { googletype_Decimal } from 'api/proto-http/admin';
 import { Layout } from 'components/layout';
 import {
   common_ProductNew,
@@ -8,6 +7,7 @@ import {
   common_MeasurementNameEnum,
   common_ProductSizeInsert,
   common_CategoryEnum,
+  googletype_Decimal,
 } from 'api/proto-http/admin';
 import { addProduct } from 'api';
 import { ChromePicker } from 'react-color';
@@ -16,16 +16,17 @@ import { Thumbnail } from './productManagerComponents/thumbnail';
 // import { Sizes } from "./productManagerComponents/sizes";
 import { Tags } from './productManagerComponents/tag';
 
-const availableSizes: common_SizeEnum[] = [
-  'SIZE_ENUM_XXS',
-  'SIZE_ENUM_XS',
-  'SIZE_ENUM_S',
-  'SIZE_ENUM_M',
-  'SIZE_ENUM_L',
-  'SIZE_ENUM_XL',
-  'SIZE_ENUM_XXL',
-  'SIZE_ENUM_OS',
-];
+
+// const availableSizes: common_SizeEnum[] = [
+//   'SIZE_ENUM_XXS',
+//   'SIZE_ENUM_XS',
+//   'SIZE_ENUM_S',
+//   'SIZE_ENUM_M',
+//   'SIZE_ENUM_L',
+//   'SIZE_ENUM_XL',
+//   'SIZE_ENUM_XXL',
+//   'SIZE_ENUM_OS',
+// ];
 
 const selectMeasurement: common_MeasurementNameEnum[] = [
   'MEASUREMENT_NAME_ENUM_WAIST',
@@ -435,7 +436,7 @@ export const AddProducts: FC = () => {
         <div className={styles.product_container}>
           <label className={styles.title}>Sizes</label>
           <div>
-            {availableSizes.map((size, sizeIndex) => (
+            {common_SizeEnum.map((size, sizeIndex) => (
               <div key={sizeIndex}>
                 <label htmlFor={size}>{size}</label>
                 <input
