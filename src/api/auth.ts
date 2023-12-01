@@ -1,14 +1,11 @@
 import axios, { AxiosResponse } from 'axios';
+import { axiosRequestHandler } from './api';
+import { LoginRequest, LoginResponse, createAuthServiceClient } from './proto-http/auth';
 
-// TODO: create authService 
+// TODO: create authService
 
-// const authService = createAuthServiceClient(axiosRequestHandler)
+const authService = createAuthServiceClient(axiosRequestHandler);
 
-// export function login(username: string, password: string): Promise<LoginResponse> {
-//     const request: LoginRequest = {
-//       username,
-//       password,
-//     };
-//     return authService.Login(request)
-//   }
-
+export function login(request: LoginRequest): Promise<LoginResponse> {
+  return authService.Login(request);
+}

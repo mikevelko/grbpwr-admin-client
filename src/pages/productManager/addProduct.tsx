@@ -8,25 +8,14 @@ import {
   common_ProductSizeInsert,
   common_CategoryEnum,
   googletype_Decimal,
+  AddProductRequest,
+  common_Size,
 } from 'api/proto-http/admin';
-import { addProduct } from 'api';
+import { addProduct, getDictionary } from 'api/admin';
 import { ChromePicker } from 'react-color';
 import styles from 'styles/addProd.scss';
-import { Thumbnail } from './productManagerComponents/thumbnail';
-// import { Sizes } from "./productManagerComponents/sizes";
+// import { Thumbnail } from './productManagerComponents/thumbnail';
 import { Tags } from './productManagerComponents/tag';
-
-
-// const availableSizes: common_SizeEnum[] = [
-//   'SIZE_ENUM_XXS',
-//   'SIZE_ENUM_XS',
-//   'SIZE_ENUM_S',
-//   'SIZE_ENUM_M',
-//   'SIZE_ENUM_L',
-//   'SIZE_ENUM_XL',
-//   'SIZE_ENUM_XXL',
-//   'SIZE_ENUM_OS',
-// ];
 
 const selectMeasurement: common_MeasurementNameEnum[] = [
   'MEASUREMENT_NAME_ENUM_WAIST',
@@ -90,7 +79,7 @@ export const AddProducts: FC = () => {
     ...initialProductState,
     tags: [],
   });
-  // Color HEX
+  const [sizeEnum, setSizeEnum] = useState<common_Size[] | undefined>();
   const [color, setColor] = useState('#000000');
   const [showHex, setShowHex] = useState(false);
   const colorPickerRef = useRef<any>(null);
@@ -128,6 +117,24 @@ export const AddProducts: FC = () => {
       return { ...prevProduct, sizeMeasurements: updatedSizeMeasurements };
     });
   };
+
+  useEffect(() => {
+    // Fetch the dictionary and update the sizeEnum state
+    const fetchDictionary = async () => {
+      try {
+        const response = await getDictionary({});
+        const sizes = response.dictionary?.sizes;
+
+        // Update the sizeEnum state with the fetched sizes
+        setSizeEnum(sizes);
+      } catch (error) {
+        console.error('Error fetching dictionary:', error);
+      }
+    };
+
+    // Call the fetchDictionary function when the component mounts
+    fetchDictionary();
+  }, []);
 
   const handleMeasurementChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -214,9 +221,11 @@ export const AddProducts: FC = () => {
       );
 
       // Update the product with the filtered sizeMeasurements
-      const productToDisplayInJSON = {
-        ...product,
-        sizeMeasurements: nonEmptySizeMeasurements,
+      const productToDisplayInJSON: AddProductRequest = {
+        product: {
+          ...product,
+          sizeMeasurements: nonEmptySizeMeasurements,
+        },
       };
 
       // Convert the categoryText to an array before submitting
@@ -224,7 +233,6 @@ export const AddProducts: FC = () => {
       // Handle the response
       console.log('Product added:', response);
       // Reset the form state
-
       setProduct(initialProductState);
     } catch (error) {
       setProduct(initialProductState);
@@ -436,12 +444,12 @@ export const AddProducts: FC = () => {
         <div className={styles.product_container}>
           <label className={styles.title}>Sizes</label>
           <div>
-            {common_SizeEnum.map((size, sizeIndex) => (
+            {sizeEnum?.map((size, sizeIndex) => (
               <div key={sizeIndex}>
-                <label htmlFor={size}>{size}</label>
+                <label htmlFor={size.name}>{size.name}</label>
                 <input
                   type='number'
-                  id={size}
+                  id={size.name}
                   name='quantity'
                   onChange={(e) => handleSizeChange(e, sizeIndex)}
                 />
@@ -453,7 +461,7 @@ export const AddProducts: FC = () => {
                         type='text'
                         id={measurement}
                         name='measurementValue'
-                        // value={sizeMeasurements.measurements[measurementIndex]?.measurementValue || ''}
+                        // value={measurement[measurementIndex]?.measurementValue.value || ''}
                         onChange={(e) => handleMeasurementChange(e, sizeIndex, measurementIndex)}
                       />
                     </div>
@@ -464,7 +472,7 @@ export const AddProducts: FC = () => {
           </div>
         </div>
 
-        <Thumbnail updateProductMedia={updateProductMedia} />
+        {/* <Thumbnail updateProductMedia={updateProductMedia} /> */}
 
         <Tags updateTags={updateTags} />
 

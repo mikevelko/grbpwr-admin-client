@@ -1,51 +1,84 @@
 import axios, { AxiosResponse } from 'axios';
+import { createAdminServiceClient } from './proto-http/admin';
+import { axiosRequestHandler } from './api';
+import {
+  ListObjectsPagedRequest,
+  ListObjectsPagedResponse,
+  UploadContentImageRequest,
+  UploadContentImageResponse,
+  UploadContentVideoRequest,
+  UploadContentVideoResponse,
+  DeleteFromBucketRequest,
+  DeleteFromBucketResponse,
+  AddProductRequest,
+  AddProductResponse,
+  GetProductsPagedRequest,
+  GetProductsPagedResponse,
+  GetProductByIDRequest,
+  GetProductByIDResponse,
+  AddProductMediaRequest,
+  AddProductMediaResponse,
+  DeleteProductByIDRequest,
+  DeleteProductByIDResponse,
+  GetDictionaryRequest,
+  GetDictionaryResponse,
+} from './proto-http/admin';
 
+const adminService = createAdminServiceClient(axiosRequestHandler);
 
+export function getAllUploadedFiles(
+  request: ListObjectsPagedRequest,
+): Promise<ListObjectsPagedResponse> {
+  return adminService.ListObjectsPaged(request);
+}
 
-// export function addProduct(product: common_ProductNew): Promise<AddProductResponse> {
-//     return adminService.AddProduct({ product });
-// }
+export function uploadContentImage(
+  request: UploadContentImageRequest,
+): Promise<UploadContentImageResponse> {
+  return adminService.UploadContentImage(request);
+}
 
-// export function getProductsPaged({
-//     limit,
-//     offset,
-//     orderFactor,
-//     sortFactors,
-//     filterConditions,
-//     showHidden,
-// }: GetProductsPagedRequest): Promise<GetProductsPagedResponse> {
-//     const request: GetProductsPagedRequest = {
-//         limit,
-//         offset,
-//         orderFactor,
-//         sortFactors,
-//         filterConditions,
-//         showHidden
-//     };
+export function uploadContentVideo(
+  request: UploadContentVideoRequest,
+): Promise<UploadContentVideoResponse> {
+  return adminService.UploadContentVideo(request);
+}
 
-//     // Filter out undefined properties
-//     Object.keys(request).forEach((key) => {
-//         const typedKey = key as keyof GetProductsPagedRequest;
-//         if (request[typedKey] === undefined) {
-//             delete request[typedKey];
-//         }
-//     });
+export function deleteFiles(request: DeleteFromBucketRequest): Promise<DeleteFromBucketResponse> {
+  return adminService.DeleteFromBucket(request);
+}
 
-//     // Making the API call with the constructed request
-//     return adminService.GetProductsPaged(request);
-// }
+export function addProduct(product: AddProductRequest): Promise<AddProductResponse> {
+  return adminService.AddProduct(product);
+}
 
-// export function getProductByID(request: GetProductByIDRequest): Promise<GetProductByIDResponse> {
-//     return adminService.GetProductByID(request);
-// }
+export function getProductsPaged(
+  request: GetProductsPagedRequest,
+): Promise<GetProductsPagedResponse> {
+  // Filter out undefined properties
+  Object.keys(request).forEach((key) => {
+    const typedKey = key as keyof GetProductsPagedRequest;
+    if (request[typedKey] === undefined) {
+      delete request[typedKey];
+    }
+  });
+  return adminService.GetProductsPaged(request);
+}
 
+export function getProductByID(request: GetProductByIDRequest): Promise<GetProductByIDResponse> {
+  return adminService.GetProductByID(request);
+}
 
-// export function addMediaByID(request: AddProductMediaRequest): Promise<AddProductMediaResponse> {
-//     return adminService.AddProductMedia(request);
-// }
+export function addMediaByID(request: AddProductMediaRequest): Promise<AddProductMediaResponse> {
+  return adminService.AddProductMedia(request);
+}
 
-// export function deleteProductByID(
-//     request: DeleteProductByIDRequest,
-// ): Promise<DeleteProductByIDResponse> {
-//     return adminService.DeleteProductByID(request)
-// }
+export function deleteProductByID(
+  request: DeleteProductByIDRequest,
+): Promise<DeleteProductByIDResponse> {
+  return adminService.DeleteProductByID(request);
+}
+
+export function getDictionary(request: GetDictionaryRequest): Promise<GetDictionaryResponse> {
+  return adminService.GetDictionary(request);
+}
