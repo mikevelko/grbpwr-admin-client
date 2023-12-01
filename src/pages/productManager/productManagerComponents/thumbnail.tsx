@@ -1,257 +1,280 @@
-// import React, {FC, useState, useEffect} from "react";
-// import styles from 'styles/thumbnail.scss';
-// import { deleteFiles, getAllUploadedFiles } from "api";
-// import { common_ProductNew, common_ProductMediaInsert, common_Media } from "api/proto-http/admin";
-// import { initialProductState } from "../addingProduct";
-// import { useNavigate } from "@tanstack/react-location";
-// import { ROUTES } from "constants/routes";
+import React, { FC, useState, useEffect } from 'react';
+import styles from 'styles/thumbnail.scss';
+import { deleteFiles, getAllUploadedFiles } from 'api/admin';
+import { common_ProductNew, common_ProductMediaInsert, common_Media } from 'api/proto-http/admin';
+import { initialProductState } from '../addProduct';
+import { useNavigate } from '@tanstack/react-location';
+import { ROUTES } from 'constants/routes';
 
-// interface ThumbnailProps {
-//   updateProductMedia: (updatedMedia: any) => void;
-// }
+interface ThumbnailProps {
+  updateProductMedia: (updatedMedia: any) => void;
+}
 
-// export const Thumbnail: FC<ThumbnailProps> = ({updateProductMedia}) => {
-//     const navigate = useNavigate();
-//     const [product, setProduct] = useState<common_ProductNew>({...initialProductState, media: []}); // to correct
-//     const [imageUrl, setImageUrl] = useState<string>('');
-//     const [selectedImage, setSelectedImage] = useState<string[]>([]);
-//     const [displayedImage, setDisplayedImage] = useState<string>('');
-//     const [thumbnailInput, setThumbnailInput] = useState(false);
-//     const [filesUrl, setFilesUrl] = useState<string[]>([]);
-//     const [showMediaSelector, setShowMediaSelector] = useState(false);
-//     const [mediaNumber, setMediaNumber] = useState<number[]>([]);
-//     const [imagesAdded, setImagesAdded] = useState(false);
+export const Thumbnail: FC<ThumbnailProps> = ({ updateProductMedia }) => {
+  const navigate = useNavigate();
+  const [product, setProduct] = useState<common_ProductNew>({ ...initialProductState, media: [] }); // to correct
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<string[]>([]);
+  const [displayedImage, setDisplayedImage] = useState<string>('');
+  const [thumbnailInput, setThumbnailInput] = useState(false);
+  const [filesUrl, setFilesUrl] = useState<string[]>([]);
+  const [showMediaSelector, setShowMediaSelector] = useState(false);
+  const [mediaNumber, setMediaNumber] = useState<number[]>([]);
+  const [imagesAdded, setImagesAdded] = useState(false);
 
-//     const select = (imageUrl: string | number) => {
-//       if (typeof imageUrl === 'string') {
+  const select = (imageUrl: string | number) => {
+    if (typeof imageUrl === 'string') {
+      if (selectedImage.includes(imageUrl)) {
+        setSelectedImage((prevSelectedImage) =>
+          prevSelectedImage.filter((image) => image !== imageUrl),
+        );
+      } else {
+        setSelectedImage([...selectedImage, imageUrl]);
+      }
+    } else if (typeof imageUrl === 'number') {
+      if (mediaNumber.includes(imageUrl)) {
+        setMediaNumber((prevMediaNumber) =>
+          prevMediaNumber.filter((imageIndex) => imageIndex !== imageUrl),
+        );
+      } else {
+        setMediaNumber([...mediaNumber, imageUrl]);
+      }
+    }
+  };
 
-//         if (selectedImage.includes(imageUrl)) {
-//           setSelectedImage((prevSelectedImage) =>
-//             prevSelectedImage.filter((image) => image !== imageUrl)
-//           );
-//         } else {
-//           setSelectedImage([...selectedImage, imageUrl]);
-//         }
-//       } else if (typeof imageUrl === 'number') {
+  function generateStringArray(input: string): string[] {
+    // Define a regular expression pattern to match the relevant part of the URL
+    const pattern = /https:\/\/files\.grbpwr\.com\/(.+?)(-og\.(jpg|mp4|webm))?$/;
 
-//         if (mediaNumber.includes(imageUrl)) {
-//           setMediaNumber((prevMediaNumber) =>
-//             prevMediaNumber.filter((imageIndex) => imageIndex !== imageUrl)
-//           );
-//         } else {
-//           setMediaNumber([...mediaNumber, imageUrl])
-//         }
-//       }
-//     }
+    // Use the regular expression to extract the matched parts of the URL
+    const match = input.match(pattern);
 
-//     function generateStringArray(input: string): string[] {
-//       // Define a regular expression pattern to match the relevant part of the URL
-//       const pattern = /https:\/\/files\.grbpwr\.com\/(.+?)(-og\.(jpg|mp4|webm))?$/;
+    if (!match) {
+      // Return an empty array if the input doesn't match the expected pattern
+      return [];
+    }
 
-//       // Use the regular expression to extract the matched parts of the URL
-//       const match = input.match(pattern);
+    const [, path, , extension] = match; // Note the additional comma to skip the second capturing group
+    const resultArray: string[] = [`${path}-og.${extension}`];
 
-//       if (!match) {
-//         // Return an empty array if the input doesn't match the expected pattern
-//         return [];
-//       }
+    if (extension === 'jpg') {
+      // If the extension is 'jpg', add the '-compressed.jpg' version to the array
+      resultArray.push(`${path}-compressed.jpg`);
+    }
+    console.log(resultArray);
+    return resultArray;
+  }
 
-//       const [, path, , extension] = match; // Note the additional comma to skip the second capturing group
-//       const resultArray: string[] = [`${path}-og.${extension}`];
+  const handleDeleteFile = async (fileIndex: number) => {
+    try {
+      const fileToDelete = filesUrl[fileIndex]; // Assuming filesUrl is an array of file URLs
+      const objectKeys = generateStringArray(fileToDelete);
 
-//       if (extension === 'jpg') {
-//         // If the extension is 'jpg', add the '-compressed.jpg' version to the array
-//         resultArray.push(`${path}-compressed.jpg`);
-//       }
-//       console.log(resultArray)
-//       return resultArray;
-//     }
+      if (objectKeys.length > 0) {
+        await deleteFiles({ id: fileIndex });
+        const updatedFiles = [...filesUrl];
+        updatedFiles.splice(fileIndex, 1);
+        setFilesUrl(updatedFiles);
+      } else {
+        console.error('Invalid file URL:', fileToDelete);
+      }
+    } catch (error) {
+      console.error('Error deleting file:', error);
+    }
+  };
 
-//     const handleDeleteFile = async (fileIndex: number) => {
-//       try {
-//         const fileToDelete = filesUrl[fileIndex]; // Assuming filesUrl is an array of file URLs
-//         const objectKeys = generateStringArray(fileToDelete);
+  const filterUploadedFiles = (files: string[]) => {
+    return files.filter((file) => /\.(jpg|jpeg|png)$/i.test(file));
+  };
 
-//         if (objectKeys.length > 0) {
-//           await deleteFiles(objectKeys);
-//           const updatedFiles = [...filesUrl];
-//           updatedFiles.splice(fileIndex, 1);
-//           setFilesUrl(updatedFiles);
-//         } else {
-//           console.error('Invalid file URL:', fileToDelete);
-//         }
-//       } catch (error) {
-//         console.error('Error deleting file:', error);
-//       }
-//     };
+  const handleViewAll = () => {
+    setShowMediaSelector(!showMediaSelector);
+  };
 
-//     const filterUploadedFiles = (files: string[]) => {
-//       return files.filter((file) => /\.(jpg|jpeg|png)$/i.test(file))
-//     }
+  useEffect(() => {
+    const fetchUploadedFiles = async () => {
+      try {
+        const response = await getAllUploadedFiles({
+          limit: 5,
+          offset: 0,
+          orderFactor: 'ORDER_FACTOR_ASC',
+        });
 
-//     const handleViewAll = () => {
-//       setShowMediaSelector(!showMediaSelector)
-//     }
+        const filesArray = response.list || [];
+        const urls = filesArray.map((file: common_Media) => file.media?.fullSize || '');
 
-//     useEffect(() => {
-//       const fetchUploadedFiles = async () => {
-//         try {
-//           const response = await getAllUploadedFiles({
-//             limit: 5,
-//             offset: 0,
-//             orderFactor: 'ORDER_FACTOR_ASC'
-//           });
+        setFilesUrl(urls);
+      } catch (error) {
+        console.error('Error fetching uploaded files:', error);
+      }
+    };
 
-//           const filesArray = response.list || [];
-//           const urls = filesArray.map((file: common_Media) => file.media?.fullSize || '');
+    fetchUploadedFiles();
+  }, []);
 
-//           setFilesUrl(urls);
+  const handleThumbnail = () => {
+    setThumbnailInput(!thumbnailInput);
+  };
 
-//         } catch (error) {
-//           console.error("Error fetching uploaded files:", error);
-//         }
-//       };
+  const handleMediaManager = () => {
+    navigate({ to: ROUTES.media, replace: true });
+  };
 
-//       fetchUploadedFiles();
-//     }, []);
+  const handleImage = () => {
+    if (selectedImage.length > 0) {
+      const updatedMedia: common_ProductMediaInsert[] = [...(product.media || [])];
 
-//     const handleThumbnail = () => {
-//       setThumbnailInput(!thumbnailInput);
-//     }
+      selectedImage.forEach((imageUrl) => {
+        const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
 
-//     const handleMediaManager = () => {
-//       navigate({to: ROUTES.media, replace: true});
-//     }
+        updatedMedia.push({
+          fullSize: imageUrl,
+          thumbnail: imageUrl,
+          compressed: compressedUrl,
+        });
+      });
 
-//     const handleImage = () => {
-//       if (selectedImage.length > 0) {
-//         const updatedMedia: common_ProductMediaInsert[] = [...(product.media || [])];
+      setProduct((prevProduct: common_ProductNew) => ({
+        ...prevProduct,
+        media: updatedMedia,
+      }));
 
-//         selectedImage.forEach((imageUrl) => {
-//           const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
+      updateProductMedia(updatedMedia);
+      setSelectedImage([]); // Clear the selected images after adding them
+      setShowMediaSelector(false);
+      setImagesAdded(true);
+    } else if (imageUrl.trim() !== '') {
+      // If no selected images, use the single URL input
+      setDisplayedImage(imageUrl);
+      const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
 
-//           updatedMedia.push({
-//             fullSize: imageUrl,
-//             thumbnail: imageUrl,
-//             compressed: compressedUrl,
-//           });
-//         });
+      setProduct((prevProduct: common_ProductNew) => {
+        const updatedMedia: common_ProductMediaInsert[] = [...(prevProduct.media || [])];
 
-//         setProduct((prevProduct: common_ProductNew) => ({
-//           ...prevProduct,
-//           media: updatedMedia
-//         }));
+        updatedMedia.push({
+          fullSize: imageUrl,
+          thumbnail: imageUrl,
+          compressed: compressedUrl,
+        });
 
-//         updateProductMedia(updatedMedia);
-//         setSelectedImage([]); // Clear the selected images after adding them
-//         setShowMediaSelector(false);
-//         setImagesAdded(true)
+        return {
+          ...prevProduct,
+          media: updatedMedia,
+        };
+      });
 
-//       } else if (imageUrl.trim() !== '') {
-//         // If no selected images, use the single URL input
-//         setDisplayedImage(imageUrl);
-//         const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
+      setImageUrl('');
+      setImagesAdded(true);
+    }
+  };
 
-//         setProduct((prevProduct: common_ProductNew) => {
-//           const updatedMedia: common_ProductMediaInsert[] = [...(prevProduct.media || [])];
+  const handleDeleteMedia = (index: number) => {
+    if (product.media) {
+      const updatedMedia = [...product.media];
 
-//           updatedMedia.push({
-//             fullSize: imageUrl,
-//             thumbnail: imageUrl,
-//             compressed: compressedUrl,
-//           });
+      updatedMedia.splice(index, 1);
 
-//           return {
-//             ...prevProduct,
-//             media: updatedMedia
-//           };
-//         });
+      setProduct((prevProduct: common_ProductNew) => ({
+        ...prevProduct,
+        media: updatedMedia,
+      }));
+    }
+  };
 
-//         setImageUrl('');
-//         setImagesAdded(true)
-//       }
-//     };
-
-//     const handleDeleteMedia = (index: number) => {
-//       if (product.media) { // Check if product.productMedia is defined
-//         // Create a copy of the product's media array
-//         const updatedMedia = [...product.media];
-
-//         // Remove the media item at the specified index
-//         updatedMedia.splice(index, 1);
-
-//         // Update the product state with the modified media array
-//         setProduct((prevProduct: common_ProductNew) => ({
-//           ...prevProduct,
-//           media: updatedMedia
-//         }));
-//       }
-//     };
-
-//     return (
-//         <div className={styles.thumbnail_wrapper}>
-//           <label htmlFor="thhumbnail" className={`${styles.thumbnail_title} ${showMediaSelector  ? styles.left : ''}`}>Media</label>
-//           <div className={`${styles.thumbnail_container} ${showMediaSelector ? styles.left : ''}`}>
-//               <button className={`${styles.thumbnail_btn} ${thumbnailInput ? styles.by_url_left : ''}`} type="button" onClick={handleThumbnail}>By Url</button>
-//               {thumbnailInput && (
-//                 <div className={styles.by_url_container}>
-//                   <input className={styles.by_url_input} type="text" name="media" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-//                   <button type="button" onClick={handleImage}>OK</button>
-//                 </div>
-//               )}
-//               <button className={styles.thumbnail_btn} type="button" onClick={handleViewAll}>Media Selector</button>
-//               <button className={styles.thumbnail_btn} onClick={handleMediaManager}>Upload New</button>
-//           </div>
-//           {showMediaSelector && (
-//             <div className={styles.thumbnail_uploaded_media_wrapper}>
-//               <ul className={styles.thhumbnail_uploaded_media_container}>
-//                 {filterUploadedFiles(filesUrl).map((url, index) => (
-//                   <li key={index}>
-//                     <button className={styles.delete_img} type="button" onClick={() => handleDeleteFile(index)}>X</button>
-//                       <input
-//                         type="checkbox"
-//                         checked={selectedImage.includes(url)}
-//                         onChange={() => select(url)}
-//                         id={`${index}`}
-//                         style={{display: 'none'}}
-//                       />
-//                       <label htmlFor={`${index}`}>
-//                       {selectedImage.includes(url) ? (
-//                         <span className={styles.media_number}>
-//                           {selectedImage.indexOf(url) + 1}
-//                         </span>
-//                       ): null}
-//                         <img
-//                           key={index}
-//                           src={url}
-//                           alt={url}
-//                           className={styles.uploaded_img}
-//                         />
-//                       </label>
-//                   </li>
-//                   ))}
-//               </ul>
-//               <div className={styles.media_selector_add}>
-//                 <button className={styles.add_btn} type="button" onClick={handleImage}>add</button>
-//               </div>
-//             </div>
-//           )}
-//           {showMediaSelector ? null : (
-//             <div className={styles.added}>
-//               {imagesAdded && product.media && product.media.length > 0 && (
-//                 <div className={styles.added_img_wrapper}>
-//                   <ul className={styles.added_img_container}>
-//                     {product.media.map((media, index) => (
-//                         <li className={styles.added_img} >
-//                           <button type="button" className={styles.delete_img} onClick={() => handleDeleteMedia(index)}>X</button>
-//                           <img src={media.fullSize} alt={`Media ${index}`} className={styles.imgs}/>
-//                         </li>
-//                     ))}
-//                   </ul>
-//                 </div>
-//               )}
-//             </div>
-//           )}
-//         </div>
-//     )
-// }
+  return (
+    <div className={styles.thumbnail_wrapper}>
+      <label
+        htmlFor='thhumbnail'
+        className={`${styles.thumbnail_title} ${showMediaSelector ? styles.left : ''}`}
+      >
+        Media
+      </label>
+      <div className={`${styles.thumbnail_container} ${showMediaSelector ? styles.left : ''}`}>
+        <button
+          className={`${styles.thumbnail_btn} ${thumbnailInput ? styles.by_url_left : ''}`}
+          type='button'
+          onClick={handleThumbnail}
+        >
+          By Url
+        </button>
+        {thumbnailInput && (
+          <div className={styles.by_url_container}>
+            <input
+              className={styles.by_url_input}
+              type='text'
+              name='media'
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
+            <button type='button' onClick={handleImage}>
+              OK
+            </button>
+          </div>
+        )}
+        <button className={styles.thumbnail_btn} type='button' onClick={handleViewAll}>
+          Media Selector
+        </button>
+        <button className={styles.thumbnail_btn} onClick={handleMediaManager}>
+          Upload New
+        </button>
+      </div>
+      {showMediaSelector && (
+        <div className={styles.thumbnail_uploaded_media_wrapper}>
+          <ul className={styles.thhumbnail_uploaded_media_container}>
+            {filterUploadedFiles(filesUrl).map((url, index) => (
+              <li key={index}>
+                <button
+                  className={styles.delete_img}
+                  type='button'
+                  onClick={() => handleDeleteFile(index)}
+                >
+                  X
+                </button>
+                <input
+                  type='checkbox'
+                  checked={selectedImage.includes(url)}
+                  onChange={() => select(url)}
+                  id={`${index}`}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor={`${index}`}>
+                  {selectedImage.includes(url) ? (
+                    <span className={styles.media_number}>{selectedImage.indexOf(url) + 1}</span>
+                  ) : null}
+                  <img key={index} src={url} alt={url} className={styles.uploaded_img} />
+                </label>
+              </li>
+            ))}
+          </ul>
+          <div className={styles.media_selector_add}>
+            <button className={styles.add_btn} type='button' onClick={handleImage}>
+              add
+            </button>
+          </div>
+        </div>
+      )}
+      {showMediaSelector ? null : (
+        <div className={styles.added}>
+          {imagesAdded && product.media && product.media.length > 0 && (
+            <div className={styles.added_img_wrapper}>
+              <ul className={styles.added_img_container}>
+                {product.media.map((media, index) => (
+                  <li className={styles.added_img} key={index}>
+                    <button
+                      type='button'
+                      className={styles.delete_img}
+                      onClick={() => handleDeleteMedia(index)}
+                    >
+                      X
+                    </button>
+                    <img src={media.fullSize} alt={`Media ${index}`} className={styles.imgs} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};

@@ -12,7 +12,7 @@ import { Main } from 'pages/MainContent';
 import { MediaManager } from 'pages/mediaManager/mediaManager';
 import { Product } from 'pages/productManager/mainProduct';
 import { AddProducts } from 'pages/productManager/addProduct';
-// import { PageProduct } from 'pages/productManager/pageProduct';
+import { PageProduct } from 'pages/productManager/pageProduct';
 // import { ProductById } from 'pages/productManager/productManagerComponents/singleProduct';
 import 'styles/global.scss';
 // import { ProductID } from 'pages/productManager/productID';

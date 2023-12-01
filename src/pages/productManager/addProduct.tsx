@@ -14,7 +14,7 @@ import {
 import { addProduct, getDictionary } from 'api/admin';
 import { ChromePicker } from 'react-color';
 import styles from 'styles/addProd.scss';
-// import { Thumbnail } from './productManagerComponents/thumbnail';
+import { Thumbnail } from './productManagerComponents/thumbnail';
 import { Tags } from './productManagerComponents/tag';
 
 const selectMeasurement: common_MeasurementNameEnum[] = [
@@ -472,7 +472,7 @@ export const AddProducts: FC = () => {
           </div>
         </div>
 
-        {/* <Thumbnail updateProductMedia={updateProductMedia} /> */}
+        <Thumbnail updateProductMedia={updateProductMedia} />
 
         <Tags updateTags={updateTags} />
 
