@@ -61,23 +61,23 @@ export const AddMediaByID: FC = () => {
     return resultArray;
   }
 
-  // const handleDeleteFile = async (fileIndex: number) => {
-  //   try {
-  //     const fileToDelete = filesUrl[fileIndex]; // Assuming filesUrl is an array of file URLs
-  //     const objectKeys = generateStringArray(fileToDelete);
+  const handleDeleteFile = async (fileIndex: number) => {
+    try {
+      const fileToDelete = filesUrl[fileIndex]; // Assuming filesUrl is an array of file URLs
+      const objectKeys = generateStringArray(fileToDelete);
 
-  //     if (objectKeys.length > 0) {
-  //       await deleteFiles(objectKeys);
-  //       const updatedFiles = [...filesUrl];
-  //       updatedFiles.splice(fileIndex, 1);
-  //       setFilesUrl(updatedFiles);
-  //     } else {
-  //       console.error('Invalid file URL:', fileToDelete);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error deleting file:', error);
-  //   }
-  // };
+      if (objectKeys.length > 0) {
+        await deleteFiles({ id: fileIndex });
+        const updatedFiles = [...filesUrl];
+        updatedFiles.splice(fileIndex, 1);
+        setFilesUrl(updatedFiles);
+      } else {
+        console.error('Invalid file URL:', fileToDelete);
+      }
+    } catch (error) {
+      console.error('Error deleting file:', error);
+    }
+  };
 
   const filterUploadedFiles = (files: string[]) => {
     return files.filter((file) => /\.(jpg|jpeg|png)$/i.test(file));
@@ -174,7 +174,7 @@ export const AddMediaByID: FC = () => {
                 <button
                   className={styles.delete_img}
                   type='button'
-                  // onClick={() => handleDeleteFile(index)}
+                  onClick={() => handleDeleteFile(index)}
                 >
                   X
                 </button>

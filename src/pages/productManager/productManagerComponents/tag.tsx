@@ -1,5 +1,5 @@
-import React, { FC, useState, useEffect } from "react";
-import { common_ProductTagInsert } from "api/proto-http/admin";
+import React, { FC, useState, useEffect } from 'react';
+import { common_ProductTagInsert, common_ProductNew } from 'api/proto-http/admin';
 import styles from 'styles/tag.scss';
 
 interface TagProps {
@@ -36,17 +36,13 @@ export const Tags: FC<TagProps> = ({ updateTags }) => {
       <div className={styles.tag_container}>
         <input
           className={styles.tag_input}
-          type="text"
-          name="categoryInput"
+          type='text'
+          name='categoryInput'
           value={categoryInput}
           onChange={(e) => setCategoryInput(e.target.value)}
-          placeholder="Enter a category"
+          placeholder='Enter a category'
         />
-        <button
-          className={styles.tag_container_btn}
-          type="button"
-          onClick={addTag}
-        >
+        <button className={styles.tag_container_btn} type='button' onClick={addTag}>
           OK
         </button>
       </div>
@@ -54,7 +50,7 @@ export const Tags: FC<TagProps> = ({ updateTags }) => {
         {tags.map((tag, index) => (
           <li key={index} className={styles.tag}>
             <button
-              type="button"
+              type='button'
               onClick={() => deleteTag(index)}
               className={styles.tag_delete_btn}
             >

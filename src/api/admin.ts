@@ -55,13 +55,14 @@ export function addProduct(product: AddProductRequest): Promise<AddProductRespon
 export function getProductsPaged(
   request: GetProductsPagedRequest,
 ): Promise<GetProductsPagedResponse> {
-  // Filter out undefined properties
-  Object.keys(request).forEach((key) => {
-    const typedKey = key as keyof GetProductsPagedRequest;
-    if (request[typedKey] === undefined) {
-      delete request[typedKey];
-    }
-  });
+  // Object.keys(request).forEach((key) => {
+  //   const typedKey = key as keyof GetProductsPagedRequest;
+  //   if (request[typedKey] === undefined) {
+  //     console.log('test', typedKey);
+  //     delete request[typedKey];
+  //   }
+  // });
+  alert('getProductsPaged');
   return adminService.GetProductsPaged(request);
 }
 

@@ -15,7 +15,7 @@ import { AddProducts } from 'pages/productManager/addProduct';
 import { PageProduct } from 'pages/productManager/pageProduct';
 // import { ProductById } from 'pages/productManager/productManagerComponents/singleProduct';
 import 'styles/global.scss';
-// import { ProductID } from 'pages/productManager/productID';
+import { ProductID } from 'pages/productManager/productID';
 
 const container = document.getElementById('root') ?? document.body;
 const root = createRoot(container);
@@ -30,8 +30,8 @@ const routes: Route<DefaultGenerics>[] = [
   { path: ROUTES.all, element: <UploadPage /> },
   { path: ROUTES.product, element: <Product /> },
   { path: ROUTES.addProduct, element: <AddProducts /> },
-  // { path: ROUTES.pagedProduct, element: <PageProduct /> },
-  // { path: ROUTES.singleProduct, element: <ProductID />}
+  { path: ROUTES.pagedProduct, element: <PageProduct /> },
+  { path: ROUTES.singleProduct, element: <ProductID /> },
 ];
 
 root.render(

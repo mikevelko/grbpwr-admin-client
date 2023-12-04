@@ -2,17 +2,17 @@ import React, { FC, useState, useEffect } from 'react';
 import styles from 'styles/thumbnail.scss';
 import { deleteFiles, getAllUploadedFiles } from 'api/admin';
 import { common_ProductNew, common_ProductMediaInsert, common_Media } from 'api/proto-http/admin';
-import { initialProductState } from '../addProduct';
 import { useNavigate } from '@tanstack/react-location';
 import { ROUTES } from 'constants/routes';
 
 interface ThumbnailProps {
-  updateProductMedia: (updatedMedia: any) => void;
+  product: common_ProductNew;
+  setProduct: React.Dispatch<React.SetStateAction<common_ProductNew>>;
 }
 
-export const Thumbnail: FC<ThumbnailProps> = ({ updateProductMedia }) => {
+export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
   const navigate = useNavigate();
-  const [product, setProduct] = useState<common_ProductNew>({ ...initialProductState, media: [] }); // to correct
+  // const [product, setProduct] = useState<common_ProductNew>({ ...initialProductState, media: [] }); // to correct
   const [imageUrl, setImageUrl] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string[]>([]);
   const [displayedImage, setDisplayedImage] = useState<string>('');
@@ -139,12 +139,10 @@ export const Thumbnail: FC<ThumbnailProps> = ({ updateProductMedia }) => {
         media: updatedMedia,
       }));
 
-      updateProductMedia(updatedMedia);
-      setSelectedImage([]); // Clear the selected images after adding them
+      setSelectedImage([]);
       setShowMediaSelector(false);
       setImagesAdded(true);
     } else if (imageUrl.trim() !== '') {
-      // If no selected images, use the single URL input
       setDisplayedImage(imageUrl);
       const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
 
