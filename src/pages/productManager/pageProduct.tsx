@@ -9,7 +9,7 @@ import styles from 'styles/paged.scss';
 
 export const PageProduct: FC = () => {
   const [products, setProducts] = useState<common_Product[] | undefined>([]);
-  const [selectedProductIndex, setSelectedProductIndex] = useState<number | undefined>(undefined);
+  // const [selectedProductIndex, setSelectedProductIndex] = useState<number | undefined>(undefined);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,11 +18,11 @@ export const PageProduct: FC = () => {
         // TODO: why alert 2 times ?
         const response: GetProductsPagedResponse = await getProductsPaged({
           limit: 10,
-          offset: 1,
+          offset: 0,
           sortFactors: undefined,
           orderFactor: 'ORDER_FACTOR_ASC',
           filterConditions: undefined,
-          showHidden: false,
+          showHidden: true,
         });
 
         setProducts(response.products || []);
@@ -31,13 +31,17 @@ export const PageProduct: FC = () => {
       }
     };
     fetchData();
+
+    return () => {
+      // Perform any cleanup tasks if needed
+    };
   }, []);
 
-  const handleProductClick = (index: number | undefined) => {
-    setSelectedProductIndex(index);
-    // Navigate to another page with the selected index
-    navigate({ to: `${ROUTES.singleProduct}?productId=${index}`, replace: true });
-  };
+  // const handleProductClick = (index: number | undefined) => {
+  //   setSelectedProductIndex(index);
+  //   // Navigate to another page with the selected index
+  //   navigate({ to: `${ROUTES.singleProduct}?productId=${index}`, replace: true });
+  // };
 
   const handleDeleteClick = async (productId: number | undefined) => {
     try {
@@ -52,7 +56,7 @@ export const PageProduct: FC = () => {
       <div className={styles.product_container}>
         <ul className={styles.product_list}>
           {products?.map((product) => (
-            <li key={product.id} onClick={() => handleProductClick(product.id)}>
+            <li key={product.id}>
               <button onClick={() => handleDeleteClick(product.id)}>X</button>
               <img src={product.productInsert?.thumbnail} alt='img' />
               <h5>{product.productInsert?.name}</h5>
