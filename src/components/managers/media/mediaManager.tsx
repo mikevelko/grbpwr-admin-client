@@ -3,7 +3,7 @@ import styles from 'styles/media-manager.scss';
 import { ROUTES } from 'constants/routes';
 import { useNavigate } from '@tanstack/react-location';
 import { uploadContentImage, uploadContentVideo, getAllUploadedFiles } from 'api/admin';
-import { Layout } from 'components/layout';
+import { Layout } from 'components/layout/layout';
 import { ListObjectsPagedRequest } from 'api/proto-http/admin';
 
 const fileExtensionToContentType: { [key: string]: string } = {

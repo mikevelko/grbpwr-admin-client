@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState, useRef } from 'react';
 import { getAllUploadedFiles, deleteFiles } from 'api/admin';
 import { common_Media } from 'api/proto-http/admin';
-import { Layout } from 'components/layout';
+import { Layout } from 'components/layout/layout';
 import styles from 'styles/upload.scss';
 
 interface UploadedFile {

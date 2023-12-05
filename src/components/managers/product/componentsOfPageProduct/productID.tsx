@@ -1,12 +1,12 @@
 import React, { FC, useState, useEffect } from 'react';
-import { Layout } from 'components/layout';
+import { Layout } from 'components/layout/layout';
 import { common_ProductFull } from 'api/proto-http/admin';
 import { getProductByID } from 'api/admin';
-import { AddMediaByID } from './productManagerComponents/addMediaById';
+import { AddMediaByID } from './addMediaById';
 import queryString from 'query-string';
 import styles from 'styles/productID.scss';
 
-export const ProductID: FC = () => {
+export const ProductId: FC = () => {
   const queryParams = queryString.parse(window.location.search);
   const productId = queryParams.productId as string;
   const [product, setProuct] = useState<common_ProductFull | undefined>(undefined);

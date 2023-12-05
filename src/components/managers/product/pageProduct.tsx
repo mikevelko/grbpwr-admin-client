@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import { Layout } from 'components/layout';
+import { Layout } from 'components/layout/layout';
 import { common_Product } from 'api/proto-http/admin';
 import { getProductsPaged, deleteProductByID } from 'api/admin';
 import { useNavigate } from '@tanstack/react-location';

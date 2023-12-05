@@ -1,14 +1,14 @@
 import React, { FC, useState } from 'react';
 import update from 'immutability-helper';
-import { Layout } from 'components/layout';
+import { Layout } from 'components/layout/layout';
 import { common_ProductNew, AddProductRequest } from 'api/proto-http/admin';
 import { addProduct } from 'api/admin';
-import { Thumbnail } from './productManagerComponents/thumbnail';
-import { Sizes } from './productManagerComponents/sizes';
-import { Tags } from './productManagerComponents/tag';
-import { Categories } from './productManagerComponents/categories';
-import { ColorHEX } from './productManagerComponents/colorHEX';
-import { InputField } from './productManagerComponents/inputFields';
+import { Thumbnail } from './componentsOfProduct/thumbnail';
+import { Sizes } from './componentsOfProduct/sizes';
+import { Tags } from './componentsOfProduct/tag';
+import { Categories } from './componentsOfProduct/categories';
+import { ColorHEX } from './componentsOfProduct/colorHEX';
+import { InputField } from './componentsOfProduct/inputFields';
 import styles from 'styles/addProd.scss';
 
 export const initialProductState: common_ProductNew = {
@@ -17,24 +17,24 @@ export const initialProductState: common_ProductNew = {
     preorder: '',
     name: '',
     brand: '',
-    sku: '', // VENDOR CODE
+    sku: '',
     color: '',
     colorHex: '',
     countryOfOrigin: '',
     thumbnail: '',
-    price: { value: '' },
+    price: undefined,
     salePercentage: undefined,
     categoryId: 0,
     description: '',
     hidden: false,
-    targetGender: 'GENDER_ENUM_MALE',
+    targetGender: undefined,
   },
   sizeMeasurements: [],
   tags: [],
 };
 
 export const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   setProduct: React.Dispatch<React.SetStateAction<common_ProductNew>>,
 ) => {
   const { name, value } = e.target;
@@ -55,7 +55,9 @@ export const AddProducts: FC = () => {
     ...initialProductState,
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     handleChange(e, setProduct);
   };
 
@@ -136,6 +138,23 @@ export const AddProducts: FC = () => {
           value={product.product?.preorder}
           onChange={handleInputChange}
         />
+
+        <div className={styles.product_container}>
+          <label htmlFor='gender' className={styles.title}>
+            GENDER
+          </label>
+          <select
+            name='targerGender'
+            id='gender'
+            value={product.product?.targetGender}
+            onChange={handleInputChange}
+            className={styles.product_input}
+          >
+            <option value='GENDER_ENUM_MALE'>Male</option>
+            <option value='GENDER_ENUM_FEMALE'>Female</option>
+            <option value='GENDER_ENUM_UNISEX'>Unisex</option>
+          </select>
+        </div>
 
         <div className={styles.product_container}>
           <label htmlFor='descrip' className={styles.title}>

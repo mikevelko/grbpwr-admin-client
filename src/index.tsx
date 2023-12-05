@@ -6,16 +6,15 @@ import { Outlet, ReactLocation, Router, Route, DefaultGenerics } from '@tanstack
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ContextProvider } from 'context';
 import { ROUTES } from 'constants/routes';
-import { LoginBlock } from 'components/login';
-import { UploadPage } from 'pages/mediaManager/upload';
-import { Main } from 'pages/MainContent';
-import { MediaManager } from 'pages/mediaManager/mediaManager';
-import { Product } from 'pages/productManager/mainProduct';
-import { AddProducts } from 'pages/productManager/addProduct';
-import { PageProduct } from 'pages/productManager/pageProduct';
-// import { ProductById } from 'pages/productManager/productManagerComponents/singleProduct';
+import { LoginBlock } from 'components/login/login';
+import { MediaManager } from 'components/managers/media/mediaManager';
+import { UploadPage } from 'components/managers/media/upload';
+import { Main } from 'components/managers/MainContent';
+import { Product } from 'components/managers/product/mainProduct';
+import { AddProducts } from 'components/managers/product/addProduct';
+import { PageProduct } from 'components/managers/product/pageProduct';
+import { ProductId } from 'components/managers/product/componentsOfPageProduct/productID';
 import 'styles/global.scss';
-import { ProductID } from 'pages/productManager/productID';
 
 const container = document.getElementById('root') ?? document.body;
 const root = createRoot(container);
@@ -31,7 +30,7 @@ const routes: Route<DefaultGenerics>[] = [
   { path: ROUTES.product, element: <Product /> },
   { path: ROUTES.addProduct, element: <AddProducts /> },
   { path: ROUTES.pagedProduct, element: <PageProduct /> },
-  { path: ROUTES.singleProduct, element: <ProductID /> },
+  { path: ROUTES.singleProduct, element: <ProductId /> },
 ];
 
 root.render(
