@@ -19,6 +19,8 @@
     .form {
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
       gap: 16px;
 
       .user_container {
@@ -34,7 +36,37 @@
           font-style: normal;
           font-weight: 500;
           line-height: normal;
+
+          input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px black inset !important;
+            -webkit-text-fill-color: white !important;
+          }
+
+          &:focus {
+            -webkit-box-shadow: 0 0 0 1000px black inset !important;
+            -webkit-text-fill-color: white !important;
+          }
+
+          &:active {
+            -webkit-box-shadow: 0 0 0 1000px black inset !important;
+            -webkit-text-fill-color: white !important;
+          }
         }
+      }
+
+      button {
+        text-align: center;
+        width: 150px;
+        height: 54px;
+        cursor: pointer;
+        border: none;
+        background-color: black;
+        color: white;
+        font-size: 29px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+        text-transform: uppercase;
       }
     }
   }

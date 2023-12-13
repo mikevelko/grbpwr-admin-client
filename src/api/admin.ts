@@ -1,4 +1,3 @@
-import axios, { AxiosResponse } from 'axios';
 import { createAdminServiceClient } from './proto-http/admin';
 import { axiosRequestHandler } from './api';
 import {
@@ -55,13 +54,13 @@ export function addProduct(product: AddProductRequest): Promise<AddProductRespon
 export function getProductsPaged(
   request: GetProductsPagedRequest,
 ): Promise<GetProductsPagedResponse> {
-  Object.keys(request).forEach((key) => {
-    const typedKey = key as keyof GetProductsPagedRequest;
-    if (request[typedKey] === undefined) {
-      console.log('test', typedKey);
-      delete request[typedKey];
-    }
-  });
+  // Object.keys(request).forEach((key) => {
+  //   const typedKey = key as keyof GetProductsPagedRequest;
+  //   if (request[typedKey] === undefined) {
+  //     console.log('test', typedKey);
+  //     delete request[typedKey];
+  //   }
+  // });
   return adminService.GetProductsPaged(request);
 }
 

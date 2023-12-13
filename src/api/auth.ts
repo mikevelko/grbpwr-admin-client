@@ -1,4 +1,3 @@
-import axios, { AxiosResponse } from 'axios';
 import { axiosRequestHandler } from './api';
 import { LoginRequest, LoginResponse, createAuthServiceClient } from './proto-http/auth';
 

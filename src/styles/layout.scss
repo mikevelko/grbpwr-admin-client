@@ -1,37 +1,35 @@
 .layout {
-    margin: 20px;
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    
-    .layout_logo {
-        position: sticky;
-        align-self: flex-start;
-        top: 20px;
-        left: 20px;
-    }
+  position: relative;
+  margin: 20px;
+  display: grid;
+  grid-template-areas:
+    'logo content'
+    'logout content';
+  grid-template-columns: 40px 1fr;
+  grid-template-rows: 1fr auto;
+  //   height: 200vh;
 
-    .layout_content {
-        width: 100%;
-    }
+  .logo {
+    grid-area: logo;
+    position: fixed;
+  }
 
-    .layout_logout {
-        // display: block;
-        width: 157px;
-        position: sticky;
-        right: 20px;
-        bottom: 20px;
-        // text-align: end;
-        align-self: flex-end;
-    }
+  .content {
+    grid-area: content;
+  }
 
-    .logout_btn {
-        width: 157px;
-        background-color: black;
-        color: #FFF;
-        font-size: 29px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: normal;
+  .logout {
+    grid-area: logout;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    text-align: right;
+
+    button {
+      background-color: black;
+      color: white;
+      border: none;
+      font-size: 25px;
     }
+  }
 }

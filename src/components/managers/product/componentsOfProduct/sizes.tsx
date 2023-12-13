@@ -120,10 +120,6 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
                     type='text'
                     id={measurement.name}
                     name='measurementValue'
-                    // value={
-                    //   product.sizeMeasurements[sizeIndex]?.measurements[measurementIndex]
-                    //     ?.measurementValue?.value || ''
-                    // }
                     onChange={(e) => handleMeasurementChange(e, sizeIndex, measurementIndex)}
                   />
                 </div>

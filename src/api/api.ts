@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { ROUTES } from 'constants/routes';
 
-// Create an Axios instance
 const axiosInstance = axios.create({
   baseURL: 'http://backend.grbpwr.com:8081',
   headers: {
@@ -22,6 +22,19 @@ axiosInstance.interceptors.request.use(
   },
 );
 
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('authToken');
+      return Promise.reject((window.location.href = ROUTES.login));
+    }
+    return Promise.reject(error);
+  },
+);
+
 interface AxiosRequestConfig {
   path: string;
   method: string;
@@ -37,7 +50,7 @@ export const axiosRequestHandler = async ({ path, method, body }: AxiosRequestCo
     });
     return response.data;
   } catch (error) {
-    console.error('api call error:', error);
+    console.error('api request error', error);
     throw error;
   }
 };

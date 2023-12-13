@@ -1,10 +1,10 @@
 export enum ROUTES {
-  login= '/',
+  login = '/',
   main = '/main',
-  media = '/mediaManager',
-  all = '/uploaded',
-  product = '/product',
-  addProduct = '/addProd',
-  pagedProduct = '/pageProd',
-  singleProduct = '/productById'
+  media = '/media-manager',
+  all = '/show-media',
+  product = '/product-manager',
+  addProduct = '/add-product',
+  pagedProduct = '/page-product',
+  singleProduct = '/product-by-id',
 }

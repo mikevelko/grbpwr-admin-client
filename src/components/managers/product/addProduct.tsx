@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import update from 'immutability-helper';
 import { Layout } from 'components/layout/layout';
-import { common_ProductNew, AddProductRequest } from 'api/proto-http/admin';
+import { common_ProductNew, AddProductRequest, common_GenderEnum } from 'api/proto-http/admin';
 import { addProduct } from 'api/admin';
 import { Thumbnail } from './componentsOfProduct/thumbnail';
 import { Sizes } from './componentsOfProduct/sizes';
@@ -60,6 +60,8 @@ export const AddProducts: FC = () => {
   ) => {
     handleChange(e, setProduct);
   };
+
+  const [gender, setGender] = useState<common_GenderEnum[] | undefined>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,12 +146,13 @@ export const AddProducts: FC = () => {
             GENDER
           </label>
           <select
-            name='targerGender'
+            name='targetGender'
             id='gender'
             value={product.product?.targetGender}
             onChange={handleInputChange}
             className={styles.product_input}
           >
+            {/* TODO: how do it dinamically */}
             <option value='GENDER_ENUM_MALE'>Male</option>
             <option value='GENDER_ENUM_FEMALE'>Female</option>
             <option value='GENDER_ENUM_UNISEX'>Unisex</option>

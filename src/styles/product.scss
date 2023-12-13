@@ -1,11 +1,11 @@
-.main {
+.product_operation_wrapper {
   display: grid;
   align-items: center;
   justify-content: center;
-  margin: 254px auto;
+  gap: 10px;
+  margin: 430px auto;
 
-  .btn {
-    // justify-self: center;
+  button {
     background-color: black;
     color: #fff;
     font-size: 35px;
@@ -14,9 +14,5 @@
     line-height: normal;
     text-transform: uppercase;
     margin-bottom: 22px;
-  }
-
-  .btn:last-child {
-    margin-bottom: 0;
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { StrictMode } from 'react';
+// import { StrictMode } from 'react'; -- TODO: what is it used for
 import { createRoot } from 'react-dom/client';
 import { Outlet, ReactLocation, Router, Route, DefaultGenerics } from '@tanstack/react-location';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -10,7 +10,7 @@ import { LoginBlock } from 'components/login/login';
 import { MediaManager } from 'components/managers/media/mediaManager';
 import { UploadPage } from 'components/managers/media/upload';
 import { Main } from 'components/managers/MainContent';
-import { Product } from 'components/managers/product/mainProduct';
+import { Product } from 'components/managers/product/product';
 import { AddProducts } from 'components/managers/product/addProduct';
 import { PageProduct } from 'components/managers/product/pageProduct';
 import { ProductId } from 'components/managers/product/componentsOfPageProduct/productID';
@@ -34,13 +34,11 @@ const routes: Route<DefaultGenerics>[] = [
 ];
 
 root.render(
-  <StrictMode>
-    <ContextProvider>
-      <QueryClientProvider client={queryClient}>
-        <Router location={location} routes={routes}>
-          <Outlet />
-        </Router>
-      </QueryClientProvider>
-    </ContextProvider>
-  </StrictMode>,
+  <ContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <Router location={location} routes={routes}>
+        <Outlet />
+      </Router>
+    </QueryClientProvider>
+  </ContextProvider>,
 );
