@@ -1,54 +1,39 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Layout } from 'components/layout/layout';
 import {
-  common_OrderFactor,
   common_Product,
-  common_SortFactor,
+  common_FilterConditions,
   GetProductsPagedRequest,
 } from 'api/proto-http/admin';
 import { getProductsPaged, deleteProductByID } from 'api/admin';
+import { initialFilter } from './componentsOfPageProduct/initialFilterStates';
 import { useNavigate } from '@tanstack/react-location';
 import { GetProductsPagedResponse } from 'api/proto-http/admin';
+import { Filter } from './componentsOfPageProduct/filterProducts';
 import { ROUTES } from 'constants/routes';
 import styles from 'styles/paged.scss';
 
 export const PageProduct: FC = () => {
   const [products, setProducts] = useState<common_Product[] | undefined>([]);
-  const [filter, setFilter] = useState<GetProductsPagedRequest>({
-    limit: 10,
-    offset: 0,
-    sortFactors: undefined,
-    orderFactor: undefined,
-    filterConditions: {
-      from: undefined,
-      to: undefined,
-      onSale: undefined,
-      color: undefined,
-      categoryId: undefined,
-      sizesIds: undefined,
-      preorder: undefined,
-      byTag: undefined,
-    },
-    showHidden: undefined,
-  });
+  const [filter, setFilter] = useState<GetProductsPagedRequest>(initialFilter);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response: GetProductsPagedResponse = await getProductsPaged({
-          ...filter,
-        });
-
-        setProducts(response.products || []);
-      } catch (error) {
-        console.error(error);
-      }
-    };
     fetchData();
+    // TODO: clean up logic ???
+  }, []);
 
-    // return () => {};
-  }, [filter]);
+  const fetchData = async () => {
+    try {
+      const response: GetProductsPagedResponse = await getProductsPaged({
+        ...filter,
+      });
+
+      setProducts(response.products || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleProductClick = (index: number | undefined) => {
     navigate({ to: `${ROUTES.singleProduct}?productId=${index}`, replace: true });
@@ -57,42 +42,44 @@ export const PageProduct: FC = () => {
   const handleDeleteClick = async (productId: number | undefined) => {
     try {
       await deleteProductByID({ id: productId });
-      setProducts((prevProducts) =>
-        prevProducts ? prevProducts.filter((product) => product.id !== productId) : prevProducts,
-      );
+      setProducts((prevProducts) => prevProducts?.filter((product) => product.id !== productId));
     } catch (error) {
       console.error('Error deleting product:', error);
     }
   };
 
-  const handleFilterChange = <K extends keyof GetProductsPagedRequest>(
+  const handleFilterChange = <
+    K extends keyof GetProductsPagedRequest | keyof common_FilterConditions,
+  >(
     key: K,
-    value: GetProductsPagedRequest[K],
+    value: K extends keyof GetProductsPagedRequest
+      ? GetProductsPagedRequest[K]
+      : K extends keyof common_FilterConditions
+      ? common_FilterConditions[K]
+      : never,
   ) => {
-    setFilter((prevFilter) => ({ ...prevFilter, [key]: value }));
+    setFilter((prevFilter) => {
+      return {
+        ...prevFilter,
+        ...(key in prevFilter
+          ? { [key]: value }
+          : {
+              filterConditions: {
+                ...(prevFilter.filterConditions || {}),
+                [key]: value,
+              },
+            }),
+      } as GetProductsPagedRequest;
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    fetchData();
   };
 
   return (
     <Layout>
-      <>
-        <select
-          value={filter.sortFactors}
-          onChange={(e) => handleFilterChange('sortFactors', [e.target.value as common_SortFactor])}
-        >
-          <option value='SORT_FACTOR_CREATED_AT'>cr at</option>
-          <option value='SORT_FACTOR_UPDATED_AT'> up at</option>
-          <option value='SORT_FACTOR_NAME'>n</option>
-          <option value='SORT_FACTOR_PRICE'>p</option>
-        </select>
-        <select
-          name='orderFactor'
-          value={filter.orderFactor}
-          onChange={(e) => handleFilterChange('orderFactor', e.target.value as common_OrderFactor)}
-        >
-          <option value='ORDER_FACTOR_ASC'>asc</option>
-          <option value='ORDER_FACTOR_DESC'>desc</option>
-        </select>
-      </>
       <div className={styles.product_container}>
         <ul className={styles.product_list}>
           {products?.map((product) => (
@@ -104,6 +91,7 @@ export const PageProduct: FC = () => {
           ))}
         </ul>
       </div>
+      <Filter filter={filter} filterChange={handleFilterChange} onSubmit={handleSubmit} />
     </Layout>
   );
 };
