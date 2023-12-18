@@ -5,6 +5,7 @@ import {
   common_SortFactor,
   common_FilterConditions,
 } from 'api/proto-http/admin';
+import { FilterInput } from './filterInput';
 
 interface FilterProps {
   filter: GetProductsPagedRequest;
@@ -16,15 +17,16 @@ interface FilterProps {
 }
 export const Filter: FC<FilterProps> = ({ filter, filterChange, onSubmit }) => {
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} style={{ display: 'grid' }}>
+      <h6>FILTER</h6>
       <select
         value={filter.sortFactors}
         onChange={(e) => filterChange('sortFactors', [e.target.value as common_SortFactor])}
       >
-        <option value='SORT_FACTOR_CREATED_AT'>cr at</option>
-        <option value='SORT_FACTOR_UPDATED_AT'> up at</option>
-        <option value='SORT_FACTOR_NAME'>n</option>
-        <option value='SORT_FACTOR_PRICE'>p</option>
+        <option value='SORT_FACTOR_CREATED_AT'>created at</option>
+        <option value='SORT_FACTOR_UPDATED_AT'> updated at</option>
+        <option value='SORT_FACTOR_NAME'>name</option>
+        <option value='SORT_FACTOR_PRICE'>price</option>
       </select>
       <select
         name='orderFactor'
@@ -35,37 +37,35 @@ export const Filter: FC<FilterProps> = ({ filter, filterChange, onSubmit }) => {
         <option value='ORDER_FACTOR_DESC'>desc</option>
       </select>
 
-      <input
-        type='number'
+      <FilterInput
         value={filter.filterConditions?.from}
         onChange={(e) => filterChange('from', e.target.value)}
         placeholder='from'
       />
-      <input
-        type='number'
+      <FilterInput
         value={filter.filterConditions?.to}
         onChange={(e) => filterChange('to', e.target.value)}
         placeholder='to'
       />
-      <input
+      <FilterInput
         type='text'
         value={filter.filterConditions?.color}
         onChange={(e) => filterChange('color', e.target.value)}
         placeholder='color'
       />
-      <input
+      <FilterInput
         type='number'
         value={filter.filterConditions?.categoryId}
         onChange={(e) => filterChange('categoryId', parseInt(e.target.value))}
         placeholder='category'
       />
-      <input
+      <FilterInput
         type='text'
         value={filter.filterConditions?.byTag}
         onChange={(e) => filterChange('byTag', e.target.value)}
         placeholder='tag'
       />
-      <input
+      <FilterInput
         type='number'
         value={
           filter.filterConditions?.sizesIds !== undefined
@@ -73,8 +73,9 @@ export const Filter: FC<FilterProps> = ({ filter, filterChange, onSubmit }) => {
             : ''
         }
         onChange={(e) => filterChange('sizesIds', e.target.value.split(',').map(Number))}
+        placeholder='size id'
       />
-      <button type='submit'>Apply Filters</button>
+      <button type='submit'>Apply</button>
     </form>
   );
 };

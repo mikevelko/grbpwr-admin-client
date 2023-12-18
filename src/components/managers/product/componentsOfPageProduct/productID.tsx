@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Layout } from 'components/layout/layout';
-import { common_ProductFull } from 'api/proto-http/admin';
-import { getProductByID } from 'api/admin';
+import { common_ProductFull, common_Size } from 'api/proto-http/admin';
+import { getProductByID, getDictionary } from 'api/admin';
 import { AddMediaByID } from './addMediaById';
 import queryString from 'query-string';
 import styles from 'styles/productID.scss';
@@ -10,6 +10,7 @@ export const ProductId: FC = () => {
   const queryParams = queryString.parse(window.location.search);
   const productId = queryParams.productId as string;
   const [product, setProuct] = useState<common_ProductFull | undefined>(undefined);
+  const [sizeDictionary, setSizeDictionary] = useState<common_Size[]>([]);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const handleThumbnailHover = () => {
@@ -33,7 +34,25 @@ export const ProductId: FC = () => {
     fetchData();
   }, [productId]);
 
-  console.log('Product:', product);
+  useEffect(() => {
+    const fetchSize = async () => {
+      try {
+        const response = await getDictionary({});
+        setSizeDictionary(response.dictionary?.sizes || []);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchSize();
+  }, []);
+
+  const getSizeName = (sizeId: number | undefined): string => {
+    const size = sizeDictionary.find((s) => s.id === sizeId);
+    if (size && size.name) {
+      return size.name.replace('SIZE_ENUM_', '');
+    }
+    return 'size not found';
+  };
 
   return (
     <Layout>
@@ -65,7 +84,7 @@ export const ProductId: FC = () => {
           <h3>{product?.product?.productInsert?.brand}</h3>
           <ul>
             {product?.sizes?.map((size, index) => (
-              <li key={index}>{size.productId}</li>
+              <li key={index}>{getSizeName(size.sizeId)}</li>
             ))}
           </ul>
         </div>

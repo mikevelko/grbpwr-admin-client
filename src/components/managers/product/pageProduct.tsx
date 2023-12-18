@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, MouseEvent } from 'react';
 import { Layout } from 'components/layout/layout';
 import {
   common_Product,
@@ -10,26 +10,37 @@ import { initialFilter } from './componentsOfPageProduct/initialFilterStates';
 import { useNavigate } from '@tanstack/react-location';
 import { GetProductsPagedResponse } from 'api/proto-http/admin';
 import { Filter } from './componentsOfPageProduct/filterProducts';
+import { Products } from './componentsOfPageProduct/products';
 import { ROUTES } from 'constants/routes';
 import styles from 'styles/paged.scss';
 
 export const PageProduct: FC = () => {
   const [products, setProducts] = useState<common_Product[] | undefined>([]);
   const [filter, setFilter] = useState<GetProductsPagedRequest>(initialFilter);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [confirmDelete, setConfirmDelete] = useState<number | undefined>(undefined);
+  const [deletionMessage, setDeletionMessage] = useState('');
+  const [deletingProductId, setDeletingProductId] = useState<number | undefined>(undefined);
+  const calculateOffset = (page: number, limit: number) => (page - 1) * limit;
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
-    // TODO: clean up logic ???
-  }, []);
+  }, [currentPage]);
 
   const fetchData = async () => {
     try {
+      const newLimit = filter.limit || 6;
+      const offset = calculateOffset(currentPage, newLimit);
       const response: GetProductsPagedResponse = await getProductsPaged({
         ...filter,
+        limit: newLimit,
+        offset,
       });
 
-      setProducts(response.products || []);
+      setProducts((prevProducts) =>
+        response.products ? response.products.slice(0, newLimit) : [],
+      );
     } catch (error) {
       console.error(error);
     }
@@ -39,12 +50,28 @@ export const PageProduct: FC = () => {
     navigate({ to: `${ROUTES.singleProduct}?productId=${index}`, replace: true });
   };
 
-  const handleDeleteClick = async (productId: number | undefined) => {
-    try {
-      await deleteProductByID({ id: productId });
-      setProducts((prevProducts) => prevProducts?.filter((product) => product.id !== productId));
-    } catch (error) {
-      console.error('Error deleting product:', error);
+  const handleDeleteClick = async (
+    e: MouseEvent<HTMLButtonElement>,
+    productId: number | undefined,
+  ) => {
+    e.stopPropagation();
+    if (confirmDelete !== productId) {
+      setConfirmDelete(productId);
+    } else {
+      setDeletingProductId(productId);
+      setTimeout(async () => {
+        try {
+          await deleteProductByID({ id: productId });
+          setProducts((prevProducts) =>
+            prevProducts?.filter((product) => product.id !== productId),
+          );
+        } catch (error) {
+          console.error('Error deleting product:', error);
+        }
+        setDeletingProductId(undefined);
+        setTimeout(() => setDeletionMessage(''), 3000);
+      }, 3000);
+      setConfirmDelete(undefined);
     }
   };
 
@@ -52,25 +79,24 @@ export const PageProduct: FC = () => {
     K extends keyof GetProductsPagedRequest | keyof common_FilterConditions,
   >(
     key: K,
-    value: K extends keyof GetProductsPagedRequest
-      ? GetProductsPagedRequest[K]
-      : K extends keyof common_FilterConditions
-      ? common_FilterConditions[K]
-      : never,
+    value:
+      | (K extends keyof GetProductsPagedRequest ? GetProductsPagedRequest[K] : never)
+      | (K extends keyof common_FilterConditions ? common_FilterConditions[K] : never),
   ) => {
-    setFilter((prevFilter) => {
-      return {
-        ...prevFilter,
-        ...(key in prevFilter
-          ? { [key]: value }
-          : {
-              filterConditions: {
-                ...(prevFilter.filterConditions || {}),
-                [key]: value,
-              },
-            }),
-      } as GetProductsPagedRequest;
-    });
+    setFilter(
+      (prevFilter) =>
+        ({
+          ...prevFilter,
+          ...(key in prevFilter
+            ? { [key]: value }
+            : {
+                filterConditions: {
+                  ...(prevFilter.filterConditions || {}),
+                  [key]: value,
+                },
+              }),
+        } as GetProductsPagedRequest),
+    );
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -80,18 +106,25 @@ export const PageProduct: FC = () => {
 
   return (
     <Layout>
+      {deletionMessage && <div>{deletionMessage}</div>}
       <div className={styles.product_container}>
-        <ul className={styles.product_list}>
-          {products?.map((product) => (
-            <li key={product.id} onClick={() => handleProductClick(product.id)}>
-              <button onClick={() => handleDeleteClick(product.id)}>X</button>
-              <img src={product.productInsert?.thumbnail} alt='img' />
-              <h5>{product.productInsert?.name}</h5>
-            </li>
-          ))}
-        </ul>
+        <div className={styles.product_wrapper}>
+          <Products
+            products={products}
+            productClick={handleProductClick}
+            deleteProduct={handleDeleteClick}
+            confirmDeleteProductId={confirmDelete}
+            deletingProductId={deletingProductId}
+          />
+          <div className={styles.product_pagination}>
+            <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage <= 1}>
+              Prev
+            </button>
+            <button onClick={() => setCurrentPage(currentPage + 1)}>Next</button>
+          </div>
+        </div>
+        <Filter filter={filter} filterChange={handleFilterChange} onSubmit={handleSubmit} />
       </div>
-      <Filter filter={filter} filterChange={handleFilterChange} onSubmit={handleSubmit} />
     </Layout>
   );
 };
