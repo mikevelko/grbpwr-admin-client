@@ -1,9 +1,23 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Layout } from 'components/layout/layout';
-import { common_ProductFull, common_Size } from 'api/proto-http/admin';
+import {
+  common_GenderEnum,
+  common_Genders,
+  common_ProductFull,
+  common_Size,
+} from 'api/proto-http/admin';
 import { getProductByID, getDictionary } from 'api/admin';
 import { AddMediaByID } from './addMediaById';
-import { updateName, updateSku, updatePreorder, updateColors } from 'api/byID';
+import {
+  updateName,
+  updateSku,
+  updatePreorder,
+  updateColors,
+  updateCountry,
+  updateBrand,
+  updateGender,
+  updateThumbnail,
+} from 'api/byID';
 import queryString from 'query-string';
 import styles from 'styles/productID.scss';
 
@@ -12,15 +26,22 @@ export const ProductId: FC = () => {
   const productId = queryParams.productId as string;
   const [product, setProuct] = useState<common_ProductFull | undefined>(undefined);
   const [sizeDictionary, setSizeDictionary] = useState<common_Size[]>([]);
+  // const [genders, setGenders] = useState<common_Genders[] | undefined>(undefined);
   const [productFields, setProductFields] = useState({
     newProductName: '',
     newSku: '',
     newPreorder: '',
     newColor: '',
     newColorHEX: '',
+    newCountry: '',
+    newBrand: '',
+    // newGender: '' as common_GenderEnum,
+    newThumbnail: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setProductFields((prevState) => ({
       ...prevState,
@@ -35,7 +56,17 @@ export const ProductId: FC = () => {
     }
 
     try {
-      const { newProductName, newSku, newPreorder, newColor, newColorHEX } = productFields;
+      const {
+        newProductName,
+        newSku,
+        newPreorder,
+        newColor,
+        newColorHEX,
+        newCountry,
+        newBrand,
+        // newGender,
+        newThumbnail,
+      } = productFields;
 
       if (newProductName !== '') {
         await updateName({ productId: product.product.id, name: newProductName });
@@ -57,12 +88,32 @@ export const ProductId: FC = () => {
         });
       }
 
+      if (newCountry !== '') {
+        await updateCountry({ productId: product.product.id, countryOfOrigin: newCountry });
+      }
+
+      if (newBrand !== '') {
+        await updateBrand({ productId: product.product.id, brand: newBrand });
+      }
+
+      // if (newGender !== 'GENDER_ENUM_UNKNOWN') {
+      //   await updateGender({ productId: product.product.id, gender: newGender });
+      // }
+
+      if (newThumbnail !== '') {
+        await updateThumbnail({ productId: product.product.id, thumbnail: newThumbnail });
+      }
+
       updateLocalProductDetails(
         newProductName !== '' ? newProductName : null,
         newSku !== '' ? newSku : null,
         newPreorder !== '' ? newPreorder : null,
         newColor !== '' ? newColor : null,
         newColorHEX !== '' ? newColorHEX : undefined,
+        newCountry !== '' ? newCountry : undefined,
+        newBrand !== '' ? newBrand : undefined,
+        // newGender !== 'GENDER_ENUM_UNKNOWN' ? newGender : undefined,
+        newThumbnail !== '' ? newThumbnail : undefined,
       );
     } catch (error) {
       console.error('Error updating product', error);
@@ -75,6 +126,10 @@ export const ProductId: FC = () => {
     newPreorder: string | null,
     newColor: string | null,
     newColorHEX: string | undefined,
+    newCountry: string | undefined,
+    newBrand: string | undefined,
+    // newGender: common_GenderEnum | undefined,
+    newThumbnail: string | undefined,
   ) => {
     setProuct((prevProduct) => {
       if (!prevProduct || !prevProduct.product || !prevProduct.product.productInsert) {
@@ -92,6 +147,10 @@ export const ProductId: FC = () => {
             preorder: newPreorder || prevProduct.product.productInsert.preorder,
             color: newColor || prevProduct.product.productInsert.color,
             colorHex: newColorHEX || prevProduct.product.productInsert.colorHex,
+            countryOfOrigin: newCountry || prevProduct.product.productInsert.countryOfOrigin,
+            brand: newBrand || prevProduct.product.productInsert.brand,
+            // targetGender: newGender || prevProduct.product.productInsert.targetGender,
+            thumbnail: newThumbnail || prevProduct.product.productInsert.thumbnail,
           },
         },
       };
@@ -117,6 +176,7 @@ export const ProductId: FC = () => {
       try {
         const response = await getDictionary({});
         setSizeDictionary(response.dictionary?.sizes || []);
+        // setGenders(response.dictionary?.genders || []);
       } catch (error) {
         console.error(error);
       }
@@ -193,7 +253,44 @@ export const ProductId: FC = () => {
           />
           <button onClick={updateProductDetails}>+</button>
 
-          <h3>{product?.product?.productInsert?.targetGender}</h3>
+          <h3>{product?.product?.productInsert?.countryOfOrigin}</h3>
+          <input
+            type='text'
+            name='newCountry'
+            value={productFields.newCountry}
+            onChange={handleChange}
+          />
+          <button onClick={updateProductDetails}>+</button>
+
+          <h3>{product?.product?.productInsert?.brand}</h3>
+          <input
+            type='text'
+            name='newBrand'
+            value={productFields.newBrand}
+            onChange={handleChange}
+          />
+          <button onClick={updateProductDetails}>+</button>
+
+          {/* <h3>{product?.product?.productInsert?.targetGender}</h3>
+          <select name='newGender' value={productFields.newGender} onChange={handleChange}>
+            <option value='select'></option>
+            {genders?.map((gender, id) => (
+              <option key={id} value={gender.id}>
+                {gender.name}
+              </option>
+            ))}
+          </select>
+          <button onClick={updateProductDetails}>+</button> */}
+
+          <img src={product?.product?.productInsert?.thumbnail} alt='thumbnail' />
+          <input
+            type='text'
+            name='newThumbnail'
+            value={productFields.newThumbnail}
+            onChange={handleChange}
+          />
+          <button onClick={updateProductDetails}>+</button>
+
           <ul>
             {product?.sizes?.map((size, index) => (
               <li key={index}>{getSizeName(size.sizeId)}</li>
