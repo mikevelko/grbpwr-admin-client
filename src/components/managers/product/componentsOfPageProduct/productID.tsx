@@ -20,14 +20,27 @@ import {
 } from 'api/byID';
 import queryString from 'query-string';
 import styles from 'styles/productID.scss';
+// TODO: ????
+interface ProductFields {
+  [key: string]: string | common_GenderEnum; // или другой подходящий тип
+  newProductName: string;
+  newSku: string;
+  newPreorder: string;
+  newColor: string;
+  newColorHEX: string;
+  newCountry: string;
+  newBrand: string;
+  newGender: common_GenderEnum;
+  newThumbnail: string;
+}
 
 export const ProductId: FC = () => {
   const queryParams = queryString.parse(window.location.search);
   const productId = queryParams.productId as string;
   const [product, setProuct] = useState<common_ProductFull | undefined>(undefined);
   const [sizeDictionary, setSizeDictionary] = useState<common_Size[]>([]);
-  // const [genders, setGenders] = useState<common_Genders[] | undefined>(undefined);
-  const [productFields, setProductFields] = useState({
+  const [genders, setGenders] = useState<common_Genders[] | undefined>(undefined);
+  const [productFields, setProductFields] = useState<ProductFields>({
     newProductName: '',
     newSku: '',
     newPreorder: '',
@@ -35,7 +48,7 @@ export const ProductId: FC = () => {
     newColorHEX: '',
     newCountry: '',
     newBrand: '',
-    // newGender: '' as common_GenderEnum,
+    newGender: '' as common_GenderEnum,
     newThumbnail: '',
   });
 
@@ -49,111 +62,44 @@ export const ProductId: FC = () => {
     }));
   };
 
-  const updateProductDetails = async () => {
+  const updateProduct = async (fieldName: string) => {
     if (!product || !product.product?.id) {
-      console.error('Product ID is not available');
+      console.error('id undefined');
       return;
     }
+    const value = productFields[fieldName as keyof typeof productFields];
+    if (!value) return;
 
     try {
-      const {
-        newProductName,
-        newSku,
-        newPreorder,
-        newColor,
-        newColorHEX,
-        newCountry,
-        newBrand,
-        // newGender,
-        newThumbnail,
-      } = productFields;
-
-      if (newProductName !== '') {
-        await updateName({ productId: product.product.id, name: newProductName });
+      switch (fieldName) {
+        case 'newProductName':
+          await updateName({ productId: product.product.id, name: value });
+          break;
+        case 'newSku':
+          await updateSku({ productId: product.product.id, sku: value });
+          break;
+        default:
+          break;
       }
-
-      if (newSku !== '') {
-        await updateSku({ productId: product.product.id, sku: newSku });
-      }
-
-      if (newPreorder !== '') {
-        await updatePreorder({ productId: product.product.id, preorder: newPreorder });
-      }
-
-      if (newColor !== '') {
-        await updateColors({
-          productId: product.product.id,
-          color: newColor,
-          colorHex: newColorHEX,
-        });
-      }
-
-      if (newCountry !== '') {
-        await updateCountry({ productId: product.product.id, countryOfOrigin: newCountry });
-      }
-
-      if (newBrand !== '') {
-        await updateBrand({ productId: product.product.id, brand: newBrand });
-      }
-
-      // if (newGender !== 'GENDER_ENUM_UNKNOWN') {
-      //   await updateGender({ productId: product.product.id, gender: newGender });
-      // }
-
-      if (newThumbnail !== '') {
-        await updateThumbnail({ productId: product.product.id, thumbnail: newThumbnail });
-      }
-
-      updateLocalProductDetails(
-        newProductName !== '' ? newProductName : null,
-        newSku !== '' ? newSku : null,
-        newPreorder !== '' ? newPreorder : null,
-        newColor !== '' ? newColor : null,
-        newColorHEX !== '' ? newColorHEX : undefined,
-        newCountry !== '' ? newCountry : undefined,
-        newBrand !== '' ? newBrand : undefined,
-        // newGender !== 'GENDER_ENUM_UNKNOWN' ? newGender : undefined,
-        newThumbnail !== '' ? newThumbnail : undefined,
-      );
+      updateLocalProductDetails(fieldName, productFields[fieldName]);
     } catch (error) {
-      console.error('Error updating product', error);
+      console.error(error);
     }
   };
 
-  const updateLocalProductDetails = (
-    newName: string | null,
-    newSku: string | null,
-    newPreorder: string | null,
-    newColor: string | null,
-    newColorHEX: string | undefined,
-    newCountry: string | undefined,
-    newBrand: string | undefined,
-    // newGender: common_GenderEnum | undefined,
-    newThumbnail: string | undefined,
-  ) => {
+  const updateLocalProductDetails = (fieldName: string, newValue: string) => {
     setProuct((prevProduct) => {
-      if (!prevProduct || !prevProduct.product || !prevProduct.product.productInsert) {
+      if (!prevProduct || !prevProduct.product) {
         return prevProduct;
       }
-      // TODO: spreading ?
-      const updatedProduct: common_ProductFull = {
-        ...prevProduct,
-        product: {
-          ...prevProduct.product,
-          productInsert: {
-            ...prevProduct.product.productInsert,
-            name: newName || prevProduct.product.productInsert.name,
-            sku: newSku || prevProduct.product.productInsert.sku,
-            preorder: newPreorder || prevProduct.product.productInsert.preorder,
-            color: newColor || prevProduct.product.productInsert.color,
-            colorHex: newColorHEX || prevProduct.product.productInsert.colorHex,
-            countryOfOrigin: newCountry || prevProduct.product.productInsert.countryOfOrigin,
-            brand: newBrand || prevProduct.product.productInsert.brand,
-            // targetGender: newGender || prevProduct.product.productInsert.targetGender,
-            thumbnail: newThumbnail || prevProduct.product.productInsert.thumbnail,
-          },
-        },
-      };
+
+      const updatedProduct = { ...prevProduct };
+      if (fieldName === 'newProductName' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.name = newValue;
+      } else if (fieldName === 'newSku' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.sku = newValue;
+      }
+
       return updatedProduct;
     });
   };
@@ -176,7 +122,7 @@ export const ProductId: FC = () => {
       try {
         const response = await getDictionary({});
         setSizeDictionary(response.dictionary?.sizes || []);
-        // setGenders(response.dictionary?.genders || []);
+        setGenders(response.dictionary?.genders || []);
       } catch (error) {
         console.error(error);
       }
@@ -220,77 +166,10 @@ export const ProductId: FC = () => {
             value={productFields.newProductName}
             onChange={handleChange}
           />
-          <button onClick={() => updateProductDetails()}>+</button>
-          <br />
-
+          <button onClick={() => updateProduct('newProductName')}>+</button>
           <h3>{product?.product?.productInsert?.sku}</h3>
           <input type='text' name='newSku' value={productFields.newSku} onChange={handleChange} />
-          <button onClick={updateProductDetails}>+</button>
-          <br />
-          <h3>{product?.product?.productInsert?.preorder}</h3>
-          <input
-            type='text'
-            name='newPreorder'
-            value={productFields.newPreorder}
-            onChange={handleChange}
-          />
-          <button onClick={() => updateProductDetails()}>+</button>
-
-          <h3>
-            {product?.product?.productInsert?.color} - {product?.product?.productInsert?.colorHex}
-          </h3>
-          <input
-            type='text'
-            name='newColor'
-            value={productFields.newColor}
-            onChange={handleChange}
-          />
-          <input
-            type='text'
-            name='newColorHEX'
-            value={productFields.newColorHEX}
-            onChange={handleChange}
-          />
-          <button onClick={updateProductDetails}>+</button>
-
-          <h3>{product?.product?.productInsert?.countryOfOrigin}</h3>
-          <input
-            type='text'
-            name='newCountry'
-            value={productFields.newCountry}
-            onChange={handleChange}
-          />
-          <button onClick={updateProductDetails}>+</button>
-
-          <h3>{product?.product?.productInsert?.brand}</h3>
-          <input
-            type='text'
-            name='newBrand'
-            value={productFields.newBrand}
-            onChange={handleChange}
-          />
-          <button onClick={updateProductDetails}>+</button>
-
-          {/* <h3>{product?.product?.productInsert?.targetGender}</h3>
-          <select name='newGender' value={productFields.newGender} onChange={handleChange}>
-            <option value='select'></option>
-            {genders?.map((gender, id) => (
-              <option key={id} value={gender.id}>
-                {gender.name}
-              </option>
-            ))}
-          </select>
-          <button onClick={updateProductDetails}>+</button> */}
-
-          <img src={product?.product?.productInsert?.thumbnail} alt='thumbnail' />
-          <input
-            type='text'
-            name='newThumbnail'
-            value={productFields.newThumbnail}
-            onChange={handleChange}
-          />
-          <button onClick={updateProductDetails}>+</button>
-
+          <button onClick={() => updateProduct('newSku')}>+</button>
           <ul>
             {product?.sizes?.map((size, index) => (
               <li key={index}>{getSizeName(size.sizeId)}</li>
