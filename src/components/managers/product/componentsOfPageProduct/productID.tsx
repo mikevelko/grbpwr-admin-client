@@ -7,7 +7,8 @@ import {
   common_Size,
 } from 'api/proto-http/admin';
 import { getProductByID, getDictionary } from 'api/admin';
-import { AddMediaByID } from './addMediaById';
+import { UpdateInputField } from './updateInputField';
+import { UpdateColors } from './updateColors';
 import {
   updateName,
   updateSku,
@@ -22,7 +23,8 @@ import queryString from 'query-string';
 import styles from 'styles/productID.scss';
 // TODO: ????
 interface ProductFields {
-  [key: string]: string | common_GenderEnum; // или другой подходящий тип
+  // TODO: ???
+  [key: string]: string | common_GenderEnum;
   newProductName: string;
   newSku: string;
   newPreorder: string;
@@ -48,7 +50,7 @@ export const ProductId: FC = () => {
     newColorHEX: '',
     newCountry: '',
     newBrand: '',
-    newGender: '' as common_GenderEnum,
+    newGender: 'GENDER_ENUM_UNKNOWN' as common_GenderEnum,
     newThumbnail: '',
   });
 
@@ -78,6 +80,30 @@ export const ProductId: FC = () => {
         case 'newSku':
           await updateSku({ productId: product.product.id, sku: value });
           break;
+        case 'newPreorder':
+          await updatePreorder({ productId: product.product.id, preorder: value });
+          break;
+        case 'newColor':
+          if (productFields.newColor && productFields.newColorHEX) {
+            await updateColors({
+              productId: product.product.id,
+              color: productFields.newColor,
+              colorHex: productFields.newColorHEX,
+            });
+          }
+          break;
+        case 'newCountry':
+          await updateCountry({ productId: product.product.id, countryOfOrigin: value });
+          break;
+        case 'newBrand':
+          await updateBrand({ productId: product.product.id, brand: value });
+          break;
+        case 'newGender':
+          await updateGender({
+            productId: product.product.id,
+            gender: value as common_GenderEnum,
+          });
+          break;
         default:
           break;
       }
@@ -98,6 +124,18 @@ export const ProductId: FC = () => {
         updatedProduct.product.productInsert.name = newValue;
       } else if (fieldName === 'newSku' && updatedProduct.product?.productInsert) {
         updatedProduct.product.productInsert.sku = newValue;
+      } else if (fieldName === 'newColor' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.color = newValue;
+      } else if (fieldName === 'newColorHEX' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.colorHex = newValue;
+      } else if (fieldName === 'newPreorder' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.preorder = newValue;
+      } else if (fieldName === 'newCountry' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.countryOfOrigin = newValue;
+      } else if (fieldName === 'newBrand' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.brand = newValue;
+      } else if (fieldName === 'newGender' && updatedProduct.product?.productInsert) {
+        // updatedProduct.product.productInsert.targetGender = newValue;
       }
 
       return updatedProduct;
@@ -159,17 +197,63 @@ export const ProductId: FC = () => {
           </ul>
         </div>
         <div className={styles.product_id_information}>
-          <h3>{product?.product?.productInsert?.name}</h3>
-          <input
-            type='text'
+          <UpdateInputField
+            label='Name'
+            productInfo={product?.product?.productInsert?.name}
             name='newProductName'
             value={productFields.newProductName}
             onChange={handleChange}
+            updateFunction={() => updateProduct('newProductName')}
           />
-          <button onClick={() => updateProduct('newProductName')}>+</button>
-          <h3>{product?.product?.productInsert?.sku}</h3>
-          <input type='text' name='newSku' value={productFields.newSku} onChange={handleChange} />
-          <button onClick={() => updateProduct('newSku')}>+</button>
+
+          <UpdateInputField
+            label='Sku'
+            productInfo={product?.product?.productInsert?.sku}
+            name='newSku'
+            value={productFields.newSku}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newSku')}
+          />
+
+          <UpdateInputField
+            label='Preorder'
+            productInfo={product?.product?.productInsert?.preorder}
+            name='newPreorder'
+            value={productFields.newPreorder}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newPreorder')}
+          />
+
+          <UpdateColors
+            label='Colors'
+            productInfo={product?.product?.productInsert?.color}
+            productInfoHEX={product?.product?.productInsert?.colorHex}
+            colorName='newColor'
+            hexName='newColorHEX'
+            colorValue={productFields.newColor}
+            hexValue={productFields.newColorHEX}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newColor')}
+          />
+
+          <UpdateInputField
+            label='Country'
+            productInfo={product?.product?.productInsert?.countryOfOrigin}
+            name='newCountry'
+            value={productFields.newCountry}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newCountry')}
+          />
+
+          <UpdateInputField
+            label='Brand'
+            productInfo={product?.product?.productInsert?.brand}
+            name='newBrand'
+            value={productFields.newBrand}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newBrand')}
+          />
+
           <ul>
             {product?.sizes?.map((size, index) => (
               <li key={index}>{getSizeName(size.sizeId)}</li>
