@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 
 interface InputFieldProps {
   label: string;
-  productInfo: string | undefined;
+  productInfo: string | number | undefined;
   name: string;
   value: string | number | undefined;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

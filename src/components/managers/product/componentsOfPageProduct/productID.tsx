@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import React, { FC, useState, useEffect } from 'react';
 import { Layout } from 'components/layout/layout';
 import {
@@ -18,13 +19,16 @@ import {
   updateBrand,
   updateGender,
   updateThumbnail,
+  updatePrice,
+  updateSale,
+  updateCategory,
 } from 'api/byID';
 import queryString from 'query-string';
 import styles from 'styles/productID.scss';
 // TODO: ????
 interface ProductFields {
   // TODO: ???
-  [key: string]: string | common_GenderEnum;
+  [key: string]: number | string | common_GenderEnum;
   newProductName: string;
   newSku: string;
   newPreorder: string;
@@ -34,6 +38,9 @@ interface ProductFields {
   newBrand: string;
   newGender: common_GenderEnum;
   newThumbnail: string;
+  newPrice: string;
+  newSale: string;
+  newCategory: number;
 }
 
 export const ProductId: FC = () => {
@@ -50,8 +57,11 @@ export const ProductId: FC = () => {
     newColorHEX: '',
     newCountry: '',
     newBrand: '',
-    newGender: 'GENDER_ENUM_UNKNOWN' as common_GenderEnum,
+    newGender: '' as common_GenderEnum,
     newThumbnail: '',
+    newPrice: '',
+    newSale: '',
+    newCategory: 0,
   });
 
   const handleChange = (
@@ -69,19 +79,29 @@ export const ProductId: FC = () => {
       console.error('id undefined');
       return;
     }
-    const value = productFields[fieldName as keyof typeof productFields];
+    const fieldValue = productFields[fieldName as keyof typeof productFields];
+
+    // Convert the fieldValue to a string if it's a number
+    const value = typeof fieldValue === 'number' ? fieldValue.toString() : fieldValue;
+
     if (!value) return;
 
     try {
       switch (fieldName) {
         case 'newProductName':
-          await updateName({ productId: product.product.id, name: value });
+          if (typeof value === 'string') {
+            await updateName({ productId: product.product.id, name: value });
+          }
           break;
         case 'newSku':
-          await updateSku({ productId: product.product.id, sku: value });
+          if (typeof value === 'string') {
+            await updateSku({ productId: product.product.id, sku: value });
+          }
           break;
         case 'newPreorder':
-          await updatePreorder({ productId: product.product.id, preorder: value });
+          if (typeof value === 'string') {
+            await updatePreorder({ productId: product.product.id, preorder: value });
+          }
           break;
         case 'newColor':
           if (productFields.newColor && productFields.newColorHEX) {
@@ -93,27 +113,52 @@ export const ProductId: FC = () => {
           }
           break;
         case 'newCountry':
-          await updateCountry({ productId: product.product.id, countryOfOrigin: value });
+          if (typeof value === 'string') {
+            await updateCountry({ productId: product.product.id, countryOfOrigin: value });
+          }
           break;
         case 'newBrand':
-          await updateBrand({ productId: product.product.id, brand: value });
+          if (typeof value === 'string') {
+            await updateBrand({ productId: product.product.id, brand: value });
+          }
           break;
         case 'newGender':
           await updateGender({
             productId: product.product.id,
-            gender: value as common_GenderEnum,
+            gender: productFields.newGender,
           });
+          break;
+        case 'newThumbnail':
+          if (typeof value === 'string') {
+            await updateThumbnail({ productId: product.product.id, thumbnail: value });
+          }
+          break;
+        case 'newPrice':
+          const decimalPrice = createDecimalObject(productFields.newPrice);
+          await updatePrice({ productId: product.product.id, price: decimalPrice });
+          break;
+        case 'newSale':
+          const decimalSale = createDecimalObject(productFields.newSale);
+          await updateSale({ productId: product.product.id, sale: decimalSale });
+          break;
+        case 'newCategory':
+          await updateCategory({ productId: product.product.id, categoryId: Number(value) });
           break;
         default:
           break;
       }
-      updateLocalProductDetails(fieldName, productFields[fieldName]);
+      updateLocalProductDetails(fieldName, value);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const updateLocalProductDetails = (fieldName: string, newValue: string) => {
+  function createDecimalObject(decimalString: string) {
+    if (!decimalString) return { value: '0' };
+    return { value: decimalString };
+  }
+
+  const updateLocalProductDetails = (fieldName: string, newValue: string | common_GenderEnum) => {
     setProuct((prevProduct) => {
       if (!prevProduct || !prevProduct.product) {
         return prevProduct;
@@ -136,6 +181,14 @@ export const ProductId: FC = () => {
         updatedProduct.product.productInsert.brand = newValue;
       } else if (fieldName === 'newGender' && updatedProduct.product?.productInsert) {
         // updatedProduct.product.productInsert.targetGender = newValue;
+      } else if (fieldName === 'newThumbnail' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.thumbnail = newValue;
+      } else if (fieldName === 'newPrice' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.price = createDecimalObject(newValue);
+      } else if (fieldName === 'newSale' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.salePercentage = createDecimalObject(newValue);
+      } else if (fieldName === 'newCategory' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.categoryId = Number(newValue);
       }
 
       return updatedProduct;
@@ -253,6 +306,53 @@ export const ProductId: FC = () => {
             onChange={handleChange}
             updateFunction={() => updateProduct('newBrand')}
           />
+
+          <UpdateInputField
+            label='Thumbnail'
+            productInfo={product?.product?.productInsert?.thumbnail}
+            name='newThumbnail'
+            value={productFields.newThumbnail}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newThumbnail')}
+          />
+
+          <UpdateInputField
+            label='Price'
+            productInfo={product?.product?.productInsert?.price?.value}
+            name='newPrice'
+            value={productFields.newPrice}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newPrice')}
+          />
+
+          <UpdateInputField
+            label='Sale'
+            productInfo={product?.product?.productInsert?.salePercentage?.value}
+            name='newSale'
+            value={productFields.newSale}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newSale')}
+          />
+
+          <UpdateInputField
+            label='Category'
+            productInfo={product?.product?.productInsert?.categoryId}
+            name='newCategory'
+            value={productFields.newCategory}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newCategory')}
+          />
+
+          <h3>{product?.product?.productInsert?.targetGender}</h3>
+          <select name='newGender' value={productFields.newGender} onChange={handleChange}>
+            <option value='GENDER_ENUM_UNKNOWN'>Select gender</option>
+            {genders?.map((gender, _) => (
+              <option key={gender.id} value={gender.id}>
+                {gender.name}
+              </option>
+            ))}
+          </select>
+          <button onClick={() => updateProduct('newGender')}>+</button>
 
           <ul>
             {product?.sizes?.map((size, index) => (

@@ -16,6 +16,12 @@ import {
   UpdateProductTargetGenderResponse,
   UpdateProductThumbnailRequest,
   UpdateProductThumbnailResponse,
+  UpdateProductPriceRequest,
+  UpdateProductPriceResponse,
+  UpdateProductSaleRequest,
+  UpdateProductSaleResponse,
+  UpdateProductCategoryRequest,
+  UpdateProductCategoryResponse,
 } from './proto-http/admin';
 
 export function updateName(request: UpdateProductNameRequest): Promise<UpdateProductNameResponse> {
@@ -60,4 +66,20 @@ export function updateThumbnail(
   request: UpdateProductThumbnailRequest,
 ): Promise<UpdateProductThumbnailResponse> {
   return adminService.UpdateProductThumbnail(request);
+}
+
+export function updatePrice(
+  request: UpdateProductPriceRequest,
+): Promise<UpdateProductPriceResponse> {
+  return adminService.UpdateProductPrice(request);
+}
+
+export function updateSale(request: UpdateProductSaleRequest): Promise<UpdateProductSaleResponse> {
+  return adminService.UpdateProductSale(request);
+}
+
+export function updateCategory(
+  request: UpdateProductCategoryRequest,
+): Promise<UpdateProductCategoryResponse> {
+  return adminService.UpdateProductCategory(request);
 }
