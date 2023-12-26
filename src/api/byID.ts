@@ -22,6 +22,10 @@ import {
   UpdateProductSaleResponse,
   UpdateProductCategoryRequest,
   UpdateProductCategoryResponse,
+  UpdateProductSizeStockRequest,
+  UpdateProductSizeStockResponse,
+  AddProductMeasurementRequest,
+  AddProductMeasurementResponse,
 } from './proto-http/admin';
 
 export function updateName(request: UpdateProductNameRequest): Promise<UpdateProductNameResponse> {
@@ -82,4 +86,16 @@ export function updateCategory(
   request: UpdateProductCategoryRequest,
 ): Promise<UpdateProductCategoryResponse> {
   return adminService.UpdateProductCategory(request);
+}
+
+export function updateSize(
+  request: UpdateProductSizeStockRequest,
+): Promise<UpdateProductSizeStockResponse> {
+  return adminService.UpdateProductSizeStock(request);
+}
+
+export function updateMeasurement(
+  request: AddProductMeasurementRequest,
+): Promise<AddProductMeasurementResponse> {
+  return adminService.AddProductMeasurement(request);
 }

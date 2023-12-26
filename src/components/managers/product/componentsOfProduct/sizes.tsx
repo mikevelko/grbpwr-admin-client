@@ -102,9 +102,9 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
   return (
     <div className={styles.product_container}>
       <label className={styles.title}>Sizes</label>
-      <div>
+      <ul>
         {sizeEnum?.map((size, sizeIndex) => (
-          <div key={sizeIndex}>
+          <li key={sizeIndex}>
             <label htmlFor={size.name}>{size.name}</label>
             <input
               type='number'
@@ -125,9 +125,9 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
                 </div>
               ))}
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };
