@@ -8,6 +8,7 @@ import {
   common_ProductFull,
   common_Size,
 } from 'api/proto-http/admin';
+import { AddMediaByID } from './addMediaById';
 import { getProductByID, getDictionary } from 'api/admin';
 import { UpdateInputField } from './updateInputField';
 import { UpdateColors } from './updateColors';
@@ -25,6 +26,7 @@ import {
   updateCategory,
   updateSize,
   updateMeasurement,
+  updateDescription,
 } from 'api/byID';
 import queryString from 'query-string';
 import styles from 'styles/productID.scss';
@@ -44,6 +46,7 @@ interface ProductFields {
   newPrice: string;
   newSale: string;
   newCategory: number;
+  newDescription: string;
 }
 
 type MeasurementUpdates = {
@@ -69,10 +72,12 @@ export const ProductId: FC = () => {
     newPrice: '',
     newSale: '',
     newCategory: 0,
+    newDescription: '',
   });
   const [sizeUpdates, setSizeUpdates] = useState<{ [sizeId: string]: number }>({});
   const [measurement, setMeasurement] = useState<common_MeasurementName[]>([]);
   const [measurementUpdates, setMeasurementUpdates] = useState<MeasurementUpdates>({});
+  const [showAddMedia, setShowAddMedia] = useState(false);
 
   const handleMeasurementChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -86,7 +91,6 @@ export const ProductId: FC = () => {
     });
   };
 
-  // Function to update measurement
   const updateMeasurementValue = async (sizeId: number, measurementNameId: number) => {
     const key = `${sizeId}-${measurementNameId}`;
     const measurementValue = measurementUpdates[key];
@@ -201,6 +205,9 @@ export const ProductId: FC = () => {
         case 'newCategory':
           await updateCategory({ productId: product.product.id, categoryId: Number(value) });
           break;
+        case 'newDescription':
+          await updateDescription({ productId: product.product.id, description: value });
+          break;
         default:
           break;
       }
@@ -246,6 +253,8 @@ export const ProductId: FC = () => {
         updatedProduct.product.productInsert.salePercentage = createDecimalObject(newValue);
       } else if (fieldName === 'newCategory' && updatedProduct.product?.productInsert) {
         updatedProduct.product.productInsert.categoryId = Number(newValue);
+      } else if (fieldName === 'newDescription' && updatedProduct.product?.productInsert) {
+        updatedProduct.product.productInsert.description = newValue;
       }
 
       return updatedProduct;
@@ -295,6 +304,10 @@ export const ProductId: FC = () => {
     return 'size not found';
   };
 
+  const toogleAddMedia = () => {
+    setShowAddMedia(!showAddMedia);
+  };
+
   return (
     <Layout>
       <div className={styles.product_id_full_content}>
@@ -305,6 +318,12 @@ export const ProductId: FC = () => {
               alt='thumbnail'
               className={styles.main_img}
             />
+            <button onClick={toogleAddMedia}>add</button>
+            {showAddMedia && (
+              <div className={styles.add_media}>
+                <AddMediaByID />
+              </div>
+            )}
           </div>
           <ul className={styles.product_by_id_media_list}>
             {product?.media?.map((media, index) => (
@@ -323,6 +342,15 @@ export const ProductId: FC = () => {
             value={productFields.newProductName}
             onChange={handleChange}
             updateFunction={() => updateProduct('newProductName')}
+          />
+
+          <UpdateInputField
+            label='description'
+            productInfo={product?.product?.productInsert?.description}
+            name='newDescription'
+            value={productFields.newDescription}
+            onChange={handleChange}
+            updateFunction={() => updateProduct('newDescription')}
           />
           <UpdateInputField
             label='Sku'

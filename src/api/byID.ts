@@ -26,6 +26,8 @@ import {
   UpdateProductSizeStockResponse,
   AddProductMeasurementRequest,
   AddProductMeasurementResponse,
+  UpdateProductDescriptionRequest,
+  UpdateProductDescriptionResponse,
 } from './proto-http/admin';
 
 export function updateName(request: UpdateProductNameRequest): Promise<UpdateProductNameResponse> {
@@ -98,4 +100,10 @@ export function updateMeasurement(
   request: AddProductMeasurementRequest,
 ): Promise<AddProductMeasurementResponse> {
   return adminService.AddProductMeasurement(request);
+}
+
+export function updateDescription(
+  request: UpdateProductDescriptionRequest,
+): Promise<UpdateProductDescriptionResponse> {
+  return adminService.UpdateProductDescription(request);
 }

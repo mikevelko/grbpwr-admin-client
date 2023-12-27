@@ -6,7 +6,7 @@ import {
   googletype_Decimal,
   common_ProductNew,
 } from 'api/proto-http/admin';
-import { getDictionary } from 'api/admin';
+import { getDictionary, addMediaByID } from 'api/admin';
 import styles from 'styles/addProd.scss';
 
 interface sizeProps {
@@ -14,9 +14,56 @@ interface sizeProps {
   setProduct: React.Dispatch<React.SetStateAction<common_ProductNew>>;
 }
 
+interface SelectedMeasurements {
+  [sizeIndex: number]: number; // Or string, if your measurement IDs are strings
+}
+
 export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
-  const [sizeEnum, setSizeEnum] = useState<common_Size[] | undefined>();
-  const [measurementEnum, setMeasurementEnum] = useState<common_MeasurementName[] | undefined>();
+  const [sizeDictionary, setSizeDictionary] = useState<common_Size[]>([]);
+  const [measurementEnum, setMeasurementEnum] = useState<common_MeasurementName[]>([]);
+  const [selectedMeasurements, setSelectedMeasurements] = useState<SelectedMeasurements>({});
+
+  const handleMeasurementSelection = (sizeIndex: any, measurementId: any) => {
+    setSelectedMeasurements((prev) => ({ ...prev, [sizeIndex]: measurementId }));
+  };
+
+  const handleMeasurementValueChange = (sizeIndex: any, measurementId: any, value: any) => {
+    setProduct((prevProduct) => {
+      // Create a deep copy of the prevProduct to avoid direct state mutation
+      const updatedProduct = JSON.parse(JSON.stringify(prevProduct));
+
+      // Ensure the sizeMeasurements array exists
+      if (!updatedProduct.sizeMeasurements) {
+        updatedProduct.sizeMeasurements = [];
+      }
+
+      // Ensure there's an entry for this size
+      if (!updatedProduct.sizeMeasurements[sizeIndex]) {
+        updatedProduct.sizeMeasurements[sizeIndex] = {
+          productSize: { sizeId: sizeIndex },
+          measurements: [],
+        };
+      }
+
+      // Find the measurement entry by measurementId, or create a new one if it doesn't exist
+      const measurementIndex = updatedProduct.sizeMeasurements[sizeIndex].measurements.findIndex(
+        (m: { measurementNameId: number }) => m.measurementNameId === measurementId,
+      );
+      if (measurementIndex === -1) {
+        // Measurement doesn't exist, create a new one
+        updatedProduct.sizeMeasurements[sizeIndex].measurements.push({
+          measurementNameId: measurementId,
+          measurementValue: { value },
+        });
+      } else {
+        // Measurement exists, update its value
+        updatedProduct.sizeMeasurements[sizeIndex].measurements[measurementIndex].measurementValue =
+          { value };
+      }
+
+      return updatedProduct;
+    });
+  };
 
   const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>, sizeIndex: number) => {
     const { name, value } = e.target;
@@ -26,11 +73,11 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
       const sizeQuantity: googletype_Decimal = { value: value };
 
       if (!updatedSizeMeasurements[sizeIndex]) {
-        const sizeId = sizeIndex + 1;
+        const sizeId = sizeIndex;
 
         const productSize: common_ProductSizeInsert = {
           quantity: sizeQuantity,
-          sizeId: sizeId,
+          sizeId: sizeId + 1,
         };
 
         updatedSizeMeasurements[sizeIndex] = {
@@ -51,79 +98,78 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
     });
   };
 
-  const handleMeasurementChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    sizeIndex: number,
-    measurementIndex: number,
-  ) => {
-    const { name, value } = e.target;
-
-    setProduct((prevProduct) => {
-      const updatedSizeMeasurements = [...(prevProduct.sizeMeasurements || [])];
-
-      if (updatedSizeMeasurements[sizeIndex]) {
-        const updatedMeasurements = [...(updatedSizeMeasurements[sizeIndex].measurements || [])];
-
-        const measurementValue: googletype_Decimal = { value: value };
-
-        updatedMeasurements[measurementIndex] = {
-          measurementNameId: measurementIndex + 1, // You may adjust this index based on your requirements
-          measurementValue: measurementValue,
-        };
-
-        updatedSizeMeasurements[sizeIndex] = {
-          ...updatedSizeMeasurements[sizeIndex],
-          measurements: updatedMeasurements,
-        };
-
-        return { ...prevProduct, sizeMeasurements: updatedSizeMeasurements };
-      }
-
-      return prevProduct;
-    });
-  };
-
   useEffect(() => {
     const fetchDictionary = async () => {
       try {
         const response = await getDictionary({});
-        const sizes = response.dictionary?.sizes;
-        const measurements = response.dictionary?.measurements;
-
-        setSizeEnum(sizes);
-        setMeasurementEnum(measurements);
+        const size = response.dictionary?.sizes || [];
+        const measurement = response.dictionary?.measurements || [];
+        const sortedSizes = size.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+        const sortedMeasurement = measurement.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+        setSizeDictionary(sortedSizes);
+        setMeasurementEnum(sortedMeasurement);
       } catch (error) {
-        console.error('Error fetching dictionary:', error);
+        console.error(error);
       }
     };
     fetchDictionary();
   }, []);
 
+  // TODO: create separate file for 2 functions
+
+  const getSizeName = (sizeId: number | undefined): string => {
+    const size = sizeDictionary.find((s) => s.id === sizeId);
+    if (size && size.name) {
+      return size.name.replace('SIZE_ENUM_', '');
+    }
+    return 'size not found';
+  };
+
+  const getMeasurementName = (id: number | undefined): string => {
+    const measurement = measurementEnum.find((m) => m.id === id);
+    if (measurement && measurement.name) {
+      return measurement.name.replace('MEASUREMENT_NAME_ENUM_', '');
+    }
+    return 'size not found';
+  };
+
   return (
     <div className={styles.product_container}>
       <label className={styles.title}>Sizes</label>
       <ul>
-        {sizeEnum?.map((size, sizeIndex) => (
+        {sizeDictionary.map((size, sizeIndex) => (
           <li key={sizeIndex}>
-            <label htmlFor={size.name}>{size.name}</label>
+            <strong>{getSizeName(size.id)}</strong>
             <input
               type='number'
               id={size.name}
               name='quantity'
               onChange={(e) => handleSizeChange(e, sizeIndex)}
             />
-            <div>
-              {measurementEnum?.map((measurement, measurementIndex) => (
-                <div key={measurementIndex}>
-                  <label htmlFor={measurement.name}>{measurement.name}</label>
-                  <input
-                    type='text'
-                    id={measurement.name}
-                    name='measurementValue'
-                    onChange={(e) => handleMeasurementChange(e, sizeIndex, measurementIndex)}
-                  />
-                </div>
-              ))}
+            <div className={styles.sizeMeasurement}>
+              <select
+                className={styles.measurementSelect}
+                onChange={(e) => handleMeasurementSelection(sizeIndex, e.target.value)}
+              >
+                {measurementEnum.map((measurement, measurementIndex) => (
+                  <option key={measurementIndex} value={measurement.id}>
+                    {getMeasurementName(measurement.id)}
+                  </option>
+                ))}
+              </select>
+              {selectedMeasurements[sizeIndex] && (
+                <input
+                  type='number'
+                  className={styles.measurementInput}
+                  onChange={(e) =>
+                    handleMeasurementValueChange(
+                      sizeIndex,
+                      selectedMeasurements[sizeIndex],
+                      e.target.value,
+                    )
+                  }
+                />
+              )}
             </div>
           </li>
         ))}

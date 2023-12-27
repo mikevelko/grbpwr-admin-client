@@ -39,22 +39,15 @@ export const AddMediaByID: FC = () => {
   };
 
   function generateStringArray(input: string): string[] {
-    // Define a regular expression pattern to match the relevant part of the URL
     const pattern = /https:\/\/files\.grbpwr\.com\/(.+?)(-og\.(jpg|mp4|webm))?$/;
-
-    // Use the regular expression to extract the matched parts of the URL
     const match = input.match(pattern);
-
     if (!match) {
-      // Return an empty array if the input doesn't match the expected pattern
       return [];
     }
-
-    const [, path, , extension] = match; // Note the additional comma to skip the second capturing group
+    const [, path, , extension] = match;
     const resultArray: string[] = [`${path}-og.${extension}`];
 
     if (extension === 'jpg') {
-      // If the extension is 'jpg', add the '-compressed.jpg' version to the array
       resultArray.push(`${path}-compressed.jpg`);
     }
     console.log(resultArray);
@@ -63,7 +56,7 @@ export const AddMediaByID: FC = () => {
 
   const handleDeleteFile = async (fileIndex: number) => {
     try {
-      const fileToDelete = filesUrl[fileIndex]; // Assuming filesUrl is an array of file URLs
+      const fileToDelete = filesUrl[fileIndex];
       const objectKeys = generateStringArray(fileToDelete);
 
       if (objectKeys.length > 0) {
