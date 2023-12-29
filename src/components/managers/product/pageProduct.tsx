@@ -39,9 +39,7 @@ export const PageProduct: FC = () => {
         offset,
       });
 
-      setProducts((prevProducts) =>
-        response.products ? response.products.slice(0, newLimit) : [],
-      );
+      setProducts(response.products ? response.products.slice(0, newLimit) : []);
     } catch (error) {
       console.error(error);
     }
@@ -116,6 +114,7 @@ export const PageProduct: FC = () => {
             deleteProduct={handleDeleteClick}
             confirmDeleteProductId={confirmDelete}
             deletingProductId={deletingProductId}
+            showHidden={filter.showHidden}
           />
           <div className={styles.product_pagination}>
             <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage <= 1}>

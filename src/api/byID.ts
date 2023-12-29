@@ -28,6 +28,12 @@ import {
   AddProductMeasurementResponse,
   UpdateProductDescriptionRequest,
   UpdateProductDescriptionResponse,
+  AddProductTagRequest,
+  AddProductTagResponse,
+  DeleteProductTagRequest,
+  DeleteProductTagResponse,
+  HideProductByIDRequest,
+  HideProductByIDResponse,
 } from './proto-http/admin';
 
 export function updateName(request: UpdateProductNameRequest): Promise<UpdateProductNameResponse> {
@@ -106,4 +112,16 @@ export function updateDescription(
   request: UpdateProductDescriptionRequest,
 ): Promise<UpdateProductDescriptionResponse> {
   return adminService.UpdateProductDescription(request);
+}
+
+export function updateTag(request: AddProductTagRequest): Promise<AddProductTagResponse> {
+  return adminService.AddProductTag(request);
+}
+
+export function deleteTag(request: DeleteProductTagRequest): Promise<DeleteProductTagResponse> {
+  return adminService.DeleteProductTag(request);
+}
+
+export function updateHide(request: HideProductByIDRequest): Promise<HideProductByIDResponse> {
+  return adminService.HideProductByID(request);
 }

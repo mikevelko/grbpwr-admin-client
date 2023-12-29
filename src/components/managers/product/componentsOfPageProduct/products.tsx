@@ -8,6 +8,7 @@ interface ProductProps {
   deleteProduct: (e: React.MouseEvent<HTMLButtonElement>, productId: number | undefined) => void;
   confirmDeleteProductId: number | undefined;
   deletingProductId: number | undefined;
+  showHidden: boolean | undefined;
 }
 
 export const Products: FC<ProductProps> = ({
@@ -16,6 +17,7 @@ export const Products: FC<ProductProps> = ({
   deleteProduct,
   confirmDeleteProductId,
   deletingProductId,
+  showHidden,
 }) => {
   const [hoveredProductId, setHoveredProductId] = useState<number | undefined>(undefined);
 
@@ -27,6 +29,7 @@ export const Products: FC<ProductProps> = ({
           onMouseEnter={() => setHoveredProductId(product.id)}
           onMouseLeave={() => setHoveredProductId(undefined)}
           onClick={() => productClick(product.id)}
+          className={`${product.productInsert?.hidden && showHidden ? styles.hidden_product : ''}`}
         >
           {hoveredProductId === product.id && (
             <button

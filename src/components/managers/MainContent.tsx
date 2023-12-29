@@ -26,8 +26,8 @@ export const Main: FC = () => {
         </button>
         <button className={styles.btn}>ORDERS</button>
         <button className={styles.btn}>HERO</button>
+        <button className={styles.btn}>PROMO</button>
         <button className={styles.btn}>ARCHIVE</button>
-        <button className={styles.btn}>ART</button>
       </div>
     </Layout>
   );

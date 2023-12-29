@@ -15,7 +15,7 @@ interface sizeProps {
 }
 
 interface SelectedMeasurements {
-  [sizeIndex: number]: number; // Or string, if your measurement IDs are strings
+  [sizeIndex: number]: number;
 }
 
 export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
@@ -29,15 +29,12 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
 
   const handleMeasurementValueChange = (sizeIndex: any, measurementId: any, value: any) => {
     setProduct((prevProduct) => {
-      // Create a deep copy of the prevProduct to avoid direct state mutation
       const updatedProduct = JSON.parse(JSON.stringify(prevProduct));
 
-      // Ensure the sizeMeasurements array exists
       if (!updatedProduct.sizeMeasurements) {
         updatedProduct.sizeMeasurements = [];
       }
 
-      // Ensure there's an entry for this size
       if (!updatedProduct.sizeMeasurements[sizeIndex]) {
         updatedProduct.sizeMeasurements[sizeIndex] = {
           productSize: { sizeId: sizeIndex },
@@ -45,18 +42,15 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
         };
       }
 
-      // Find the measurement entry by measurementId, or create a new one if it doesn't exist
       const measurementIndex = updatedProduct.sizeMeasurements[sizeIndex].measurements.findIndex(
         (m: { measurementNameId: number }) => m.measurementNameId === measurementId,
       );
       if (measurementIndex === -1) {
-        // Measurement doesn't exist, create a new one
         updatedProduct.sizeMeasurements[sizeIndex].measurements.push({
           measurementNameId: measurementId,
           measurementValue: { value },
         });
       } else {
-        // Measurement exists, update its value
         updatedProduct.sizeMeasurements[sizeIndex].measurements[measurementIndex].measurementValue =
           { value };
       }

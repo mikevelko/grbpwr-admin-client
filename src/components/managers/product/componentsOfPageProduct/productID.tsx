@@ -27,6 +27,9 @@ import {
   updateSize,
   updateMeasurement,
   updateDescription,
+  updateTag,
+  deleteTag,
+  updateHide,
 } from 'api/byID';
 import queryString from 'query-string';
 import styles from 'styles/productID.scss';
@@ -78,6 +81,8 @@ export const ProductId: FC = () => {
   const [measurement, setMeasurement] = useState<common_MeasurementName[]>([]);
   const [measurementUpdates, setMeasurementUpdates] = useState<MeasurementUpdates>({});
   const [showAddMedia, setShowAddMedia] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState<string>('');
 
   const handleMeasurementChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -266,6 +271,12 @@ export const ProductId: FC = () => {
       try {
         const response = await getProductByID({ id: Number(productId) });
         setProuct(response.product);
+        const fetchedTags =
+          response.product?.tags
+            // TODO: what the fuck ???
+            ?.map((tag) => tag.productTagInsert?.tag)
+            .filter((tag): tag is string => tag !== undefined) || [];
+        setTags(fetchedTags);
       } catch (error) {
         console.error('Error fetching product data:', error);
       }
@@ -308,6 +319,65 @@ export const ProductId: FC = () => {
     setShowAddMedia(!showAddMedia);
   };
 
+  const handleNewTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewTag(e.target.value);
+  };
+  // ADD TAG
+
+  const addTag = async () => {
+    if (newTag && product?.product?.id) {
+      try {
+        await updateTag({ productId: product.product.id, tag: newTag });
+        setTags((prev) => [...prev, newTag]);
+        setNewTag('');
+      } catch (error) {
+        console.error('Error adding tag:', error);
+      }
+    }
+  };
+
+  // DELETE TAG
+
+  const deleteUpdatedTag = async (tag: string) => {
+    if (tag && product?.product?.id) {
+      try {
+        await deleteTag({ productId: product.product.id, tag });
+        setTags((prev) => prev.filter((t) => t !== tag));
+      } catch (error) {
+        console.error('Error deleting tag:', error);
+      }
+    }
+  };
+
+  const toggleHideProduct = async (
+    productId: number | undefined,
+    currentHideStatus: boolean | undefined,
+  ) => {
+    if (productId !== undefined) {
+      try {
+        const request = {
+          id: productId,
+          hide: !currentHideStatus, // Toggle the hide status
+        };
+        await updateHide(request);
+        // Handle the response, e.g., update local state or UI
+        setProuct((prevProduct) => {
+          if (!prevProduct) return prevProduct; // If there's no previous product, return as is
+
+          // Creating a deep copy of the product object
+          const updatedProduct = JSON.parse(JSON.stringify(prevProduct));
+
+          // Updating the 'hidden' property
+          updatedProduct.product.hidden = !currentHideStatus;
+
+          return updatedProduct; // Return the updated product
+        });
+      } catch (error) {
+        console.error('Error toggling product hide status:', error);
+      }
+    }
+  };
+
   return (
     <Layout>
       <div className={styles.product_id_full_content}>
@@ -335,6 +405,13 @@ export const ProductId: FC = () => {
           </ul>
         </div>
         <div className={styles.product_id_information}>
+          <button
+            onClick={() =>
+              toggleHideProduct(product?.product?.id, product?.product?.productInsert?.hidden)
+            }
+          >
+            {product?.product?.productInsert?.hidden ? 'Unhide Product' : 'Hide Product'}
+          </button>
           <UpdateInputField
             label='Name'
             productInfo={product?.product?.productInsert?.name}
@@ -427,6 +504,23 @@ export const ProductId: FC = () => {
             onChange={handleChange}
             updateFunction={() => updateProduct('newCategory')}
           />
+
+          <div>
+            <h3>Tags</h3>
+            {tags.map((tag, index) => (
+              <div key={index}>
+                {tag} <button onClick={() => deleteUpdatedTag(tag)}>Delete</button>
+              </div>
+            ))}
+            <input
+              type='text'
+              placeholder='Add new tag'
+              value={newTag}
+              onChange={handleNewTagChange}
+            />
+            <button onClick={addTag}>Add Tag</button>
+          </div>
+
           <h3>{product?.product?.productInsert?.targetGender}</h3>
           <select name='newGender' value={productFields.newGender} onChange={handleChange}>
             <option value='GENDER_ENUM_UNKNOWN'>Select gender</option>

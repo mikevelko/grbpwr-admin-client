@@ -24,6 +24,11 @@
         align-items: center;
         border: 2px solid black;
 
+        &.hidden_product {
+          opacity: 0.5; // Уменьшает прозрачность, создавая эффект затемнения
+          background-color: rgba(0, 0, 0, 0.1); // Необязательно: добавляет слегка темный фон
+        }
+
         img {
           width: 200px;
           height: 255px;

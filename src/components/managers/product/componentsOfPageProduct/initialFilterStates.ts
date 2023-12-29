@@ -15,5 +15,5 @@ export const initialFilter: GetProductsPagedRequest = {
     preorder: undefined,
     byTag: undefined,
   },
-  showHidden: undefined,
+  showHidden: true,
 };
