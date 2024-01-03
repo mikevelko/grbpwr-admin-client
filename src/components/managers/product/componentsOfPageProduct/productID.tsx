@@ -8,10 +8,11 @@ import {
   common_ProductFull,
   common_Size,
 } from 'api/proto-http/admin';
-import { AddMediaByID } from './addMediaById';
 import { getProductByID, getDictionary } from 'api/admin';
-import { UpdateInputField } from './updateInputField';
-import { UpdateColors } from './updateColors';
+import { UpdateInputField } from './componentsOfProductID/updateInputField';
+import { UpdateColors } from './componentsOfProductID/updateColors';
+import { AddMediaByID } from './componentsOfProductID/addMediaById';
+import { UpdateSizeMeasurements } from './componentsOfProductID/updateSizeMeasurements';
 import {
   updateName,
   updateSku,
@@ -532,52 +533,18 @@ export const ProductId: FC = () => {
           </select>
           <button onClick={() => updateProduct('newGender')}>+</button>
 
-          {product?.sizes
-            ?.filter((size) => typeof size.sizeId !== 'undefined')
-            .map((size, index) => (
-              <div key={index}>
-                <span>
-                  {getSizeName(size.sizeId)}: {size.quantity?.value}
-                </span>
-                <input
-                  type='number'
-                  value={size.sizeId !== undefined ? sizeUpdates[size.sizeId] : 0}
-                  onChange={(e) => handleSizeChange(size.sizeId!, Number(e.target.value))}
-                />
-                <button
-                  onClick={() =>
-                    size.sizeId !== undefined &&
-                    updateSizeQuantity(size.sizeId, sizeUpdates[size.sizeId])
-                  }
-                >
-                  Update Quantity
-                </button>
-              </div>
-            ))}
-          <ul>
-            {product?.sizes?.map((size, sizeIndex) =>
-              product?.measurements?.map((m, measurementIndex) => {
-                const key = `${size.sizeId}-${m.measurementNameId}`;
-                return (
-                  <li key={`${sizeIndex}-${measurementIndex}`}>
-                    {getMeasuremntName(m.measurementNameId)}:{m.measurementValue?.value}
-                    <input
-                      type='text'
-                      value={measurementUpdates[key] || ''}
-                      onChange={(e) =>
-                        handleMeasurementChange(e, size.sizeId!, m.measurementNameId!)
-                      }
-                    />
-                    <button
-                      onClick={() => updateMeasurementValue(size.sizeId!, m.measurementNameId!)}
-                    >
-                      Update
-                    </button>
-                  </li>
-                );
-              }),
-            )}
-          </ul>
+          <UpdateSizeMeasurements
+            sizes={product?.sizes}
+            measurements={product?.measurements}
+            sizeUpdates={sizeUpdates}
+            measurementUpdates={measurementUpdates}
+            getSizeName={getSizeName}
+            getMeasuremntName={getMeasuremntName}
+            handleSizeChange={handleSizeChange}
+            handleMeasurementChange={handleMeasurementChange}
+            updateSizeQuantity={updateSizeQuantity}
+            updateMeasurementValue={updateMeasurementValue}
+          />
         </div>
       </div>
     </Layout>

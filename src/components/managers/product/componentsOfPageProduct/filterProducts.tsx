@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import {
   GetProductsPagedRequest,
   common_OrderFactor,
@@ -76,6 +76,14 @@ export const Filter: FC<FilterProps> = ({ filter, filterChange, onSubmit }) => {
         onChange={(e) => filterChange('sizesIds', e.target.value.split(',').map(Number))}
         placeholder='size id'
       />
+
+      <input
+        type='checkbox'
+        checked={filter.showHidden || false}
+        onChange={(e) => filterChange('showHidden', e.target.checked)}
+        placeholder='show hidden'
+      />
+
       <button type='submit'>Apply</button>
     </form>
   );
