@@ -35,6 +35,7 @@ import {
 } from 'api/byID';
 import queryString from 'query-string';
 import styles from 'styles/productID.scss';
+
 // TODO: ????
 interface ProductFields {
   // TODO: ???
@@ -59,93 +60,7 @@ export const ProductId: FC = () => {
   const productId = queryParams.productId as string;
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const [sizeDictionary, setSizeDictionary] = useState<common_Size[]>([]);
-  const [genders, setGenders] = useState<common_Genders[] | undefined>(undefined);
-  // const [productFields, setProductFields] = useState<ProductFields>({
-  //   newProductName: '',
-  //   newSku: '',
-  //   newPreorder: '',
-  //   newColor: '',
-  //   newColorHEX: '',
-  //   newCountry: '',
-  //   newBrand: '',
-  //   newGender: '' as common_GenderEnum,
-  //   newThumbnail: '',
-  //   newPrice: '',
-  //   newSale: '',
-  //   newCategory: 0,
-  //   newDescription: '',
-  // });
-  // const [sizeUpdates, setSizeUpdates] = useState<{ [sizeId: string]: number }>({});
-  // const [measurement, setMeasurement] = useState<common_MeasurementName[]>([]);
-  // const [measurementUpdates, setMeasurementUpdates] = useState<MeasurementUpdates>({});
-  // const [showAddMedia, setShowAddMedia] = useState(false);
-  // const [tags, setTags] = useState<string[]>([]);
-  // const [newTag, setNewTag] = useState<string>('');
-
-  const updateFunctions = {
-    newProductName: updateName,
-    newSku: updateSku,
-    newPreorder: updatePreorder,
-    newColor: updateColors,
-    newColorHEX: updateColors,
-    newCountry: updateCountry,
-    newBrand: updateBrand,
-    newGender: updateGender,
-    newThumbnail: updateThumbnail,
-    newPrice: updatePrice,
-    newSale: updateSale,
-    newCategory: updateCategory,
-    newDescription: updateDescription,
-  };
-
-  // const handleMeasurementChange = (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   sizeId: number,
-  //   measurementNameId: number,
-  // ) => {
-  //   const key = `${sizeId}-${measurementNameId}`;
-  //   setMeasurementUpdates({
-  //     ...measurementUpdates,
-  //     [key]: e.target.value,
-  //   });
-  // };
-
-  // const updateMeasurementValue = async (sizeId: number, measurementNameId: number) => {
-  //   const key = `${sizeId}-${measurementNameId}`;
-  //   const measurementValue = measurementUpdates[key];
-  //   if (!sizeId || !measurementNameId || !measurementValue || !product?.product?.id) return;
-
-  //   try {
-  //     const decimalValue = createDecimalObject(measurementValue);
-  //     await updateMeasurement({
-  //       productId: product.product.id,
-  //       sizeId,
-  //       measurementNameId,
-  //       measurementValue: decimalValue,
-  //     });
-  //     // Optionally, update local state or refetch measurement details
-  //   } catch (error) {
-  //     console.error('Error updating measurement:', error);
-  //   }
-  // };
-
-  // const handleSizeChange = (sizeId: number | undefined, quantity: number) => {
-  //   if (typeof sizeId !== 'undefined') {
-  //     setSizeUpdates((prev) => ({ ...prev, [sizeId]: quantity }));
-  //   }
-  // };
-
-  // const updateSizeQuantity = async (sizeId: number | undefined, quantity: number | undefined) => {
-  //   if (typeof sizeId === 'undefined' || typeof quantity === 'undefined' || !product?.product?.id)
-  //     return;
-  //   try {
-  //     await updateSize({ productId: product.product.id, sizeId, quantity });
-  //     // Optionally, update local state or refetch product details
-  //   } catch (error) {
-  //     console.error('Error updating size:', error);
-  //   }
-  // };
+  // const [genders, setGenders] = useState<common_Genders[] | undefined>(undefined);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>,
@@ -216,6 +131,9 @@ export const ProductId: FC = () => {
         case 'newDescription':
           await updateDescription({ productId, description: value as string });
           break;
+        case 'newTag':
+          await updateTag({ productId, tag: value as string });
+          break;
         default:
           console.warn(`No update function for field: ${fieldNameToUpdate}`);
       }
@@ -247,6 +165,10 @@ export const ProductId: FC = () => {
           type: 'SET_SIZE_DICTIONARY',
           payload: dictionaryResponse.dictionary?.sizes || [],
         });
+        dispatch({
+          type: 'SET_MEASUREMENT_DICTIONARY',
+          payload: dictionaryResponse.dictionary?.measurements || [],
+        });
         dispatch({ type: 'SET_GENDERS', payload: dictionaryResponse.dictionary?.genders });
       } catch (error) {
         console.error(error);
@@ -256,83 +178,147 @@ export const ProductId: FC = () => {
   }, [productId]);
 
   const getSizeName = (sizeId: number | undefined): string => {
-    const size = sizeDictionary.find((s) => s.id === sizeId);
+    const size = state.sizeDictionary.find((s) => s.id === sizeId);
     if (size && size.name) {
       return size.name.replace('SIZE_ENUM_', '');
     }
     return 'size not found';
   };
+  // TODO: rewrite
+  const getMeasuremntName = (measurementId: number | undefined): string => {
+    const measure = state.measurementsDictionary.find((m) => m.id === measurementId);
+    if (measure && measure.name) {
+      return measure.name.replace('MEASUREMENT_NAME_ENUM_', '');
+    }
+    return 'size not found';
+  };
 
-  // const getMeasuremntName = (measurementId: number | undefined): string => {
-  //   const measure = measurement.find((m) => m.id === measurementId);
-  //   if (measure && measure.name) {
-  //     return measure.name.replace('MEASUREMENT_NAME_ENUM_', '');
-  //   }
-  //   return 'size not found';
-  // };
+  const toogleAddMedia = () => {
+    dispatch({ type: 'TOGGLE_ADD_MEDIA' });
+  };
 
-  // const toogleAddMedia = () => {
-  //   setShowAddMedia(!showAddMedia);
-  // };
+  const handleNewTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({ type: 'SET_NEW_TAG', payload: e.target.value });
+  };
 
-  // const handleNewTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setNewTag(e.target.value);
-  // };
-  // ADD TAG
+  const deleteUpdatedTag = async (tag: string) => {
+    if (tag && state.product?.product?.id) {
+      try {
+        await deleteTag({ productId: state.product.product.id, tag });
+        dispatch({ type: 'REMOVE_TAG', tag });
+      } catch (error) {
+        console.error('Error deleting tag:', error);
+      }
+    }
+  };
+  // // TODO: rewrite
+  const toggleHideProduct = async (
+    productId: number | undefined,
+    currentHideStatus: boolean | undefined,
+  ) => {
+    if (productId !== undefined) {
+      try {
+        const request = {
+          id: productId,
+          hide: !currentHideStatus, // Toggle the hide status
+        };
+        await updateHide(request);
+        // Handle the response, e.g., update local state or UI
+        dispatch({
+          type: 'TOGGLE_HIDE_PRODUCT',
+          payload: { productId, hideStatus: !currentHideStatus },
+        });
+      } catch (error) {
+        console.error('Error toggling product hide status:', error);
+      }
+    }
+  };
 
-  // const addTag = async () => {
-  //   if (newTag && product?.product?.id) {
-  //     try {
-  //       await updateTag({ productId: product.product.id, tag: newTag });
-  //       setTags((prev) => [...prev, newTag]);
-  //       setNewTag('');
-  //     } catch (error) {
-  //       console.error('Error adding tag:', error);
-  //     }
-  //   }
-  // };
-
-  // DELETE TAG
-
-  // const deleteUpdatedTag = async (tag: string) => {
-  //   if (tag && product?.product?.id) {
-  //     try {
-  //       await deleteTag({ productId: product.product.id, tag });
-  //       setTags((prev) => prev.filter((t) => t !== tag));
-  //     } catch (error) {
-  //       console.error('Error deleting tag:', error);
-  //     }
-  //   }
-  // };
-
-  // const toggleHideProduct = async (
-  //   productId: number | undefined,
-  //   currentHideStatus: boolean | undefined,
+  // // TODO: rewrite
+  // const handleMeasurementChange = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   sizeId: number,
+  //   measurementNameId: number,
   // ) => {
-  //   if (productId !== undefined) {
-  //     try {
-  //       const request = {
-  //         id: productId,
-  //         hide: !currentHideStatus, // Toggle the hide status
-  //       };
-  //       await updateHide(request);
-  //       // Handle the response, e.g., update local state or UI
-  //       setProuct((prevProduct) => {
-  //         if (!prevProduct) return prevProduct; // If there's no previous product, return as is
+  //   const key = `${sizeId}-${measurementNameId}`;
+  //   setMeasurementUpdates({
+  //     ...measurementUpdates,
+  //     [key]: e.target.value,
+  //   });
+  // };
+  const handleMeasurementChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    sizeId: number,
+    measurementNameId: number,
+  ) => {
+    const key = `${sizeId}-${measurementNameId}`;
+    dispatch({
+      type: 'UPDATE_MEASUREMENT',
+      sizeId,
+      measurementNameId,
+      value: e.target.value,
+    });
+  };
+  // // TODO: rewrite
+  // const updateMeasurementValue = async (sizeId: number, measurementNameId: number) => {
+  //   const key = `${sizeId}-${measurementNameId}`;
+  //   const measurementValue = measurementUpdates[key];
+  //   if (!sizeId || !measurementNameId || !measurementValue || !product?.product?.id) return;
 
-  //         // Creating a deep copy of the product object
-  //         const updatedProduct = JSON.parse(JSON.stringify(prevProduct));
-
-  //         // Updating the 'hidden' property
-  //         updatedProduct.product.hidden = !currentHideStatus;
-
-  //         return updatedProduct; // Return the updated product
-  //       });
-  //     } catch (error) {
-  //       console.error('Error toggling product hide status:', error);
-  //     }
+  //   try {
+  //     const decimalValue = createDecimalObject(measurementValue);
+  //     await updateMeasurement({
+  //       productId: product.product.id,
+  //       sizeId,
+  //       measurementNameId,
+  //       measurementValue: decimalValue,
+  //     });
+  //     // Optionally, update local state or refetch measurement details
+  //   } catch (error) {
+  //     console.error('Error updating measurement:', error);
   //   }
   // };
+  // const updateMeasurementValue = async (sizeId: number, measurementNameId: number) => {
+  //   const key = `${sizeId}-${measurementNameId}`;
+  //   const measurementValue = state.measurementUpdates[key];
+  //   if (!sizeId || !measurementNameId || !measurementValue || !state.product?.product?.id) return;
+
+  //   try {
+  //     const decimalValue = createDecimalObject(measurementValue);
+  //     await updateMeasurement({
+  //       productId: state.product.product.id,
+  //       sizeId,
+  //       measurementNameId,
+  //       measurementValue: decimalValue,
+  //     });
+  //     // Optionally, update local state or refetch measurement details
+  //   } catch (error) {
+  //     console.error('Error updating measurement:', error);
+  //   }
+  // };
+  // // TODO: rewrite
+  const handleSizeChange = (sizeId: number, quantity: number) => {
+    dispatch({
+      type: 'UPDATE_SIZE',
+      sizeId,
+      quantity,
+    });
+  };
+  // TODO: rewrite
+  const updateSizeQuantity = async (sizeId: number | undefined, quantity: number | undefined) => {
+    if (
+      typeof sizeId === 'undefined' ||
+      typeof quantity === 'undefined' ||
+      !state.product?.product?.id
+    )
+      return;
+    try {
+      await updateSize({ productId: state.product?.product?.id, sizeId, quantity });
+      // Optionally, update local state or refetch product details
+    } catch (error) {
+      console.error('Error updating size:', error);
+    }
+  };
 
   return (
     <Layout>
@@ -344,12 +330,12 @@ export const ProductId: FC = () => {
               alt='thumbnail'
               className={styles.main_img}
             />
-            {/* <button onClick={toogleAddMedia}>add</button>
-            {showAddMedia && (
+            <button onClick={toogleAddMedia}>add</button>
+            {state.showAddMedia && (
               <div className={styles.add_media}>
                 <AddMediaByID />
               </div>
-            )} */}
+            )}
           </div>
           <ul className={styles.product_by_id_media_list}>
             {state.product?.media?.map((media, index) => (
@@ -361,13 +347,16 @@ export const ProductId: FC = () => {
           </ul>
         </div>
         <div className={styles.product_id_information}>
-          {/* <button
+          <button
             onClick={() =>
-              toggleHideProduct(product?.product?.id, product?.product?.productInsert?.hidden)
+              toggleHideProduct(
+                state.product?.product?.id,
+                state.product?.product?.productInsert?.hidden,
+              )
             }
           >
             {state.product?.product?.productInsert?.hidden ? 'Unhide Product' : 'Hide Product'}
-          </button> */}
+          </button>
           <UpdateInputField
             label='Name'
             productInfo={state.product?.product?.productInsert?.name}
@@ -461,7 +450,7 @@ export const ProductId: FC = () => {
             updateFunction={() => updateProduct('newCategory')}
           />
 
-          {/* <div>
+          <div>
             <h3>Tags</h3>
             {state.tags.map((tag, index) => (
               <div key={index}>
@@ -471,11 +460,11 @@ export const ProductId: FC = () => {
             <input
               type='text'
               placeholder='Add new tag'
-              value={newTag}
+              value={state.productFields.newTag}
               onChange={handleNewTagChange}
             />
-            <button onClick={addTag}>Add Tag</button>
-          </div> */}
+            <button onClick={() => updateProduct('newTag')}>Add Tag</button>
+          </div>
 
           {/* <h3>{product?.product?.productInsert?.targetGender}</h3>
           <select name='newGender' value={productFields.newGender} onChange={handleChange}>
@@ -492,7 +481,7 @@ export const ProductId: FC = () => {
             sizes={state.product?.sizes}
             measurements={state.product?.measurements}
             sizeUpdates={state.sizeUpdates}
-            measurementUpdates={measurementUpdates}
+            measurementUpdates={state.measurementUpdates}
             getSizeName={getSizeName}
             getMeasuremntName={getMeasuremntName}
             handleSizeChange={handleSizeChange}

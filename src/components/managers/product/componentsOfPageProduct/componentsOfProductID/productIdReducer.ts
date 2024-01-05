@@ -1,8 +1,11 @@
+/* eslint-disable no-case-declarations */
 import {
   common_GenderEnum,
   common_Genders,
   common_MeasurementName,
   common_ProductFull,
+  common_ProductMeasurement,
+  common_ProductSize,
   common_Size,
 } from 'api/proto-http/admin';
 
@@ -25,19 +28,24 @@ interface ProductFields {
   newSale: string;
   newCategory: number;
   newDescription: string;
+  newTag: string;
 }
 
 interface IState {
   product: common_ProductFull | undefined;
   sizeDictionary: common_Size[];
+  measurementsDictionary: common_MeasurementName[];
   genders: common_Genders[] | undefined;
   productFields: ProductFields;
+  showAddMedia: boolean;
+  tags: string[];
+  measurement: MeasurementUpdates;
+  sizeUpdates: { [sizeId: string]: number };
   // ... other states
 }
 
 const initialState: IState = {
   product: undefined,
-  sizeDictionary: [],
   genders: undefined,
   productFields: {
     newProductName: '',
@@ -53,9 +61,15 @@ const initialState: IState = {
     newSale: '',
     newCategory: 0,
     newDescription: '',
+    newTag: '',
     // ... other initial values for product fields
   },
-  // ... other initial values for state
+  showAddMedia: false,
+  tags: [],
+  measurement: {},
+  sizeUpdates: {},
+  sizeDictionary: [],
+  measurementsDictionary: [],
 };
 
 type ActionType =
@@ -66,18 +80,31 @@ type ActionType =
       value: string | number | common_GenderEnum;
     }
   | { type: 'SET_SIZE_DICTIONARY'; payload: common_Size[] }
+  | { type: 'SET_MEASUREMENT_DICTIONARY'; payload: common_MeasurementName[] }
+  | { type: 'UPDATE_SIZE'; sizeId: number; quantity: number }
+  | { type: 'UPDATE_MEASUREMENT'; sizeId: number; measurementNameId: number; value: string }
   | { type: 'SET_GENDERS'; payload: common_Genders[] | undefined }
-  | { type: 'UPDATE_SIZE_UPDATE'; sizeId: string; quantity: number }
-  | { type: 'SET_MEASUREMENT_UPDATES'; payload: MeasurementUpdates }
   | { type: 'TOGGLE_ADD_MEDIA' }
+  | { type: 'TOGGLE_HIDE_PRODUCT'; payload: { productId: number; hideStatus: boolean } }
   | { type: 'SET_TAGS'; payload: string[] }
+  | { type: 'SET_NEW_TAG'; payload: string }
   | { type: 'ADD_TAG'; tag: string }
   | { type: 'REMOVE_TAG'; tag: string };
 
 const reducer = (state: IState, action: ActionType): IState => {
   switch (action.type) {
     case 'SET_PRODUCT':
-      return { ...state, product: action.payload };
+      const productTags =
+        action.payload?.tags
+          ?.map((tag) => tag.productTagInsert?.tag)
+          .filter((tagName): tagName is string => tagName !== undefined) ?? [];
+      return {
+        ...state,
+        product: action.payload,
+        tags: productTags,
+        // sizes: action.payload?.sizes ?? [], // Default to an empty array if sizes are undefined
+        // measurements: action.payload?.measurements ?? [],
+      };
     case 'UPDATE_PRODUCT_FIELD':
       return {
         ...state,
@@ -86,11 +113,59 @@ const reducer = (state: IState, action: ActionType): IState => {
           [action.fieldName]: action.value,
         },
       };
-    // ... other cases for different actions
+    case 'TOGGLE_ADD_MEDIA':
+      return { ...state, showAddMedia: !state.showAddMedia };
+    case 'TOGGLE_HIDE_PRODUCT':
+      if (state.product && state.product.product?.id === action.payload.productId) {
+        // Assuming your product structure has a 'hidden' field to toggle
+        const updatedProduct = {
+          ...state.product,
+          product: {
+            ...state.product.product,
+            hidden: action.payload.hideStatus,
+          },
+        };
+        return { ...state, product: updatedProduct };
+      }
+      return state;
+    case 'ADD_TAG':
+      return {
+        ...state,
+        tags: [...state.tags, action.tag],
+      };
+    case 'REMOVE_TAG':
+      return {
+        ...state,
+        tags: state.tags.filter((tag) => tag !== action.tag),
+      };
+    case 'SET_NEW_TAG':
+      return {
+        ...state,
+        productFields: {
+          ...state.productFields,
+          newTag: action.payload,
+        },
+      };
+    case 'UPDATE_MEASUREMENT':
+      const measurementKey = `${action.sizeId}-${action.measurementNameId}`;
+      return {
+        ...state,
+        measurement: {
+          ...state.measurement,
+          [measurementKey]: action.value,
+        },
+      };
+    case 'UPDATE_SIZE':
+      return {
+        ...state,
+        sizeUpdates: {
+          ...state.sizeUpdates,
+          [action.sizeId]: action.quantity,
+        },
+      };
     default:
       return state;
   }
 };
 
-// Export the reducer and the initial state
 export { reducer, initialState };
