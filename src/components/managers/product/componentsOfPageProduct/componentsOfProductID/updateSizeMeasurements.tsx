@@ -1,10 +1,4 @@
-import {
-  common_ProductFull,
-  common_ProductMeasurement,
-  common_ProductMeasurementInsert,
-  common_ProductSize,
-  common_ProductSizeInsert,
-} from 'api/proto-http/admin';
+import { common_ProductMeasurement, common_ProductSize } from 'api/proto-http/admin';
 import React, { FC } from 'react';
 
 interface ProductSizeMeasurements {

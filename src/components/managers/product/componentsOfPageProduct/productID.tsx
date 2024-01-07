@@ -1,14 +1,8 @@
 /* eslint-disable no-case-declarations */
-import React, { FC, useState, useEffect, useReducer } from 'react';
+import React, { FC, useEffect, useReducer } from 'react';
 import { reducer, initialState } from './componentsOfProductID/productIdReducer';
 import { Layout } from 'components/layout/layout';
-import {
-  common_GenderEnum,
-  common_Genders,
-  common_MeasurementName,
-  common_ProductFull,
-  common_Size,
-} from 'api/proto-http/admin';
+import { common_GenderEnum } from 'api/proto-http/admin';
 import { getProductByID, getDictionary } from 'api/admin';
 import { UpdateInputField } from './componentsOfProductID/updateInputField';
 import { UpdateColors } from './componentsOfProductID/updateColors';
@@ -60,8 +54,6 @@ export const ProductId: FC = () => {
   const productId = queryParams.productId as string;
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // const [genders, setGenders] = useState<common_Genders[] | undefined>(undefined);
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>,
   ) => {
@@ -72,7 +64,7 @@ export const ProductId: FC = () => {
       value,
     });
   };
-
+  // TODO: useCallback ???
   const updateProduct = async (fieldNameToUpdate: string) => {
     if (!state.product?.product?.id) {
       console.error('Product ID is undefined');
@@ -161,32 +153,29 @@ export const ProductId: FC = () => {
         const response = await getProductByID({ id: Number(productId) });
         dispatch({ type: 'SET_PRODUCT', payload: response.product });
         const dictionaryResponse = await getDictionary({});
+        dispatch({ type: 'SET_GENDERS', payload: dictionaryResponse.dictionary?.genders || [] });
+        dispatch({ type: 'SET_SIZES', payload: dictionaryResponse.dictionary?.sizes || [] });
         dispatch({
-          type: 'SET_SIZE_DICTIONARY',
-          payload: dictionaryResponse.dictionary?.sizes || [],
-        });
-        dispatch({
-          type: 'SET_MEASUREMENT_DICTIONARY',
+          type: 'SET_MEASUREMENTS',
           payload: dictionaryResponse.dictionary?.measurements || [],
         });
-        dispatch({ type: 'SET_GENDERS', payload: dictionaryResponse.dictionary?.genders });
       } catch (error) {
         console.error(error);
       }
     };
     fetchData();
-  }, [productId]);
+  }, [state.product?.product?.productInsert]);
 
   const getSizeName = (sizeId: number | undefined): string => {
-    const size = state.sizeDictionary.find((s) => s.id === sizeId);
+    const size = state.sizes.find((s) => s.id === sizeId);
     if (size && size.name) {
       return size.name.replace('SIZE_ENUM_', '');
     }
     return 'size not found';
   };
-  // TODO: rewrite
+
   const getMeasuremntName = (measurementId: number | undefined): string => {
-    const measure = state.measurementsDictionary.find((m) => m.id === measurementId);
+    const measure = state.measurements?.find((m) => m.id === measurementId);
     if (measure && measure.name) {
       return measure.name.replace('MEASUREMENT_NAME_ENUM_', '');
     }
@@ -211,19 +200,14 @@ export const ProductId: FC = () => {
       }
     }
   };
-  // // TODO: rewrite
+
   const toggleHideProduct = async (
     productId: number | undefined,
     currentHideStatus: boolean | undefined,
   ) => {
     if (productId !== undefined) {
       try {
-        const request = {
-          id: productId,
-          hide: !currentHideStatus, // Toggle the hide status
-        };
-        await updateHide(request);
-        // Handle the response, e.g., update local state or UI
+        await updateHide({ id: productId, hide: !currentHideStatus });
         dispatch({
           type: 'TOGGLE_HIDE_PRODUCT',
           payload: { productId, hideStatus: !currentHideStatus },
@@ -234,18 +218,6 @@ export const ProductId: FC = () => {
     }
   };
 
-  // // TODO: rewrite
-  // const handleMeasurementChange = (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   sizeId: number,
-  //   measurementNameId: number,
-  // ) => {
-  //   const key = `${sizeId}-${measurementNameId}`;
-  //   setMeasurementUpdates({
-  //     ...measurementUpdates,
-  //     [key]: e.target.value,
-  //   });
-  // };
   const handleMeasurementChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     sizeId: number,
@@ -259,52 +231,32 @@ export const ProductId: FC = () => {
       value: e.target.value,
     });
   };
-  // // TODO: rewrite
-  // const updateMeasurementValue = async (sizeId: number, measurementNameId: number) => {
-  //   const key = `${sizeId}-${measurementNameId}`;
-  //   const measurementValue = measurementUpdates[key];
-  //   if (!sizeId || !measurementNameId || !measurementValue || !product?.product?.id) return;
+  const updateMeasurementValue = async (sizeId: number, measurementNameId: number) => {
+    const key = `${sizeId}-${measurementNameId}`;
+    const measurementValue = state.measurement[key];
+    if (!sizeId || !measurementNameId || !measurementValue || !state.product?.product?.id) return;
 
-  //   try {
-  //     const decimalValue = createDecimalObject(measurementValue);
-  //     await updateMeasurement({
-  //       productId: product.product.id,
-  //       sizeId,
-  //       measurementNameId,
-  //       measurementValue: decimalValue,
-  //     });
-  //     // Optionally, update local state or refetch measurement details
-  //   } catch (error) {
-  //     console.error('Error updating measurement:', error);
-  //   }
-  // };
-  // const updateMeasurementValue = async (sizeId: number, measurementNameId: number) => {
-  //   const key = `${sizeId}-${measurementNameId}`;
-  //   const measurementValue = state.measurementUpdates[key];
-  //   if (!sizeId || !measurementNameId || !measurementValue || !state.product?.product?.id) return;
+    try {
+      const decimalValue = createDecimalObject(measurementValue);
+      await updateMeasurement({
+        productId: state.product.product.id,
+        sizeId,
+        measurementNameId,
+        measurementValue: decimalValue,
+      });
+    } catch (error) {
+      console.error('Error updating measurement:', error);
+    }
+  };
 
-  //   try {
-  //     const decimalValue = createDecimalObject(measurementValue);
-  //     await updateMeasurement({
-  //       productId: state.product.product.id,
-  //       sizeId,
-  //       measurementNameId,
-  //       measurementValue: decimalValue,
-  //     });
-  //     // Optionally, update local state or refetch measurement details
-  //   } catch (error) {
-  //     console.error('Error updating measurement:', error);
-  //   }
-  // };
-  // // TODO: rewrite
-  const handleSizeChange = (sizeId: number, quantity: number) => {
+  const handleSizeChange = (sizeId: number | undefined, quantity: number | undefined) => {
     dispatch({
       type: 'UPDATE_SIZE',
       sizeId,
       quantity,
     });
   };
-  // TODO: rewrite
+
   const updateSizeQuantity = async (sizeId: number | undefined, quantity: number | undefined) => {
     if (
       typeof sizeId === 'undefined' ||
@@ -466,29 +418,29 @@ export const ProductId: FC = () => {
             <button onClick={() => updateProduct('newTag')}>Add Tag</button>
           </div>
 
-          {/* <h3>{product?.product?.productInsert?.targetGender}</h3>
-          <select name='newGender' value={productFields.newGender} onChange={handleChange}>
+          <h3>{state.product?.product?.productInsert?.targetGender}</h3>
+          <select name='newGender' value={state.productFields.newGender} onChange={handleChange}>
             <option value='GENDER_ENUM_UNKNOWN'>Select gender</option>
-            {genders?.map((gender, _) => (
+            {state.genders?.map((gender, _) => (
               <option key={gender.id} value={gender.id}>
                 {gender.name}
               </option>
             ))}
           </select>
-          <button onClick={() => updateProduct('newGender')}>+</button> */}
+          <button onClick={() => updateProduct('newGender')}>+</button>
 
-          {/* <UpdateSizeMeasurements
+          <UpdateSizeMeasurements
             sizes={state.product?.sizes}
             measurements={state.product?.measurements}
             sizeUpdates={state.sizeUpdates}
-            measurementUpdates={state.measurementUpdates}
+            measurementUpdates={state.measurement}
             getSizeName={getSizeName}
             getMeasuremntName={getMeasuremntName}
             handleSizeChange={handleSizeChange}
             handleMeasurementChange={handleMeasurementChange}
             updateSizeQuantity={updateSizeQuantity}
             updateMeasurementValue={updateMeasurementValue}
-          /> */}
+          />
         </div>
       </div>
     </Layout>

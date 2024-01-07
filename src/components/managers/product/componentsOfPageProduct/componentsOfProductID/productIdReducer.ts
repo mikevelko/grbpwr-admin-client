@@ -33,14 +33,14 @@ interface ProductFields {
 
 interface IState {
   product: common_ProductFull | undefined;
-  sizeDictionary: common_Size[];
-  measurementsDictionary: common_MeasurementName[];
   genders: common_Genders[] | undefined;
   productFields: ProductFields;
   showAddMedia: boolean;
   tags: string[];
   measurement: MeasurementUpdates;
   sizeUpdates: { [sizeId: string]: number };
+  sizes: common_Size[];
+  measurements: common_MeasurementName[] | undefined;
   // ... other states
 }
 
@@ -68,8 +68,8 @@ const initialState: IState = {
   tags: [],
   measurement: {},
   sizeUpdates: {},
-  sizeDictionary: [],
-  measurementsDictionary: [],
+  sizes: [],
+  measurements: [],
 };
 
 type ActionType =
@@ -79,9 +79,7 @@ type ActionType =
       fieldName: keyof ProductFields;
       value: string | number | common_GenderEnum;
     }
-  | { type: 'SET_SIZE_DICTIONARY'; payload: common_Size[] }
-  | { type: 'SET_MEASUREMENT_DICTIONARY'; payload: common_MeasurementName[] }
-  | { type: 'UPDATE_SIZE'; sizeId: number; quantity: number }
+  | { type: 'UPDATE_SIZE'; sizeId: number | undefined; quantity: number | undefined }
   | { type: 'UPDATE_MEASUREMENT'; sizeId: number; measurementNameId: number; value: string }
   | { type: 'SET_GENDERS'; payload: common_Genders[] | undefined }
   | { type: 'TOGGLE_ADD_MEDIA' }
@@ -89,7 +87,9 @@ type ActionType =
   | { type: 'SET_TAGS'; payload: string[] }
   | { type: 'SET_NEW_TAG'; payload: string }
   | { type: 'ADD_TAG'; tag: string }
-  | { type: 'REMOVE_TAG'; tag: string };
+  | { type: 'REMOVE_TAG'; tag: string }
+  | { type: 'SET_SIZES'; payload: common_Size[] }
+  | { type: 'SET_MEASUREMENTS'; payload: common_MeasurementName[] };
 
 const reducer = (state: IState, action: ActionType): IState => {
   switch (action.type) {
@@ -102,8 +102,6 @@ const reducer = (state: IState, action: ActionType): IState => {
         ...state,
         product: action.payload,
         tags: productTags,
-        // sizes: action.payload?.sizes ?? [], // Default to an empty array if sizes are undefined
-        // measurements: action.payload?.measurements ?? [],
       };
     case 'UPDATE_PRODUCT_FIELD':
       return {
@@ -156,13 +154,23 @@ const reducer = (state: IState, action: ActionType): IState => {
         },
       };
     case 'UPDATE_SIZE':
-      return {
-        ...state,
-        sizeUpdates: {
-          ...state.sizeUpdates,
-          [action.sizeId]: action.quantity,
-        },
-      };
+      if (typeof action.sizeId === 'number') {
+        return {
+          ...state,
+          sizeUpdates: {
+            ...state.sizeUpdates,
+            [action.sizeId]: action.quantity,
+          },
+        };
+      }
+      return state;
+    case 'SET_SIZES':
+      return { ...state, sizes: action.payload };
+
+    case 'SET_MEASUREMENTS':
+      return { ...state, measurements: action.payload };
+    case 'SET_GENDERS':
+      return { ...state, genders: action.payload };
     default:
       return state;
   }
