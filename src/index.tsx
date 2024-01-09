@@ -14,6 +14,7 @@ import { Product } from 'components/managers/product/product';
 import { AddProducts } from 'components/managers/product/addProduct';
 import { PageProduct } from 'components/managers/product/pageProduct';
 import { ProductId } from 'components/managers/product/componentsOfPageProduct/productID';
+import { Hero } from 'components/managers/hero/hero';
 import 'styles/global.scss';
 
 const container = document.getElementById('root') ?? document.body;
@@ -31,6 +32,7 @@ const routes: Route<DefaultGenerics>[] = [
   { path: ROUTES.addProduct, element: <AddProducts /> },
   { path: ROUTES.pagedProduct, element: <PageProduct /> },
   { path: ROUTES.singleProduct, element: <ProductId /> },
+  { path: ROUTES.hero, element: <Hero /> },
 ];
 
 root.render(
