@@ -4,16 +4,14 @@ import {
   common_Genders,
   common_MeasurementName,
   common_ProductFull,
-  common_ProductMeasurement,
-  common_ProductSize,
   common_Size,
 } from 'api/proto-http/admin';
 
-type MeasurementUpdates = {
+export type MeasurementUpdates = {
   [key: string]: string;
 };
 
-interface ProductFields {
+export interface ProductFields {
   [key: string]: number | string | common_GenderEnum;
   newProductName: string;
   newSku: string;

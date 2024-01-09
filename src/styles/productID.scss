@@ -34,4 +34,53 @@
       }
     }
   }
+
+  .product_id_information {
+    display: grid;
+    // flex-direction: column;
+    gap: 10px;
+    height: 50%;
+
+    .update_info_container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      label {
+        color: #000;
+        font-family: Inter;
+        font-size: 35px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        text-transform: uppercase;
+      }
+
+      input {
+        width: 334px;
+        height: 35px;
+        color: #000;
+        font-family: Inter;
+        font-size: 35px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        text-transform: uppercase;
+      }
+
+      .tags {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        color: #000;
+        font-family: Inter;
+        font-size: 35px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        text-transform: uppercase;
+      }
+    }
+  }
 }

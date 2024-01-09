@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import { common_ProductMediaInsert, common_Media } from 'api/proto-http/admin';
+import { common_Media } from 'api/proto-http/admin';
 import { addMediaByID, getAllUploadedFiles, deleteFiles } from 'api/admin';
 import { useNavigate } from '@tanstack/react-location';
 import { ROUTES } from 'constants/routes';
@@ -149,7 +149,7 @@ export const AddMediaByID: FC = () => {
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
             />
-            {/* <button type="button" onClick={handleImage}>OK</button> */}
+            <button type='button'>OK</button>
           </div>
         )}
         <button className={styles.thumbnail_btn} type='button' onClick={handleViewAll}>
@@ -189,7 +189,7 @@ export const AddMediaByID: FC = () => {
           </ul>
           <div className={styles.media_selector_add}>
             <button className={styles.add_btn} type='button' onClick={handleAddMedia}>
-              add
+              add new one
             </button>
           </div>
         </div>

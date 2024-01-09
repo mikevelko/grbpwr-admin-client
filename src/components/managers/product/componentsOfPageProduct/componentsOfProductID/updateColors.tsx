@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import styles from 'styles/productID.scss';
 
 interface UpdateColors {
   label: string;
@@ -32,14 +33,26 @@ export const UpdateColors: FC<UpdateColors> = ({
     setIsEditing(false);
   };
   return (
-    <div>
+    <div className={styles.update_info_container}>
       <label htmlFor={colorName}>
         {label}: {productInfo}({productInfoHEX})
       </label>
       {isEditing && (
         <>
-          <input type={type} name={colorName} value={colorValue} onChange={onChange} />
-          <input type={type} name={hexName} value={hexValue} onChange={onChange} />
+          <input
+            type={type}
+            name={colorName}
+            value={colorValue}
+            onChange={onChange}
+            placeholder='color'
+          />
+          <input
+            type={type}
+            name={hexName}
+            value={hexValue}
+            onChange={onChange}
+            placeholder='hex'
+          />
           <button onClick={handleUpdate}>UPDATE</button>
         </>
       )}

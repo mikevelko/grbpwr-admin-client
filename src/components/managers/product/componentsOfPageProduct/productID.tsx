@@ -2,12 +2,10 @@
 import React, { FC, useEffect, useReducer } from 'react';
 import { reducer, initialState } from './componentsOfProductID/productIdReducer';
 import { Layout } from 'components/layout/layout';
-import { common_GenderEnum } from 'api/proto-http/admin';
+import { ProductFields } from './componentsOfProductID/productIdReducer';
 import { getProductByID, getDictionary } from 'api/admin';
-import { UpdateInputField } from './componentsOfProductID/updateInputField';
-import { UpdateColors } from './componentsOfProductID/updateColors';
-import { AddMediaByID } from './componentsOfProductID/addMediaById';
-import { UpdateSizeMeasurements } from './componentsOfProductID/updateSizeMeasurements';
+import { ProductInformation } from './componentsOfProductID/prodyctInformation';
+import { ProductMediaContainer } from './componentsOfProductID/productMediaContainer';
 import {
   updateName,
   updateSku,
@@ -29,25 +27,6 @@ import {
 } from 'api/byID';
 import queryString from 'query-string';
 import styles from 'styles/productID.scss';
-
-// TODO: ????
-interface ProductFields {
-  // TODO: ???
-  [key: string]: number | string | common_GenderEnum;
-  newProductName: string;
-  newSku: string;
-  newPreorder: string;
-  newColor: string;
-  newColorHEX: string;
-  newCountry: string;
-  newBrand: string;
-  newGender: common_GenderEnum;
-  newThumbnail: string;
-  newPrice: string;
-  newSale: string;
-  newCategory: number;
-  newDescription: string;
-}
 
 export const ProductId: FC = () => {
   const queryParams = queryString.parse(window.location.search);
@@ -150,8 +129,6 @@ export const ProductId: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getProductByID({ id: Number(productId) });
-        dispatch({ type: 'SET_PRODUCT', payload: response.product });
         const dictionaryResponse = await getDictionary({});
         dispatch({ type: 'SET_GENDERS', payload: dictionaryResponse.dictionary?.genders || [] });
         dispatch({ type: 'SET_SIZES', payload: dictionaryResponse.dictionary?.sizes || [] });
@@ -164,7 +141,19 @@ export const ProductId: FC = () => {
       }
     };
     fetchData();
-  }, [state.product?.product?.productInsert]);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getProductByID({ id: Number(productId) });
+        dispatch({ type: 'SET_PRODUCT', payload: response.product });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, [state.productFields]);
 
   const getSizeName = (sizeId: number | undefined): string => {
     const size = state.sizes.find((s) => s.id === sizeId);
@@ -266,7 +255,6 @@ export const ProductId: FC = () => {
       return;
     try {
       await updateSize({ productId: state.product?.product?.id, sizeId, quantity });
-      // Optionally, update local state or refetch product details
     } catch (error) {
       console.error('Error updating size:', error);
     }
@@ -275,173 +263,32 @@ export const ProductId: FC = () => {
   return (
     <Layout>
       <div className={styles.product_id_full_content}>
-        <div className={styles.img_grid}>
-          <div className={styles.main_img_container}>
-            <img
-              src={state.product?.product?.productInsert?.thumbnail}
-              alt='thumbnail'
-              className={styles.main_img}
-            />
-            <button onClick={toogleAddMedia}>add</button>
-            {state.showAddMedia && (
-              <div className={styles.add_media}>
-                <AddMediaByID />
-              </div>
-            )}
-          </div>
-          <ul className={styles.product_by_id_media_list}>
-            {state.product?.media?.map((media, index) => (
-              <li key={index}>
-                <p>{index + 1}</p>
-                <img src={media.productMediaInsert?.compressed} alt='' />
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className={styles.product_id_information}>
-          <button
-            onClick={() =>
-              toggleHideProduct(
-                state.product?.product?.id,
-                state.product?.product?.productInsert?.hidden,
-              )
-            }
-          >
-            {state.product?.product?.productInsert?.hidden ? 'Unhide Product' : 'Hide Product'}
-          </button>
-          <UpdateInputField
-            label='Name'
-            productInfo={state.product?.product?.productInsert?.name}
-            name='newProductName'
-            value={state.productFields.newProductName}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newProductName')}
-          />
+        <ProductMediaContainer
+          product={state.product}
+          toggleAddMedia={toogleAddMedia}
+          showAddMedia={state.showAddMedia}
+        />
 
-          <UpdateInputField
-            label='description'
-            productInfo={state.product?.product?.productInsert?.description}
-            name='newDescription'
-            value={state.productFields.newDescription}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newDescription')}
-          />
-          <UpdateInputField
-            label='Sku'
-            productInfo={state.product?.product?.productInsert?.sku}
-            name='newSku'
-            value={state.productFields.newSku}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newSku')}
-          />
-          <UpdateInputField
-            label='Preorder'
-            productInfo={state.product?.product?.productInsert?.preorder}
-            name='newPreorder'
-            value={state.productFields.newPreorder}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newPreorder')}
-          />
-          <UpdateColors
-            label='Colors'
-            productInfo={state.product?.product?.productInsert?.color}
-            productInfoHEX={state.product?.product?.productInsert?.colorHex}
-            colorName='newColor'
-            hexName='newColorHEX'
-            colorValue={state.productFields.newColor}
-            hexValue={state.productFields.newColorHEX}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newColor')}
-          />
-          <UpdateInputField
-            label='Country'
-            productInfo={state.product?.product?.productInsert?.countryOfOrigin}
-            name='newCountry'
-            value={state.productFields.newCountry}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newCountry')}
-          />
-          <UpdateInputField
-            label='Brand'
-            productInfo={state.product?.product?.productInsert?.brand}
-            name='newBrand'
-            value={state.productFields.newBrand}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newBrand')}
-          />
-          <UpdateInputField
-            label='Thumbnail'
-            productInfo={state.product?.product?.productInsert?.thumbnail}
-            name='newThumbnail'
-            value={state.productFields.newThumbnail}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newThumbnail')}
-          />
-          <UpdateInputField
-            label='Price'
-            productInfo={state.product?.product?.productInsert?.price?.value}
-            name='newPrice'
-            value={state.productFields.newPrice}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newPrice')}
-          />
-          <UpdateInputField
-            label='Sale'
-            productInfo={state.product?.product?.productInsert?.salePercentage?.value}
-            name='newSale'
-            value={state.productFields.newSale}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newSale')}
-          />
-          <UpdateInputField
-            label='Category'
-            productInfo={state.product?.product?.productInsert?.categoryId}
-            name='newCategory'
-            value={state.productFields.newCategory}
-            onChange={handleChange}
-            updateFunction={() => updateProduct('newCategory')}
-          />
-
-          <div>
-            <h3>Tags</h3>
-            {state.tags.map((tag, index) => (
-              <div key={index}>
-                {tag} <button onClick={() => deleteUpdatedTag(tag)}>Delete</button>
-              </div>
-            ))}
-            <input
-              type='text'
-              placeholder='Add new tag'
-              value={state.productFields.newTag}
-              onChange={handleNewTagChange}
-            />
-            <button onClick={() => updateProduct('newTag')}>Add Tag</button>
-          </div>
-
-          <h3>{state.product?.product?.productInsert?.targetGender}</h3>
-          <select name='newGender' value={state.productFields.newGender} onChange={handleChange}>
-            <option value='GENDER_ENUM_UNKNOWN'>Select gender</option>
-            {state.genders?.map((gender, _) => (
-              <option key={gender.id} value={gender.id}>
-                {gender.name}
-              </option>
-            ))}
-          </select>
-          <button onClick={() => updateProduct('newGender')}>+</button>
-
-          <UpdateSizeMeasurements
-            sizes={state.product?.sizes}
-            measurements={state.product?.measurements}
-            sizeUpdates={state.sizeUpdates}
-            measurementUpdates={state.measurement}
-            getSizeName={getSizeName}
-            getMeasuremntName={getMeasuremntName}
-            handleSizeChange={handleSizeChange}
-            handleMeasurementChange={handleMeasurementChange}
-            updateSizeQuantity={updateSizeQuantity}
-            updateMeasurementValue={updateMeasurementValue}
-          />
-        </div>
+        <ProductInformation
+          product={state.product}
+          productFields={state.productFields}
+          handleChange={handleChange}
+          updateProduct={updateProduct}
+          toggleHideProduct={toggleHideProduct}
+          deleteUpdatedTag={deleteUpdatedTag}
+          handleNewTagChange={handleNewTagChange}
+          getSizeName={getSizeName}
+          getMeasuremntName={getMeasuremntName}
+          handleSizeChange={handleSizeChange}
+          updateSizeQuantity={updateSizeQuantity}
+          handleMeasurementChange={handleMeasurementChange}
+          updateMeasurementValue={updateMeasurementValue}
+          sizeUpdates={state.sizeUpdates}
+          tags={state.tags}
+          genders={state.genders}
+          sizes={undefined}
+          measurements={undefined}
+        />
       </div>
     </Layout>
   );

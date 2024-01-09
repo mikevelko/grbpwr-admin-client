@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import styles from 'styles/productID.scss';
 
 interface InputFieldProps {
   label: string;
@@ -25,14 +26,14 @@ export const UpdateInputField: FC<InputFieldProps> = ({
     setIsEditing(false);
   };
   return (
-    <div>
+    <div className={styles.update_info_container}>
       <label htmlFor={name}>
         {label}: {productInfo}
       </label>
       {isEditing && (
         <>
           <input type={type} name={name} value={value} onChange={onChange} />
-          <button onClick={handleUpdate}>UPDATE</button>
+          <button onClick={handleUpdate}>+</button>
         </>
       )}
       {!isEditing && <button onClick={() => setIsEditing(true)}>+</button>}

@@ -1,5 +1,6 @@
 import { common_ProductMeasurement, common_ProductSize } from 'api/proto-http/admin';
 import React, { FC } from 'react';
+import styles from 'styles/productID.scss';
 
 interface ProductSizeMeasurements {
   sizes: common_ProductSize[] | undefined;
@@ -31,14 +32,14 @@ export const UpdateSizeMeasurements: FC<ProductSizeMeasurements> = ({
   updateMeasurementValue,
 }) => {
   return (
-    <div>
+    <div className={styles.update_info_container}>
       {sizes
         ?.filter((size) => typeof size.sizeId !== 'undefined')
         .map((size, index) => (
           <div key={index}>
-            <span>
+            <label>
               {getSizeName(size.sizeId)}: {size.quantity?.value}
-            </span>
+            </label>
             <input
               type='number'
               value={size.sizeId !== undefined ? sizeUpdates[size.sizeId] : 0}
@@ -60,7 +61,9 @@ export const UpdateSizeMeasurements: FC<ProductSizeMeasurements> = ({
             const key = `${size.sizeId}-${m.measurementNameId}`;
             return (
               <li key={`${sizeIndex}-${measurementIndex}`}>
-                {getMeasuremntName(m.measurementNameId)}:{m.measurementValue?.value}
+                <label>
+                  {getMeasuremntName(m.measurementNameId)}:{m.measurementValue?.value}
+                </label>
                 <input
                   type='text'
                   value={measurementUpdates[key] || ''}
