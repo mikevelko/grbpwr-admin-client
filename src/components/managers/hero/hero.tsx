@@ -1,6 +1,7 @@
-import React, { FC, FormEvent, useState } from 'react';
+import React, { FC, FormEvent, useEffect, useState } from 'react';
 import { addHero, getHero } from 'api/hero';
-import { AddHeroRequest, common_HeroInsert } from 'api/proto-http/admin';
+import { getAllUploadedFiles } from 'api/admin';
+import { common_HeroInsert, common_Media } from 'api/proto-http/admin';
 import { Layout } from 'components/layout/layout';
 
 export const Hero: FC = () => {
@@ -18,8 +19,14 @@ export const Hero: FC = () => {
       exploreText: '',
     },
   ]);
-
   const [productIds, setProductIds] = useState<number[]>([]);
+  const [media, setMedia] = useState<string[]>([]);
+
+  const [input, setInput] = useState(false);
+
+  const handleInput = () => {
+    setInput(!input);
+  };
 
   const determineContentType = (link: string) => {
     const extension = link.split('.').pop()?.toLowerCase() ?? '';
@@ -28,7 +35,7 @@ export const Hero: FC = () => {
     } else if (['mp4', 'webm', 'ogg'].includes(extension)) {
       return 'video';
     }
-    return ''; // Default or unknown type
+    return '';
   };
 
   const addNewHero = async (e: FormEvent<HTMLFormElement>) => {
@@ -41,6 +48,7 @@ export const Hero: FC = () => {
       console.error(error);
     }
   };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const newMain = { ...main, [name]: value };
@@ -83,25 +91,58 @@ export const Hero: FC = () => {
       },
     ]);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getAllUploadedFiles({
+          limit: 5,
+          offset: 0,
+          orderFactor: 'ORDER_FACTOR_ASC',
+        });
+
+        const filesArray = response.list || [];
+        const urls = filesArray.map((file: common_Media) => file.media?.fullSize || '');
+
+        setMedia(urls);
+      } catch (error) {
+        console.error;
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <Layout>
       <form onSubmit={addNewHero}>
         <div>
           <h3>MAIN</h3>
-          <input
+          {/* <input
             type='text'
             name='contentLink'
             value={main.contentLink}
             onChange={handleChange}
             placeholder='Content Link'
-          />
-          {/* <input
-            type='text'
-            name='contentType'
-            value={main.contentType}
-            onChange={handleChange}
-            placeholder='Content Type'
           /> */}
+
+          <div>
+            <button type='button' onClick={handleInput}>
+              by url
+            </button>
+            {input && (
+              <div>
+                <input
+                  type='text'
+                  name='contentLink'
+                  value={main.contentLink}
+                  onChange={handleChange}
+                  placeholder='Content Link'
+                />
+              </div>
+            )}
+            <button>media selector</button>
+            <button>add new media</button>
+          </div>
           <input
             type='text'
             name='exploreLink'
@@ -128,13 +169,6 @@ export const Hero: FC = () => {
               onChange={handleAdsChange(index)}
               placeholder='Content Link'
             />
-            {/* <input
-              type='text'
-              name='contentType'
-              value={ad.contentType}
-              onChange={handleAdsChange(index)}
-              placeholder='type'
-            /> */}
             <input
               type='text'
               name='exploreText'
@@ -165,6 +199,14 @@ export const Hero: FC = () => {
             placeholder='Product IDs (comma-separated)'
           />
         </div>
+
+        <ul>
+          {media.map((m, id) => (
+            <li key={id}>
+              <img src={m} alt='img|video' style={{ height: '100px', width: '100px' }} />
+            </li>
+          ))}
+        </ul>
 
         <button type='submit'>add hero</button>
       </form>
