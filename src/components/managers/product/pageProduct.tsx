@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect, MouseEvent } from 'react';
-import { Layout } from 'components/layout/layout';
+import { Layout } from 'components/login/layout';
 import {
   common_Product,
   common_FilterConditions,

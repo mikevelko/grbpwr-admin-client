@@ -2,7 +2,7 @@ import React, { FC, FormEvent, useEffect, useState } from 'react';
 import { addHero } from 'api/hero';
 import { getAllUploadedFiles } from 'api/admin';
 import { common_HeroInsert, common_Media } from 'api/proto-http/admin';
-import { Layout } from 'components/layout/layout';
+import { Layout } from 'components/login/layout';
 
 const determineContentType = (link: string) => {
   const extension = link.split('.').pop()?.toLowerCase() ?? '';
@@ -15,15 +15,78 @@ const determineContentType = (link: string) => {
 };
 
 export const Hero: FC = () => {
+  const [selectedImage, setSelectedImage] = useState<string[]>([]);
+  const [thumbnailInput, setThumbnailInput] = useState(false);
+  const [filesUrl, setFilesUrl] = useState<string[]>([]);
+  const [showMediaSelector, setShowMediaSelector] = useState(false);
+  const [mediaNumber, setMediaNumber] = useState<number[]>([]);
+  const [exploreTextMap, setExploreTextMap] = useState<Record<string, string>>({});
+
   const [main, setMain] = useState<common_HeroInsert>({
     contentLink: '',
     contentType: '',
     exploreLink: '',
     exploreText: '',
   });
-  const [files, setFiles] = useState<string[]>([]);
-  const [toggleMediaSelector, setToggleMediaSelector] = useState(false);
-  const [toggleByUrlMain, setToggleByUrl] = useState(false);
+
+  const [ads, setAds] = useState<common_HeroInsert[]>([]);
+
+  const handleAddToAds = () => {
+    // Create a new ad object with the selected images
+    const newAds = selectedImage.map((imageUrl, index) => ({
+      contentLink: imageUrl,
+      contentType: determineContentType(imageUrl),
+      exploreLink: '',
+      exploreText: exploreTextMap[imageUrl],
+    }));
+
+    // Add the new ad object to the ads array
+    setAds((prevAds) => [...prevAds, ...newAds]);
+
+    // Clear the selected images
+    setSelectedImage([]);
+    setExploreTextMap({});
+  };
+
+  const handleExploreTextChange = (url: string, value: string) => {
+    setExploreTextMap((prevExploreTextMap) => ({
+      ...prevExploreTextMap,
+      [url]: value,
+    }));
+  };
+
+  const addNewHero = async () => {
+    try {
+      const response = await addHero({ main, ads, productIds: [] });
+      console.log('hero added:', response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const select = (imageUrl: string | number) => {
+    if (typeof imageUrl === 'string') {
+      if (selectedImage.includes(imageUrl)) {
+        setSelectedImage((prevSelectedImage) =>
+          prevSelectedImage.filter((image) => image !== imageUrl),
+        );
+      } else {
+        setSelectedImage([...selectedImage, imageUrl]);
+      }
+    } else if (typeof imageUrl === 'number') {
+      if (mediaNumber.includes(imageUrl)) {
+        setMediaNumber((prevMediaNumber) =>
+          prevMediaNumber.filter((imageIndex) => imageIndex !== imageUrl),
+        );
+      } else {
+        setMediaNumber([...mediaNumber, imageUrl]);
+      }
+    }
+  };
+
+  const handleViewAll = () => {
+    setShowMediaSelector(!showMediaSelector);
+  };
 
   useEffect(() => {
     const fetchUploadedFiles = async () => {
@@ -37,7 +100,7 @@ export const Hero: FC = () => {
         const filesArray = response.list || [];
         const urls = filesArray.map((file: common_Media) => file.media?.fullSize || '');
 
-        setFiles(urls);
+        setFilesUrl(urls);
       } catch (error) {
         console.error('Error fetching uploaded files:', error);
       }
@@ -46,69 +109,62 @@ export const Hero: FC = () => {
     fetchUploadedFiles();
   }, []);
 
-  const handleAddHero = async () => {
-    try {
-      const response = await addHero({ main, ads: [], productIds: [] });
-      console.log(response);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleMainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    if (name === 'contentLink') {
-      const contentType = determineContentType(value);
-      setMain({ ...main, contentLink: value, contentType });
-    } else {
-      setMain({ ...main, [name]: value });
-    }
-  };
-
-  const handleMediaSelectorFiles = (mediaURL: string) => {
-    const contentType = determineContentType(mediaURL);
-    setMain({ ...main, contentLink: mediaURL, contentType });
-  };
-  const handleMainByUrlVisibility = () => {
-    setToggleByUrl(!toggleByUrlMain);
-  };
-
-  const mediaSelectorVisibility = () => {
-    setToggleMediaSelector(!toggleMediaSelector);
+  const handleThumbnail = () => {
+    setThumbnailInput(!thumbnailInput);
   };
 
   return (
-    <Layout>
-      <h3>Main</h3>
+    <div>
+      <label htmlFor='thhumbnail'>Media</label>
       <div>
-        <button type='button' onClick={handleMainByUrlVisibility}>
-          by url
+        <button type='button' onClick={handleViewAll}>
+          Media Selector
         </button>
-        {toggleByUrlMain && (
-          <input
-            type='text'
-            name='contentLink'
-            value={main?.contentLink}
-            onChange={handleMainChange}
-          />
-        )}
-        <button type='button' onClick={mediaSelectorVisibility}>
-          media selector
-        </button>
-        {toggleMediaSelector && (
+      </div>
+      {showMediaSelector && (
+        <div>
           <ul>
-            {files.map((media, index) => (
-              <li key={index} onClick={() => handleMediaSelectorFiles(media)}>
-                <img src={media} alt='' style={{ width: '100px', height: '100px' }} />
+            {filesUrl.map((url, index) => (
+              <li key={index}>
+                <input
+                  type='checkbox'
+                  checked={selectedImage.includes(url)}
+                  onChange={() => select(url)}
+                  id={`${index}`}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor={`${index}`}>
+                  {selectedImage.includes(url) ? (
+                    <span>{selectedImage.indexOf(url) + 1}</span>
+                  ) : null}
+                  <img
+                    key={index}
+                    src={url}
+                    alt={url}
+                    style={{ width: '100px', height: '100px' }}
+                  />
+                  {selectedImage.includes(url) && (
+                    <input
+                      type='text'
+                      placeholder='Explore Text'
+                      value={exploreTextMap[url] || ''}
+                      onChange={(e) => handleExploreTextChange(url, e.target.value)}
+                    />
+                  )}
+                </label>
               </li>
             ))}
           </ul>
-        )}
-      </div>
-      <button type='button' onClick={handleAddHero}>
+          <div>
+            <button type='button' onClick={handleAddToAds}>
+              add
+            </button>
+          </div>
+        </div>
+      )}
+      <button type='button' onClick={addNewHero}>
         ok
       </button>
-    </Layout>
+    </div>
   );
 };

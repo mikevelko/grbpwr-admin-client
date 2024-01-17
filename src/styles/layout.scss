@@ -9,23 +9,23 @@
   grid-template-rows: 1fr auto;
   //   height: 200vh;
 
-  .logo {
+  .layout_logo {
     grid-area: logo;
     position: fixed;
   }
 
-  .content {
+  .layout_content {
     grid-area: content;
   }
 
-  .logout {
+  .layout_logout {
     grid-area: logout;
     position: fixed;
     bottom: 20px;
     right: 20px;
     text-align: right;
 
-    button {
+    .logout_btn {
       background-color: black;
       color: white;
       border: none;

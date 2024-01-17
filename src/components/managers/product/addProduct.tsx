@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import update from 'immutability-helper';
-import { Layout } from 'components/layout/layout';
+import { Layout } from 'components/login/layout';
 import { common_ProductNew, AddProductRequest, common_GenderEnum } from 'api/proto-http/admin';
 import { addProduct } from 'api/admin';
 import { Thumbnail } from './componentsOfProduct/thumbnail';

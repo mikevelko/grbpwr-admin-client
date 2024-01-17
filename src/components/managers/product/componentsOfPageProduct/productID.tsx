@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
 import React, { FC, useEffect, useReducer } from 'react';
 import { reducer, initialState } from './componentsOfProductID/productIdReducer';
-import { Layout } from 'components/layout/layout';
+import { Layout } from 'components/login/layout';
 import { ProductFields } from './componentsOfProductID/productIdReducer';
 import { getProductByID, getDictionary } from 'api/admin';
 import { ProductInformation } from './componentsOfProductID/prodyctInformation';
