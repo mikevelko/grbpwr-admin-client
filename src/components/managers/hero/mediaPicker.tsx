@@ -2,6 +2,7 @@ import { getAllUploadedFiles } from 'api/admin';
 import { addHero } from 'api/hero';
 import { common_HeroInsert, common_Media } from 'api/proto-http/admin';
 import { Ads } from './pickerComponents/ads';
+import { MainHero } from './pickerComponents/main';
 import React, { FC, useState, useEffect } from 'react';
 
 const determineContentType = (link: string) => {
@@ -33,16 +34,6 @@ export const MediaPicker: FC = () => {
   const [newAdUrl, setNewAdUrl] = useState('');
   const [newMainUrl, setNewMainUrl] = useState('');
 
-  const handleMainSelect = (url: string) => {
-    const newMain = {
-      contentLink: url,
-      contentType: determineContentType(url),
-      exploreLink: '',
-      exploreText: exploreTextMap[url] || '',
-    };
-    setMain(newMain);
-  };
-
   const handleAddByUrl = () => {
     const newAd = {
       contentLink: newAdUrl,
@@ -55,10 +46,14 @@ export const MediaPicker: FC = () => {
     setThumbnailInput(false);
   };
 
-  const handleMainByUrl = () => {
+  const handleMainExploreTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMain({ ...main, exploreText: e.target.value });
+  };
+
+  const handleMainByUrlOrFile = (url: string) => {
     const newMain = {
-      contentLink: newMainUrl,
-      contentType: determineContentType(newMainUrl),
+      contentLink: url,
+      contentType: determineContentType(url),
       exploreLink: '',
       exploreText: '',
     };
@@ -146,29 +141,13 @@ export const MediaPicker: FC = () => {
 
   return (
     <div>
-      <input
-        type='text'
-        placeholder='by url'
-        name='contentLink'
-        value={newMainUrl}
-        onChange={(e) => setNewMainUrl(e.target.value)}
+      <MainHero
+        filesUrl={filesUrl}
+        handleMainByUrlOrFile={handleMainByUrlOrFile}
+        handleMainExploreText={handleMainExploreTextChange}
+        exploreText={main.exploreText}
       />
-      <button type='button' onClick={handleMainByUrl}>
-        ok
-      </button>
-      <ul>
-        {filesUrl.map((media, index) => (
-          <li key={index}>
-            <img src={media} alt='' style={{ width: '100px', height: '100px' }} />
-            <input
-              type='text'
-              name='contentLink'
-              value={exploreTextMap[media] || ''}
-              onChange={(e) => handleExploreTextChange(media, e.target.value)}
-            />
-          </li>
-        ))}
-      </ul>
+
       <Ads
         filesUrl={filesUrl}
         selectedImage={selectedImage}

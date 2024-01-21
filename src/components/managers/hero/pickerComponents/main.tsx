@@ -1,79 +1,42 @@
-// import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, FC, useState } from 'react';
 
-// export const main = () => {
-//   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-//     onChange(e.target.value);
-//   };
-//   return (
-//     <div>
-//       <label htmlFor='thhumbnail'>main</label>
-//       <div>
-//         <button type='button' onClick={handleThumbnail}>
-//           by url
-//         </button>
-//         {thumbnailInput && (
-//           <div>
-//             <input
-//               type='text'
-//               name='contentLink'
-//               value={value}
-//               onChange={(e) => setNewAdUrl(e.target.value)}
-//             />
-//             <button type='button' onClick={handleAddByUrl}>
-//               Add by URL
-//             </button>
-//           </div>
-//         )}
-//       </div>
-//       <div>
-//         <button type='button' onClick={handleViewAll}>
-//           Media Selector
-//         </button>
-//       </div>
-//       {showMediaSelector && (
-//         <div>
-//           <ul>
-//             {filesUrl.map((url, index) => (
-//               <li key={index}>
-//                 <input
-//                   type='checkbox'
-//                   checked={selectedImage.includes(url)}
-//                   onChange={() => select(url)}
-//                   id={`${index}`}
-//                   style={{ display: 'none' }}
-//                 />
-//                 <label htmlFor={`${index}`}>
-//                   {selectedImage.includes(url) ? (
-//                     <span>{selectedImage.indexOf(url) + 1}</span>
-//                   ) : null}
-//                   <img
-//                     key={index}
-//                     src={url}
-//                     alt={url}
-//                     style={{ width: '100px', height: '100px' }}
-//                   />
-//                   {selectedImage.includes(url) && (
-//                     <input
-//                       type='text'
-//                       placeholder='Explore Text'
-//                       value={exploreTextMap[url] || ''}
-//                       onChange={(e) => handleExploreTextChange(url, e.target.value)}
-//                     />
-//                   )}
-//                 </label>
-//               </li>
-//             ))}
-//           </ul>
-//           <div>
-//             <button type='button' onClick={handleAddToAds}>
-//               add
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//       <button type='button' onClick={addNewHero}>
-//         ok
-//       </button>
-//     </div>
-//   );
-// };
+interface MainProps {
+  handleMainByUrlOrFile: (value: string) => void;
+  filesUrl: string[];
+  handleMainExploreText: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  exploreText: string | undefined;
+}
+
+export const MainHero: FC<MainProps> = ({
+  handleMainByUrlOrFile,
+  filesUrl,
+  exploreText,
+  handleMainExploreText,
+}) => {
+  const [url, setUrl] = useState('');
+  return (
+    <div>
+      <input
+        type='text'
+        placeholder='by url'
+        name='contentLink'
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+      />
+      <button type='button' onClick={() => handleMainByUrlOrFile(url)}>
+        ok
+      </button>
+      <ul>
+        {filesUrl.map((media, index) => (
+          <li key={index}>
+            <img src={media} alt='' style={{ width: '100px', height: '100px' }} />
+            <button type='button' onClick={() => handleMainByUrlOrFile(media)}>
+              ok
+            </button>
+          </li>
+        ))}
+      </ul>
+      <input type='text' name='exploreText' value={exploreText} onChange={handleMainExploreText} />
+    </div>
+  );
+};
