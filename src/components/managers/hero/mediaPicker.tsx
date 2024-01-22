@@ -3,6 +3,7 @@ import { addHero } from 'api/hero';
 import { common_HeroInsert, common_Media } from 'api/proto-http/admin';
 import { Ads } from './pickerComponents/ads';
 import { MainHero } from './pickerComponents/main';
+import { HeroPageProduct } from './heroPageProduct';
 import React, { FC, useState, useEffect } from 'react';
 
 const determineContentType = (link: string) => {
@@ -22,6 +23,7 @@ export const MediaPicker: FC = () => {
   const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [mediaNumber, setMediaNumber] = useState<number[]>([]);
   const [exploreTextMap, setExploreTextMap] = useState<Record<string, string>>({});
+  const [productIds, setProductIds] = useState<number[]>([]);
 
   const [main, setMain] = useState<common_HeroInsert>({
     contentLink: '',
@@ -83,7 +85,7 @@ export const MediaPicker: FC = () => {
 
   const addNewHero = async () => {
     try {
-      const response = await addHero({ main, ads, productIds: [] });
+      const response = await addHero({ main, ads, productIds });
       console.log('hero added:', response);
     } catch (error) {
       console.error(error);
@@ -147,7 +149,7 @@ export const MediaPicker: FC = () => {
         handleMainExploreText={handleMainExploreTextChange}
         exploreText={main.exploreText}
       />
-
+      {/* TODO: remove unnessary properties in ads file */}
       <Ads
         filesUrl={filesUrl}
         selectedImage={selectedImage}
@@ -165,6 +167,12 @@ export const MediaPicker: FC = () => {
         handleExploreTextChange={handleExploreTextChange}
         handleAddToAds={handleAddToAds}
         addNewHero={addNewHero}
+      />
+
+      <HeroPageProduct
+        addNewHero={addNewHero}
+        productIds={productIds}
+        setProductIds={setProductIds}
       />
     </div>
   );

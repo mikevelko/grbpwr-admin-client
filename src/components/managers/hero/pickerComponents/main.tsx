@@ -16,28 +16,52 @@ export const MainHero: FC<MainProps> = ({
   handleMainExploreText,
 }) => {
   const [url, setUrl] = useState('');
+  const [inputFieldVisibility, setInputFieldVisibility] = useState(false);
+  const [mediaSelectorVisibility, setMediaSelectorVisibility] = useState(false);
+
+  const handleInputFieldVisibility = () => {
+    setInputFieldVisibility(!inputFieldVisibility);
+  };
+
+  const handleMediaSelectorVisibility = () => {
+    setMediaSelectorVisibility(!mediaSelectorVisibility);
+  };
   return (
     <div>
-      <input
-        type='text'
-        placeholder='by url'
-        name='contentLink'
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-      />
-      <button type='button' onClick={() => handleMainByUrlOrFile(url)}>
-        ok
+      <button type='button' onClick={handleInputFieldVisibility}>
+        by url
       </button>
-      <ul>
-        {filesUrl.map((media, index) => (
-          <li key={index}>
-            <img src={media} alt='' style={{ width: '100px', height: '100px' }} />
-            <button type='button' onClick={() => handleMainByUrlOrFile(media)}>
-              ok
-            </button>
-          </li>
-        ))}
-      </ul>
+      {inputFieldVisibility && (
+        <div>
+          <input
+            type='text'
+            placeholder='by url'
+            name='contentLink'
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+          <button type='button' onClick={() => handleMainByUrlOrFile(url)}>
+            ok
+          </button>
+        </div>
+      )}
+      <button type='button' onClick={handleMediaSelectorVisibility}>
+        media selector
+      </button>
+      {mediaSelectorVisibility && (
+        <div>
+          <ul>
+            {filesUrl.map((media, index) => (
+              <li key={index}>
+                <img src={media} alt='' style={{ width: '100px', height: '100px' }} />
+                <button type='button' onClick={() => handleMainByUrlOrFile(media)}>
+                  ok
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <input type='text' name='exploreText' value={exploreText} onChange={handleMainExploreText} />
     </div>
   );
