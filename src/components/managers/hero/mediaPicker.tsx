@@ -32,14 +32,14 @@ export const MediaPicker: FC = () => {
 
   const [ads, setAds] = useState<common_HeroInsert[]>([]);
   const [newAdUrl, setNewAdUrl] = useState('');
-  const [newMainUrl, setNewMainUrl] = useState('');
+  const [newExploreText, setNewExploreText] = useState('');
 
   const handleAddByUrl = () => {
     const newAd = {
       contentLink: newAdUrl,
       contentType: determineContentType(newAdUrl),
       exploreLink: '',
-      exploreText: '',
+      exploreText: newExploreText,
     };
     setAds((prevAds) => [...prevAds, newAd]);
     setNewAdUrl('');
@@ -55,7 +55,7 @@ export const MediaPicker: FC = () => {
       contentLink: url,
       contentType: determineContentType(url),
       exploreLink: '',
-      exploreText: '',
+      exploreText: main.exploreText,
     };
     setMain(newMain);
   };
@@ -155,6 +155,8 @@ export const MediaPicker: FC = () => {
         thumbnailInput={thumbnailInput}
         newAdUrl={newAdUrl}
         setNewAdUrl={setNewAdUrl}
+        newExploreText={newExploreText}
+        setNewExploreText={setNewExploreText}
         handleAddByUrl={handleAddByUrl}
         handleViewAll={handleViewAll}
         showMediaSelector={showMediaSelector}

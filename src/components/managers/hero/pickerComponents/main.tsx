@@ -7,6 +7,8 @@ interface MainProps {
   exploreText: string | undefined;
 }
 
+// TODO: fix issue: after click on btn intendet for add files exploreText content deleted
+
 export const MainHero: FC<MainProps> = ({
   handleMainByUrlOrFile,
   filesUrl,

@@ -7,6 +7,8 @@ interface AdsProps {
   thumbnailInput: boolean;
   newAdUrl: string;
   setNewAdUrl: (url: string) => void;
+  newExploreText: string;
+  setNewExploreText: (text: string) => void;
   handleAddByUrl: () => void;
   handleViewAll: () => void;
   showMediaSelector: boolean;
@@ -32,6 +34,8 @@ export const Ads: FC<AdsProps> = ({
   handleExploreTextChange,
   handleAddToAds,
   addNewHero,
+  newExploreText,
+  setNewExploreText,
 }) => {
   return (
     <div>
@@ -47,6 +51,12 @@ export const Ads: FC<AdsProps> = ({
               name='contentLink'
               value={newAdUrl}
               onChange={(e) => setNewAdUrl(e.target.value)}
+            />
+            <input
+              type='text'
+              name='exploreText'
+              value={newExploreText}
+              onChange={(e) => setNewExploreText(e.target.value)}
             />
             <button type='button' onClick={handleAddByUrl}>
               Add by URL
