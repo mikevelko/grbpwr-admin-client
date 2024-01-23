@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import styles from 'styles/hero.scss';
 
 interface AdsProps {
   filesUrl: string[];
@@ -40,8 +41,8 @@ export const Ads: FC<AdsProps> = ({
   return (
     <div>
       <label htmlFor='thhumbnail'>ads</label>
-      <div>
-        <button type='button' onClick={handleThumbnail}>
+      <div className={styles.section}>
+        <button type='button' onClick={handleThumbnail} className={styles.btn}>
           by url
         </button>
         {thumbnailInput && (
@@ -63,9 +64,7 @@ export const Ads: FC<AdsProps> = ({
             </button>
           </div>
         )}
-      </div>
-      <div>
-        <button type='button' onClick={handleViewAll}>
+        <button type='button' onClick={handleViewAll} className={styles.btn}>
           Media Selector
         </button>
       </div>

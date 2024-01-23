@@ -4,7 +4,7 @@ import { getProductsPaged } from 'api/admin';
 import { initialFilter } from '../product/componentsOfPageProduct/initialFilterStates';
 import { GetProductsPagedResponse } from 'api/proto-http/admin';
 import { HeroProducts } from './page/heroProducts';
-import styles from 'styles/paged.scss';
+import styles from 'styles/hero.scss';
 
 interface HeroProductsProps {
   addNewHero: () => void;
@@ -49,17 +49,21 @@ export const HeroPageProduct: FC<HeroProductsProps> = ({
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex' }}>
-        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage <= 1}>
-          1
-        </button>
+    <div className={styles.page}>
+      <div className={styles.products_carousel}>
+        <div>
+          <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage <= 1}>
+            1
+          </button>
+        </div>
         <HeroProducts
           products={products}
           productClick={handleProductClick}
           showHidden={filter.showHidden}
         />
-        <button onClick={() => setCurrentPage(currentPage + 1)}>2</button>
+        <div>
+          <button onClick={() => setCurrentPage(currentPage + 1)}>2</button>
+        </div>
       </div>
 
       <button type='button' onClick={addNewHero} disabled={productIds.length === 0}>

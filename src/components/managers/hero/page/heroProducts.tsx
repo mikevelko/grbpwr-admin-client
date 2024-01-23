@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { common_Product } from 'api/proto-http/admin';
-import styles from 'styles/paged.scss';
+import styles from 'styles/hero.scss';
 
 interface ProductProps {
   products: common_Product[] | undefined;

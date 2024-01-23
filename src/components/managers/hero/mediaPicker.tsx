@@ -4,6 +4,7 @@ import { common_HeroInsert, common_Media } from 'api/proto-http/admin';
 import { Ads } from './pickerComponents/ads';
 import { MainHero } from './pickerComponents/main';
 import { HeroPageProduct } from './heroPageProduct';
+import styles from 'styles/hero.scss';
 import React, { FC, useState, useEffect } from 'react';
 
 const determineContentType = (link: string) => {
@@ -142,7 +143,7 @@ export const MediaPicker: FC = () => {
   };
 
   return (
-    <div>
+    <div className={styles.hero}>
       <MainHero
         filesUrl={filesUrl}
         handleMainByUrlOrFile={handleMainByUrlOrFile}

@@ -1,0 +1,62 @@
+.hero {
+    display: grid;
+    gap: 20px;
+
+    .section { 
+        width: 460px;
+        height: 360px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        border: 2px solid #000000;
+
+        .btn {
+            color: #FFF;
+            background-color: #000000;
+            border: none;
+            font-family: Inter;
+            font-size: 35px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: normal;
+            text-transform: uppercase;
+        }
+    }
+
+    .page {
+        display: grid;
+        gap: 10px;
+
+        .products_carousel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .product_list {
+                display: flex;
+                gap: 50px;
+
+                li {
+                    width: 157px;
+                    height: 216px;
+                    border: 1px solid black;
+                    position: relative;
+
+                    img {
+                        object-fit: scale-down;
+                        width: 155px;
+                        height: 200px;
+                    }
+
+                    h5 {
+                        position: absolute;
+                        right: 0;
+                        bottom: 0;
+                    }
+                }
+            }
+        }
+    }
+}
