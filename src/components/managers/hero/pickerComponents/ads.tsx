@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import styles from 'styles/hero.scss';
 
 interface AdsProps {
@@ -17,7 +17,6 @@ interface AdsProps {
   exploreTextMap: Record<string, string>;
   handleExploreTextChange: (url: string, value: string) => void;
   handleAddToAds: () => void;
-  // addNewHero: () => void;
 }
 
 export const Ads: FC<AdsProps> = ({
@@ -34,10 +33,25 @@ export const Ads: FC<AdsProps> = ({
   exploreTextMap,
   handleExploreTextChange,
   handleAddToAds,
-  // addNewHero,
   newExploreText,
   setNewExploreText,
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
+  const startId = (currentPage - 1) * itemsPerPage;
+  const endId = startId + itemsPerPage;
+  const files = filesUrl.slice(startId, endId);
+
+  const nextPage = () => {
+    setCurrentPage((prevPage) =>
+      prevPage < Math.ceil(filesUrl.length / itemsPerPage) ? prevPage + 1 : prevPage,
+    );
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
+  };
+
   return (
     <div>
       <label htmlFor='thhumbnail'>ads</label>
@@ -71,7 +85,7 @@ export const Ads: FC<AdsProps> = ({
       {showMediaSelector && (
         <div>
           <ul>
-            {filesUrl.map((url, index) => (
+            {files.map((url, index) => (
               <li key={index}>
                 <input
                   type='checkbox'
@@ -101,6 +115,12 @@ export const Ads: FC<AdsProps> = ({
                 </label>
               </li>
             ))}
+            <button type='button' onClick={prevPage}>
+              1
+            </button>
+            <button type='button' onClick={nextPage}>
+              2
+            </button>
           </ul>
           <div>
             <button type='button' onClick={handleAddToAds}>

@@ -89,6 +89,8 @@ export const MediaPicker: FC = () => {
     try {
       const response = await addHero({ main, ads, productIds });
       console.log('hero added:', response);
+      setAds([]);
+      setProductIds([]);
     } catch (error) {
       console.error(error);
     }

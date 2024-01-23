@@ -17,6 +17,11 @@ export const MainHero: FC<MainProps> = ({
   const [url, setUrl] = useState('');
   const [inputFieldVisibility, setInputFieldVisibility] = useState(false);
   const [mediaSelectorVisibility, setMediaSelectorVisibility] = useState(false);
+  const itemsPerPage = 4;
+  const [currentPage, setCurrentPage] = useState(1);
+  const startId = (currentPage - 1) * itemsPerPage;
+  const endId = startId + itemsPerPage;
+  const totalItems = filesUrl.slice(startId, endId);
 
   const handleInputFieldVisibility = () => {
     setInputFieldVisibility(!inputFieldVisibility);
@@ -25,6 +30,17 @@ export const MainHero: FC<MainProps> = ({
   const handleMediaSelectorVisibility = () => {
     setMediaSelectorVisibility(!mediaSelectorVisibility);
   };
+
+  const nextPage = () => {
+    setCurrentPage((prevPage) =>
+      prevPage < Math.ceil(filesUrl.length / itemsPerPage) ? prevPage + 1 : prevPage,
+    );
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
+  };
+
   return (
     <div style={{ display: 'flex', gap: '20px' }}>
       <div className={styles.section}>
@@ -56,22 +72,29 @@ export const MainHero: FC<MainProps> = ({
         />
       </div>
       {mediaSelectorVisibility && (
-        <div>
-          <ul>
-            {filesUrl.map((media, index) => (
+        <>
+          <ul className={styles.files_list}>
+            <div>
+              <button type='button' onClick={prevPage}>
+                1
+              </button>
+            </div>
+            {totalItems.map((media, index) => (
               <li key={index}>
-                <img src={media} alt='' style={{ width: '100px', height: '100px' }} />
+                <img src={media} alt='' />
                 <button type='button' onClick={() => handleMainByUrlOrFile(media)}>
                   ok
                 </button>
               </li>
             ))}
+            <div>
+              <button type='button' onClick={nextPage}>
+                2
+              </button>
+            </div>
           </ul>
-        </div>
+        </>
       )}
     </div>
   );
 };
-
-// TODO: maybe form instead of btn for each section ?
-// TODO: clear inputs after uploading hero

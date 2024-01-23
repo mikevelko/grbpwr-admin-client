@@ -25,6 +25,31 @@
         }
     }
 
+    .files_list {
+        display: flex;
+        align-items: center;
+        border: 1px solid black;
+
+        li {
+            width: 157px;
+            height: 216px;
+            border: 1px solid black;
+            position: relative;
+
+            img {
+                object-fit: scale-down;
+                width: 155px;
+                height: 215px;
+            }
+
+            button {
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
+        }
+    }
+
     .page {
         display: grid;
         gap: 10px;
