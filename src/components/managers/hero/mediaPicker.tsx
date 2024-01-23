@@ -84,7 +84,8 @@ export const MediaPicker: FC = () => {
     }));
   };
 
-  const addNewHero = async () => {
+  const addNewHero = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       const response = await addHero({ main, ads, productIds });
       console.log('hero added:', response);
@@ -144,37 +145,37 @@ export const MediaPicker: FC = () => {
 
   return (
     <div className={styles.hero}>
-      <MainHero
-        filesUrl={filesUrl}
-        handleMainByUrlOrFile={handleMainByUrlOrFile}
-        handleMainExploreText={handleMainExploreTextChange}
-        exploreText={main.exploreText}
-      />
-      {/* TODO: remove unnessary properties in ads file */}
-      <Ads
-        filesUrl={filesUrl}
-        selectedImage={selectedImage}
-        handleThumbnail={handleThumbnail}
-        thumbnailInput={thumbnailInput}
-        newAdUrl={newAdUrl}
-        setNewAdUrl={setNewAdUrl}
-        newExploreText={newExploreText}
-        setNewExploreText={setNewExploreText}
-        handleAddByUrl={handleAddByUrl}
-        handleViewAll={handleViewAll}
-        showMediaSelector={showMediaSelector}
-        select={select}
-        exploreTextMap={exploreTextMap}
-        handleExploreTextChange={handleExploreTextChange}
-        handleAddToAds={handleAddToAds}
-        addNewHero={addNewHero}
-      />
+      <form onSubmit={addNewHero}>
+        <MainHero
+          filesUrl={filesUrl}
+          handleMainByUrlOrFile={handleMainByUrlOrFile}
+          handleMainExploreText={handleMainExploreTextChange}
+          exploreText={main.exploreText}
+        />
+        {/* TODO: remove unnessary properties in ads file */}
+        <Ads
+          filesUrl={filesUrl}
+          selectedImage={selectedImage}
+          handleThumbnail={handleThumbnail}
+          thumbnailInput={thumbnailInput}
+          newAdUrl={newAdUrl}
+          setNewAdUrl={setNewAdUrl}
+          newExploreText={newExploreText}
+          setNewExploreText={setNewExploreText}
+          handleAddByUrl={handleAddByUrl}
+          handleViewAll={handleViewAll}
+          showMediaSelector={showMediaSelector}
+          select={select}
+          exploreTextMap={exploreTextMap}
+          handleExploreTextChange={handleExploreTextChange}
+          handleAddToAds={handleAddToAds}
+        />
 
-      <HeroPageProduct
-        addNewHero={addNewHero}
-        productIds={productIds}
-        setProductIds={setProductIds}
-      />
+        <HeroPageProduct productIds={productIds} setProductIds={setProductIds} />
+        <button type='submit'>add hero</button>
+      </form>
     </div>
   );
 };
+
+// TODO: clear inputs after uploading hero

@@ -7,13 +7,13 @@ import { HeroProducts } from './page/heroProducts';
 import styles from 'styles/hero.scss';
 
 interface HeroProductsProps {
-  addNewHero: () => void;
+  //   addNewHero: () => void;
   productIds: number[];
   setProductIds: (value: number[]) => void;
 }
 
 export const HeroPageProduct: FC<HeroProductsProps> = ({
-  addNewHero,
+  //   addNewHero,
   productIds,
   setProductIds,
 }) => {
@@ -66,9 +66,9 @@ export const HeroPageProduct: FC<HeroProductsProps> = ({
         </div>
       </div>
 
-      <button type='button' onClick={addNewHero} disabled={productIds.length === 0}>
+      {/* <button type='button' onClick={addNewHero} disabled={productIds.length === 0}>
         add ids
-      </button>
+      </button> */}
     </div>
   );
 };

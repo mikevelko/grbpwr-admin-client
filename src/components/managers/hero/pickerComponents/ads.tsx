@@ -17,7 +17,7 @@ interface AdsProps {
   exploreTextMap: Record<string, string>;
   handleExploreTextChange: (url: string, value: string) => void;
   handleAddToAds: () => void;
-  addNewHero: () => void;
+  // addNewHero: () => void;
 }
 
 export const Ads: FC<AdsProps> = ({
@@ -34,7 +34,7 @@ export const Ads: FC<AdsProps> = ({
   exploreTextMap,
   handleExploreTextChange,
   handleAddToAds,
-  addNewHero,
+  // addNewHero,
   newExploreText,
   setNewExploreText,
 }) => {
@@ -109,9 +109,9 @@ export const Ads: FC<AdsProps> = ({
           </div>
         </div>
       )}
-      <button type='button' onClick={addNewHero}>
+      {/* <button type='button' onClick={addNewHero}>
         ok
-      </button>
+      </button> */}
     </div>
   );
 };

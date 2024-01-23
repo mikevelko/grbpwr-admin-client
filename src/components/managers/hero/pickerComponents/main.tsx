@@ -72,3 +72,6 @@ export const MainHero: FC<MainProps> = ({
     </div>
   );
 };
+
+// TODO: maybe form instead of btn for each section ?
+// TODO: clear inputs after uploading hero
