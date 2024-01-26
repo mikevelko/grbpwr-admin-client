@@ -1,11 +1,14 @@
 import React, { FC, useState } from 'react';
 import styles from 'styles/hero.scss';
+import arrow from 'img/arrow-right.png';
 
 interface MainProps {
   handleMainByUrlOrFile: (value: string) => void;
   filesUrl: string[];
   handleMainExploreText: (e: React.ChangeEvent<HTMLInputElement>) => void;
   exploreText: string | undefined;
+  handleMainExploreLink: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  exploreLink: string | undefined;
 }
 
 export const MainHero: FC<MainProps> = ({
@@ -13,15 +16,23 @@ export const MainHero: FC<MainProps> = ({
   filesUrl,
   exploreText,
   handleMainExploreText,
+  handleMainExploreLink,
+  exploreLink,
 }) => {
   const [url, setUrl] = useState('');
   const [inputFieldVisibility, setInputFieldVisibility] = useState(false);
   const [mediaSelectorVisibility, setMediaSelectorVisibility] = useState(false);
+  const [exploreVisibility, setExploreVisibility] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const itemsPerPage = 4;
   const [currentPage, setCurrentPage] = useState(1);
   const startId = (currentPage - 1) * itemsPerPage;
   const endId = startId + itemsPerPage;
   const totalItems = filesUrl.slice(startId, endId);
+
+  const handleExploreVisibility = () => {
+    setExploreVisibility(!exploreVisibility);
+  };
 
   const handleInputFieldVisibility = () => {
     setInputFieldVisibility(!inputFieldVisibility);
@@ -41,6 +52,20 @@ export const MainHero: FC<MainProps> = ({
     setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
   };
 
+  const handleSelectImage = (image: string) => {
+    if (image === selectedImage) {
+      setSelectedImage(null);
+      handleMainByUrlOrFile('');
+    } else {
+      setSelectedImage(image);
+      handleMainByUrlOrFile(image);
+    }
+  };
+
+  const handleMainByUrl = () => {
+    handleMainByUrlOrFile(url);
+    setUrl('');
+  };
   return (
     <div style={{ display: 'flex', gap: '20px' }}>
       <div className={styles.section}>
@@ -56,7 +81,7 @@ export const MainHero: FC<MainProps> = ({
               value={url}
               onChange={(e) => setUrl(e.target.value)}
             />
-            <button type='button' onClick={() => handleMainByUrlOrFile(url)}>
+            <button type='button' onClick={handleMainByUrl}>
               ok
             </button>
           </div>
@@ -64,32 +89,49 @@ export const MainHero: FC<MainProps> = ({
         <button type='button' onClick={handleMediaSelectorVisibility} className={styles.btn}>
           media selector
         </button>
-        <input
-          type='text'
-          name='exploreText'
-          value={exploreText}
-          onChange={handleMainExploreText}
-        />
+        <button type='button' onClick={handleExploreVisibility} className={styles.btn}>
+          explore
+        </button>
+        {exploreVisibility && (
+          <div>
+            <input
+              type='text'
+              name='exploreText'
+              value={exploreText}
+              onChange={handleMainExploreText}
+            />
+            <input
+              type='text'
+              name='exploreLink'
+              value={exploreLink}
+              onChange={handleMainExploreLink}
+            />
+          </div>
+        )}
       </div>
       {mediaSelectorVisibility && (
         <>
           <ul className={styles.files_list}>
             <div>
               <button type='button' onClick={prevPage}>
-                1
+                <img src={arrow} alt='' style={{ rotate: '180deg' }} />
               </button>
             </div>
             {totalItems.map((media, index) => (
               <li key={index}>
-                <img src={media} alt='' />
-                <button type='button' onClick={() => handleMainByUrlOrFile(media)}>
+                <img
+                  src={media}
+                  alt=''
+                  className={media === selectedImage ? styles.transparent : ''}
+                />
+                <button type='button' onClick={() => handleSelectImage(media)}>
                   ok
                 </button>
               </li>
             ))}
             <div>
               <button type='button' onClick={nextPage}>
-                2
+                <img src={arrow} alt='' />
               </button>
             </div>
           </ul>

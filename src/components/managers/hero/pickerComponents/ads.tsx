@@ -1,5 +1,6 @@
 import React, { FC, useState } from 'react';
 import styles from 'styles/hero.scss';
+import arrow from 'img/arrow-right.png';
 
 interface AdsProps {
   filesUrl: string[];
@@ -15,7 +16,9 @@ interface AdsProps {
   showMediaSelector: boolean;
   select: (url: string) => void;
   exploreTextMap: Record<string, string>;
+  exploreLinkMap: Record<string, string>;
   handleExploreTextChange: (url: string, value: string) => void;
+  handleExploreLinkChange: (url: string, value: string) => void;
   handleAddToAds: () => void;
 }
 
@@ -35,6 +38,8 @@ export const Ads: FC<AdsProps> = ({
   handleAddToAds,
   newExploreText,
   setNewExploreText,
+  exploreLinkMap,
+  handleExploreLinkChange,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
@@ -53,8 +58,7 @@ export const Ads: FC<AdsProps> = ({
   };
 
   return (
-    <div>
-      <label htmlFor='thhumbnail'>ads</label>
+    <div style={{ display: 'flex', gap: '20px' }}>
       <div className={styles.section}>
         <button type='button' onClick={handleThumbnail} className={styles.btn}>
           by url
@@ -64,12 +68,14 @@ export const Ads: FC<AdsProps> = ({
             <input
               type='text'
               name='contentLink'
+              placeholder='by url'
               value={newAdUrl}
               onChange={(e) => setNewAdUrl(e.target.value)}
             />
             <input
               type='text'
               name='exploreText'
+              placeholder='explore text'
               value={newExploreText}
               onChange={(e) => setNewExploreText(e.target.value)}
             />
@@ -83,8 +89,13 @@ export const Ads: FC<AdsProps> = ({
         </button>
       </div>
       {showMediaSelector && (
-        <div>
-          <ul>
+        <>
+          <ul className={styles.files_list}>
+            <div>
+              <button type='button' onClick={prevPage}>
+                <img src={arrow} alt='' style={{ rotate: '180deg' }} />
+              </button>
+            </div>
             {files.map((url, index) => (
               <li key={index}>
                 <input
@@ -98,36 +109,38 @@ export const Ads: FC<AdsProps> = ({
                   {selectedImage.includes(url) ? (
                     <span>{selectedImage.indexOf(url) + 1}</span>
                   ) : null}
-                  <img
-                    key={index}
-                    src={url}
-                    alt={url}
-                    style={{ width: '100px', height: '100px' }}
-                  />
+                  <img key={index} src={url} alt={url} />
                   {selectedImage.includes(url) && (
-                    <input
-                      type='text'
-                      placeholder='Explore Text'
-                      value={exploreTextMap[url] || ''}
-                      onChange={(e) => handleExploreTextChange(url, e.target.value)}
-                    />
+                    <div className={styles.input_container}>
+                      <input
+                        type='text'
+                        placeholder='explore text'
+                        value={exploreTextMap[url] || ''}
+                        onChange={(e) => handleExploreTextChange(url, e.target.value)}
+                      />
+                      <input
+                        type='text'
+                        placeholder='explore link'
+                        value={exploreLinkMap[url] || ''}
+                        onChange={(e) => handleExploreLinkChange(url, e.target.value)}
+                      />
+                    </div>
                   )}
                 </label>
               </li>
             ))}
-            <button type='button' onClick={prevPage}>
-              1
-            </button>
-            <button type='button' onClick={nextPage}>
-              2
-            </button>
+            <div>
+              <button type='button' onClick={nextPage}>
+                <img src={arrow} alt='' />
+              </button>
+            </div>
+            <div className={styles.add}>
+              <button type='button' onClick={handleAddToAds}>
+                add
+              </button>
+            </div>
           </ul>
-          <div>
-            <button type='button' onClick={handleAddToAds}>
-              add
-            </button>
-          </div>
-        </div>
+        </>
       )}
       {/* <button type='button' onClick={addNewHero}>
         ok

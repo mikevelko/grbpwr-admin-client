@@ -65,10 +65,6 @@ export const HeroPageProduct: FC<HeroProductsProps> = ({
           <button onClick={() => setCurrentPage(currentPage + 1)}>2</button>
         </div>
       </div>
-
-      {/* <button type='button' onClick={addNewHero} disabled={productIds.length === 0}>
-        add ids
-      </button> */}
     </div>
   );
 };

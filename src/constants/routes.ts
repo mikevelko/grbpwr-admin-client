@@ -8,4 +8,7 @@ export enum ROUTES {
   pagedProduct = '/page-product',
   singleProduct = '/product-by-id',
   hero = '/hero',
+  fullHero = '/full-hero',
+  promo = '/promo',
+  getPromo = '/get-promo'
 }

@@ -1,9 +1,8 @@
 .hero {
     display: grid;
-    gap: 20px;
-
+    gap: 30px;
     .section { 
-        width: 460px;
+        width: 360px;
         height: 360px;
         display: flex;
         flex-direction: column;
@@ -24,11 +23,31 @@
             text-transform: uppercase;
         }
     }
+    
 
     .files_list {
         display: flex;
         align-items: center;
+        gap: 10px;
         border: 1px solid black;
+        position: relative;
+
+        button {
+            border: none;
+            background-color: white;
+        }
+
+        .add {
+            position: absolute;
+            top: 0;
+            right: 0;
+
+            button {
+                text-transform: uppercase;
+                background-color: #000000;
+                color: #FFF;
+            }
+        }
 
         li {
             width: 157px;
@@ -41,11 +60,42 @@
                 width: 155px;
                 height: 215px;
             }
+            .transparent {
+                opacity: 0.2;;
+            }
 
             button {
                 position: absolute;
+                display: none;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            span {
+                position: absolute;
+                left: 0;
                 top: 0;
-                right: 0;
+            }
+            
+            .input_container {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+
+                input {
+                    width: 155px;
+                }
+            }
+
+            &:hover {
+                button {
+                    display: block;
+                    border: none;
+                    text-transform: uppercase;
+                    background-color:black;
+                    color: #FFF;
+                }
             }
         }
     }
