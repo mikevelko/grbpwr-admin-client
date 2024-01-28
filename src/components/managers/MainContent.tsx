@@ -23,6 +23,10 @@ export const Main: FC = () => {
     navigate({ to: ROUTES.promo, replace: true });
   };
 
+  const navigateArchive = () => {
+    navigate({ to: ROUTES.archive, replace: true });
+  };
+
   return (
     <Layout>
       <div className={styles.main}>
@@ -39,7 +43,9 @@ export const Main: FC = () => {
         <button className={styles.btn} onClick={navigatePromo}>
           PROMO
         </button>
-        <button className={styles.btn}>ARCHIVE</button>
+        <button className={styles.btn} onClick={navigateArchive}>
+          ARCHIVE
+        </button>
       </div>
     </Layout>
   );

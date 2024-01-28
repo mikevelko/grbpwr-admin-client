@@ -18,6 +18,7 @@ import { Hero } from 'components/managers/hero/hero';
 import { GetHero } from 'components/managers/hero/getHero';
 import { Promo } from 'components/managers/promo/promo';
 import { GetPromo } from 'components/managers/promo/getPromo';
+import { Archive } from 'components/managers/archive/archive';
 import 'styles/global.scss';
 
 const container = document.getElementById('root') ?? document.body;
@@ -39,6 +40,7 @@ const routes: Route<DefaultGenerics>[] = [
   { path: ROUTES.fullHero, element: <GetHero /> },
   { path: ROUTES.promo, element: <Promo /> },
   { path: ROUTES.getPromo, element: <GetPromo /> },
+  { path: ROUTES.archive, element: <Archive /> },
 ];
 
 root.render(
