@@ -19,6 +19,7 @@ import { GetHero } from 'components/managers/hero/getHero';
 import { Promo } from 'components/managers/promo/promo';
 import { GetPromo } from 'components/managers/promo/getPromo';
 import { Archive } from 'components/managers/archive/archive';
+import { GetArchive } from 'components/managers/archive/getArchive';
 import 'styles/global.scss';
 
 const container = document.getElementById('root') ?? document.body;
@@ -41,6 +42,7 @@ const routes: Route<DefaultGenerics>[] = [
   { path: ROUTES.promo, element: <Promo /> },
   { path: ROUTES.getPromo, element: <GetPromo /> },
   { path: ROUTES.archive, element: <Archive /> },
+  { path: ROUTES.getArchive, element: <GetArchive /> },
 ];
 
 root.render(

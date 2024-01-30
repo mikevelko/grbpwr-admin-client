@@ -1,0 +1,62 @@
+.promo {
+    margin: 20px auto;
+    display: grid;
+    gap: 50px;
+
+    .promo_fields_container {
+        // margin: 0 auto;
+        display: grid;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+
+        .promo_fields {
+            display: grid;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+
+            label {
+                color: #FFF;
+                background-color: #000;
+                font-family: Inter;
+                font-size: 35px;
+                font-style: normal;
+                font-weight: 600;
+                line-height: normal;
+                text-transform: uppercase;
+                text-align: center;
+            }
+
+            input { 
+                justify-self: center;
+                font-size: 29px;
+                width: 200px;
+                height: 30px;
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    .promo_btns {
+        justify-self: center;
+        display: grid;
+        gap: 10px;
+
+        button {
+            background-color: #000;
+            color: #FFF;
+            border: none;
+            color: #FFF;
+            background-color: #000;
+            font-family: Inter;
+            font-size: 30px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: normal;
+            text-transform: uppercase;
+            text-align: center;
+            cursor: pointer;
+        }
+    }
+}

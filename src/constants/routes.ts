@@ -11,5 +11,6 @@ export enum ROUTES {
   fullHero = '/full-hero',
   promo = '/promo',
   getPromo = '/get-promo',
-  archive = '/archive'
+  archive = '/archive',
+  getArchive = '/get-archive'
 }
