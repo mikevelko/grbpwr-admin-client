@@ -7,25 +7,25 @@ import { ROUTES } from 'constants/routes';
 import styles from 'styles/promo.scss';
 
 interface PromoState {
-  Code: string;
-  freeShipping: boolean;
+  code: string;
   discount: number;
   expiration: string;
+  freeShipping: boolean;
   allowed: boolean;
   voucher: boolean;
 }
 
 export const Promo: FC = () => {
   const [promoState, setPromoState] = useState<PromoState>({
-    Code: '',
-    freeShipping: false,
+    code: '',
     discount: 0,
     expiration: '',
+    freeShipping: false,
     allowed: false,
     voucher: false,
   });
 
-  const { Code, freeShipping, discount, expiration, allowed, voucher } = promoState;
+  const { code, freeShipping, discount, expiration, allowed, voucher } = promoState;
   const navigate = useNavigate();
 
   const handleChange = (key: keyof PromoState, value: string | boolean | number) => {
@@ -45,10 +45,10 @@ export const Promo: FC = () => {
 
     const promo: AddPromoRequest = {
       promo: {
-        code: Code,
-        freeShipping,
+        code: code,
         discount: { value: discount.toString() },
         expiration: formattedExpiration,
+        freeShipping,
         allowed,
         voucher,
       },
@@ -71,7 +71,14 @@ export const Promo: FC = () => {
       <div className={styles.promo}>
         <div className={styles.promo_fields_container}>
           {Object.entries(promoState).map(([key, value]) => (
-            <div key={key} className={styles.promo_fields}>
+            <div
+              key={key}
+              className={
+                key === 'freeShipping' || key === 'voucher' || key === 'allowed'
+                  ? styles.boolean
+                  : styles.fields
+              }
+            >
               <label htmlFor={key}>{key}</label>
               {typeof value === 'boolean' ? (
                 <input
@@ -84,8 +91,8 @@ export const Promo: FC = () => {
                 <>
                   {key === 'discount' ? (
                     <input
-                      type='number' // Set the type to 'number' for the discount input
-                      value={value as number} // Ensure value is treated as number
+                      type='number'
+                      value={value as number}
                       onChange={(e) =>
                         handleChange(key as keyof PromoState, parseInt(e.target.value))
                       }

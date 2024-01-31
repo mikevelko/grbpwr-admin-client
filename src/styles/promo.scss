@@ -1,5 +1,5 @@
 .promo {
-    margin: 20px auto;
+    margin: 40px auto;
     display: grid;
     gap: 50px;
 
@@ -10,32 +10,49 @@
         justify-content: center;
         align-items: center;
 
-        .promo_fields {
-            display: grid;
-            gap: 5px;
-            justify-content: center;
+        
+        .boolean {
+            display: flex;
             align-items: center;
+            gap: 5px;
 
             label {
-                color: #FFF;
-                background-color: #000;
-                font-family: Inter;
-                font-size: 35px;
-                font-style: normal;
-                font-weight: 600;
-                line-height: normal;
+                justify-self: flex-start;
                 text-transform: uppercase;
-                text-align: center;
+                font-size: 25px;
             }
 
-            input { 
-                justify-self: center;
-                font-size: 29px;
-                width: 200px;
+            input[type='checkbox'] {
+                width: 30px;
                 height: 30px;
-                flex-shrink: 0;
+                accent-color: #000;
+                border: 2px solid #000;
             }
         }
+
+        .fields {
+            display: grid;
+            gap: 5px;
+
+            label {
+                justify-self: flex-start;
+                text-transform: uppercase;
+                font-size: 25px;
+            }
+
+            input {
+                height: 40px;
+                width: 200px;
+                font-size: 25px;
+                outline: none;
+            }
+        }
+
+        label {
+            background-color: #000;
+            color: #FFF;
+        }
+        
     }
 
     .promo_btns {
@@ -50,7 +67,7 @@
             color: #FFF;
             background-color: #000;
             font-family: Inter;
-            font-size: 30px;
+            font-size: 25px;
             font-style: normal;
             font-weight: 600;
             line-height: normal;

@@ -1,0 +1,15 @@
+.archive_list_container {
+    display: grid;
+    gap: 30px;
+
+    div {
+        border: 1px solid black;
+        display: grid;
+        gap: 10px;
+
+        ul {
+            display: flex;
+            gap: 10px;
+        }
+    }
+}
