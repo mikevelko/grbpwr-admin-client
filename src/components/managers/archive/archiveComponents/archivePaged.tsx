@@ -1,4 +1,5 @@
 import { common_ArchiveFull, common_ArchiveItemInsert } from 'api/proto-http/admin';
+import { deleteItemFromArchive } from 'api/archive';
 import React, { FC, useState } from 'react';
 
 interface ArchiveList {
@@ -12,6 +13,7 @@ interface ArchiveList {
   handleMediaSelection: (archiveId: number, mediaUrl: string) => void;
   submitNewItem: (archiveId: number) => void;
   filesUrl: string[];
+  fetchArchive: () => void;
 }
 
 export const ArchivePaged: FC<ArchiveList> = ({
@@ -21,6 +23,7 @@ export const ArchivePaged: FC<ArchiveList> = ({
   handleMediaSelection,
   submitNewItem,
   filesUrl,
+  fetchArchive,
 }) => {
   const [urlVisibility, setUrlVisibility] = useState(false);
   const [mediaVisibility, setMediaVisibility] = useState(false);
@@ -32,18 +35,34 @@ export const ArchivePaged: FC<ArchiveList> = ({
   const handleMediaVisibility = () => {
     setMediaVisibility(!mediaVisibility);
   };
+
+  const deleteItem = async (id: number | undefined) => {
+    try {
+      const response = await deleteItemFromArchive({ itemId: id });
+      console.log('iteme deleted: ', response);
+      fetchArchive();
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
-    <ul>
-      {archive?.items?.map((item, itemId) => (
-        <li key={itemId}>
-          <img
-            src={item.archiveItemInsert?.media}
-            alt='media'
-            style={{ width: '200px', height: '200px' }}
-          />
-          <p>{item.archiveItemInsert?.title}</p>
-          <p>{item.archiveItemInsert?.url}</p>
-        </li>
+    <ul style={{ width: '800px' }}>
+      {archive.items?.map((item, itemId) => (
+        <>
+          <p>{itemId}</p>
+          <li key={itemId}>
+            <button type='button' onClick={() => deleteItem(item.id)}>
+              delete
+            </button>
+            <img
+              src={item.archiveItemInsert?.media}
+              alt='media'
+              style={{ width: '200px', height: '200px' }}
+            />
+            <p>{item.archiveItemInsert?.title}</p>
+            <p>{item.archiveItemInsert?.url}</p>
+          </li>
+        </>
       ))}
 
       <li>

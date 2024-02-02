@@ -1,6 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
-import { getArchive, addArchiveItem, deleteArchive } from 'api/archive';
-import { common_ArchiveFull, common_ArchiveItemInsert, common_Media } from 'api/proto-http/admin';
+import { getArchive, addArchiveItem, deleteArchive, updateArchive } from 'api/archive';
+import {
+  common_ArchiveFull,
+  common_ArchiveInsert,
+  common_ArchiveItemInsert,
+  common_Media,
+} from 'api/proto-http/admin';
 import styles from 'styles/archiveList.scss';
 import { getAllUploadedFiles } from 'api/admin';
 import { ArchivePaged } from './archiveComponents/archivePaged';
@@ -14,8 +19,40 @@ export const GetArchive: FC = () => {
   }>({});
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1); // or whatever page size you want
+  const [pageSize, setPageSize] = useState(4); // or whatever page size you want
   const [isLastPage, setIsLastPage] = useState(false);
+  const [editingArchive, setEditingArchive] = useState<common_ArchiveInsert | null>(null);
+  const [editItemId, setEditItemId] = useState<number | undefined>();
+
+  const handleEditClick = (archive: common_ArchiveFull) => {
+    setEditItemId(archive.archive?.id);
+    setEditingArchive(archive.archive?.archiveInsert || null); // Initialize editingArchive with current data
+  };
+
+  const handleEditingFieldChange = (field: 'heading' | 'description', value: string) => {
+    setEditingArchive((currentEditingArchive) => {
+      if (currentEditingArchive) {
+        return { ...currentEditingArchive, [field]: value };
+      }
+      return null;
+    });
+  };
+
+  const handleSaveClick = async () => {
+    if (editingArchive && editItemId) {
+      try {
+        await updateArchive({
+          id: editItemId,
+          archive: editingArchive,
+        });
+        setEditItemId(undefined); // Exit edit mode
+        setEditingArchive(null); // Reset editing archive
+        fetchArchive(); // Refresh the list
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
 
   const goToNextPage = () => {
     if (!isLastPage) {
@@ -124,7 +161,31 @@ export const GetArchive: FC = () => {
             <button type='button' onClick={() => removeArchive(archive.archive?.id)}>
               delete
             </button>
-            <h3>{archive.archive?.archiveInsert?.heading}</h3>
+            {editItemId === archive.archive?.id ? (
+              <>
+                <input
+                  type='text'
+                  value={editingArchive?.heading || ''}
+                  onChange={(e) => handleEditingFieldChange('heading', e.target.value)}
+                />
+                <input
+                  type='text'
+                  value={editingArchive?.description || ''}
+                  onChange={(e) => handleEditingFieldChange('description', e.target.value)}
+                />
+                <button type='button' onClick={handleSaveClick}>
+                  save
+                </button>
+              </>
+            ) : (
+              <>
+                <h3>{archive.archive?.archiveInsert?.heading}</h3>
+                <h3>{archive.archive?.archiveInsert?.description}</h3>
+                <button type='button' onClick={() => handleEditClick(archive)}>
+                  edit
+                </button>
+              </>
+            )}
 
             <ArchivePaged
               filesUrl={filesUrl}
@@ -133,9 +194,8 @@ export const GetArchive: FC = () => {
               handleMediaSelection={handleMediaSelection}
               handleNewItemFieldChange={handleNewItemFieldChange}
               submitNewItem={submitNewItem}
+              fetchArchive={fetchArchive}
             />
-
-            <h3>{archive.archive?.archiveInsert?.description}</h3>
           </div>
         ))}
         <button type='button' onClick={goToNextPage} disabled={isLastPage}>

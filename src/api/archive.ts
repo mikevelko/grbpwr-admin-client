@@ -1,5 +1,5 @@
 import { adminService } from "./admin";
-import { AddArchiveRequest, AddArchiveResponse, GetArchivesPagedRequest, GetArchivesPagedResponse, AddArchiveItemsRequest, AddArchiveItemsResponse, DeleteArchiveByIdRequest, DeleteArchiveByIdResponse } from "./proto-http/admin";
+import { AddArchiveRequest, AddArchiveResponse, GetArchivesPagedRequest, GetArchivesPagedResponse, AddArchiveItemsRequest, AddArchiveItemsResponse, DeleteArchiveByIdRequest, DeleteArchiveByIdResponse, DeleteArchiveItemRequest, DeleteArchiveItemResponse, UpdateArchiveRequest, UpdateArchiveResponse } from "./proto-http/admin";
 
 export function addArchive(request: AddArchiveRequest): Promise<AddArchiveResponse> {
     return adminService.AddArchive(request)
@@ -17,3 +17,13 @@ export function addArchiveItem(request: AddArchiveItemsRequest): Promise<AddArch
 export function deleteArchive(request: DeleteArchiveByIdRequest): Promise<DeleteArchiveByIdResponse> {
     return adminService.DeleteArchiveById(request)
 }
+
+export function deleteItemFromArchive(request: DeleteArchiveItemRequest): Promise<DeleteArchiveItemResponse> {
+    return adminService.DeleteArchiveItem(request)
+}
+
+export function updateArchive(request: UpdateArchiveRequest): Promise<UpdateArchiveResponse> {
+    return adminService.UpdateArchive(request)
+}
+
+
