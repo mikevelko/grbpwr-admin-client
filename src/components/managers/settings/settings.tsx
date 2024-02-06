@@ -6,7 +6,7 @@ import {
   common_PaymentMethodNameEnum,
   common_ShipmentCarrierInsert,
 } from 'api/proto-http/admin';
-import { setPaymentMethod, setShipmentCarrier } from 'api/settings';
+import { setPaymentMethod } from 'api/settings';
 
 export const Settings: FC = () => {
   const [payment, setPayment] = useState<common_PaymentMethod[] | undefined>([]);
