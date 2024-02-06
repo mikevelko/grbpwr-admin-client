@@ -6,6 +6,7 @@ import { common_Media } from 'api/proto-http/admin';
 import { getAllUploadedFiles } from 'api/admin';
 import { Layout } from 'components/login/layout';
 import { ROUTES } from 'constants/routes';
+import styles from 'styles/addNewArchive.scss';
 
 export const Archive: FC = () => {
   const [newTitle, setNewTitle] = useState('');
@@ -16,7 +17,17 @@ export const Archive: FC = () => {
   const [newUrl, setNewUrl] = useState('');
   const [itemTitle, setItemTitle] = useState('');
   const [item, setItem] = useState<{ title: string; media: string; url: string }[]>([]);
+  const [urlVisibility, setUrlVisibility] = useState(false);
+  const [mediaVisibility, setMediaVisibility] = useState(false);
   const navigate = useNavigate();
+
+  const handleUrlVisibility = () => {
+    setUrlVisibility(!urlVisibility);
+  };
+
+  const handleMediaVisibility = () => {
+    setMediaVisibility(!mediaVisibility);
+  };
 
   const createArchive = async () => {
     const newArchive: AddArchiveRequest = {
@@ -79,41 +90,65 @@ export const Archive: FC = () => {
 
   return (
     <Layout>
-      <form>
-        <input type='text' value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+      <form className={styles.archive_form}>
+        <input
+          type='text'
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          placeholder='heading'
+        />
         <input
           type='text'
           value={newDescription}
           onChange={(e) => setNewDescription(e.target.value)}
+          placeholder='description'
         />
         <div>
-          <button>by url</button>
+          <button type='button' onClick={handleUrlVisibility} className={styles.button}>
+            by url
+          </button>
+          {urlVisibility && (
+            <input
+              type='text'
+              value={newMediaByUrl}
+              onChange={(e) => setNewMediaByUrl(e.target.value)}
+            />
+          )}
+          <button type='button' onClick={handleMediaVisibility} className={styles.button}>
+            media selector
+          </button>
+          {mediaVisibility && (
+            <ul>
+              {filesUrl.map((media, id) => (
+                <li key={id}>
+                  <img src={media} alt='' style={{ width: '100px', height: '100px' }} />
+                  <button type='button' onClick={() => handleSelectedMedia(media)}>
+                    ok
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
           <input
             type='text'
-            value={newMediaByUrl}
-            onChange={(e) => setNewMediaByUrl(e.target.value)}
+            value={newUrl}
+            onChange={(e) => setNewUrl(e.target.value)}
+            placeholder='url'
           />
-          <button>media selector</button>
-          <ul>
-            {filesUrl.map((media, id) => (
-              <li key={id}>
-                <img src={media} alt='' style={{ width: '100px', height: '100px' }} />
-                <button type='button' onClick={() => handleSelectedMedia(media)}>
-                  ok
-                </button>
-              </li>
-            ))}
-          </ul>
-          <input type='text' value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
-          <input type='text' value={itemTitle} onChange={(e) => setItemTitle(e.target.value)} />
-          <button type='button' onClick={addNewItem}>
+          <input
+            type='text'
+            value={itemTitle}
+            onChange={(e) => setItemTitle(e.target.value)}
+            placeholder='title'
+          />
+          <button type='button' onClick={addNewItem} className={styles.submit}>
             submit
           </button>
         </div>
-        <button type='button' onClick={createArchive}>
+        <button type='button' onClick={createArchive} className={styles.btn}>
           add archive
         </button>
-        <button type='button' onClick={navigateGetArchive}>
+        <button type='button' onClick={navigateGetArchive} className={styles.btn}>
           get archive
         </button>
       </form>

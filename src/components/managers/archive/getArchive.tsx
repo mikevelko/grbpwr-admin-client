@@ -18,15 +18,17 @@ export const GetArchive: FC = () => {
     [key: number]: common_ArchiveItemInsert;
   }>({});
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
+  const itemsPerPage = 1;
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(4); // or whatever page size you want
-  const [isLastPage, setIsLastPage] = useState(false);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const totalPages = Math.ceil((archive?.length ?? 0) / itemsPerPage);
   const [editingArchive, setEditingArchive] = useState<common_ArchiveInsert | null>(null);
   const [editItemId, setEditItemId] = useState<number | undefined>();
 
   const handleEditClick = (archive: common_ArchiveFull) => {
     setEditItemId(archive.archive?.id);
-    setEditingArchive(archive.archive?.archiveInsert || null); // Initialize editingArchive with current data
+    setEditingArchive(archive.archive?.archiveInsert || null);
   };
 
   const handleEditingFieldChange = (field: 'heading' | 'description', value: string) => {
@@ -45,39 +47,31 @@ export const GetArchive: FC = () => {
           id: editItemId,
           archive: editingArchive,
         });
-        setEditItemId(undefined); // Exit edit mode
-        setEditingArchive(null); // Reset editing archive
-        fetchArchive(); // Refresh the list
+        setEditItemId(undefined);
+        setEditingArchive(null);
+        fetchArchive();
       } catch (error) {
         console.error(error);
       }
     }
   };
 
-  const goToNextPage = () => {
-    if (!isLastPage) {
-      setCurrentPage((page) => page + 1);
-    }
+  const nextPage = () => {
+    setCurrentPage((currentPage) => Math.min(currentPage + 1, totalPages));
   };
 
-  const goToPreviousPage = () => {
-    setCurrentPage((page) => Math.max(page - 1, 1));
-    if (currentPage > 1) {
-      setIsLastPage(false); // Reset the isLastPage when going back
-    }
+  const prevPage = () => {
+    setCurrentPage((currentPage) => Math.max(currentPage - 1, 1));
   };
 
-  const fetchArchive = async (page = currentPage) => {
+  const fetchArchive = async () => {
     try {
-      const offset = (page - 1) * pageSize;
       const response = await getArchive({
-        limit: pageSize,
-        offset: offset,
+        limit: 5,
+        offset: 0,
         orderFactor: 'ORDER_FACTOR_ASC',
       });
       setArchive(response.archives);
-      const fetchedLength = response.archives?.length ?? 0;
-      setIsLastPage(fetchedLength < pageSize || fetchedLength === 0);
     } catch (error) {
       console.error(error);
     }
@@ -85,7 +79,7 @@ export const GetArchive: FC = () => {
 
   useEffect(() => {
     fetchArchive();
-  }, [currentPage, pageSize]);
+  }, [currentPage]);
 
   useEffect(() => {
     const fetchUploadedFiles = async () => {
@@ -153,13 +147,17 @@ export const GetArchive: FC = () => {
   return (
     <Layout>
       <div className={styles.archive_list_container}>
-        <button type='button' onClick={goToPreviousPage} disabled={currentPage === 1}>
+        <button type='button' onClick={prevPage} disabled={currentPage === 1}>
           <img src={arrow} style={{ rotate: '180deg' }} />
         </button>
-        {archive?.map((archive, archiveIdx) => (
-          <div key={archiveIdx} className={styles.list}>
-            <button type='button' onClick={() => removeArchive(archive.archive?.id)}>
-              delete
+        {archive?.slice(indexOfFirstItem, indexOfLastItem).map((archive, archiveIdx) => (
+          <div key={archiveIdx} className={styles.archive_info}>
+            <button
+              type='button'
+              onClick={() => removeArchive(archive.archive?.id)}
+              className={styles.delete_archive}
+            >
+              X
             </button>
             {editItemId === archive.archive?.id ? (
               <>
@@ -167,6 +165,15 @@ export const GetArchive: FC = () => {
                   type='text'
                   value={editingArchive?.heading || ''}
                   onChange={(e) => handleEditingFieldChange('heading', e.target.value)}
+                />
+                <ArchivePaged
+                  filesUrl={filesUrl}
+                  archive={archive}
+                  newItemsByArchiveId={newItemsByArchiveId}
+                  handleMediaSelection={handleMediaSelection}
+                  handleNewItemFieldChange={handleNewItemFieldChange}
+                  submitNewItem={submitNewItem}
+                  fetchArchive={fetchArchive}
                 />
                 <input
                   type='text'
@@ -180,25 +187,28 @@ export const GetArchive: FC = () => {
             ) : (
               <>
                 <h3>{archive.archive?.archiveInsert?.heading}</h3>
+                <ArchivePaged
+                  filesUrl={filesUrl}
+                  archive={archive}
+                  newItemsByArchiveId={newItemsByArchiveId}
+                  handleMediaSelection={handleMediaSelection}
+                  handleNewItemFieldChange={handleNewItemFieldChange}
+                  submitNewItem={submitNewItem}
+                  fetchArchive={fetchArchive}
+                />
                 <h3>{archive.archive?.archiveInsert?.description}</h3>
-                <button type='button' onClick={() => handleEditClick(archive)}>
+                <button
+                  type='button'
+                  onClick={() => handleEditClick(archive)}
+                  className={styles.edit_archive}
+                >
                   edit
                 </button>
               </>
             )}
-
-            <ArchivePaged
-              filesUrl={filesUrl}
-              archive={archive}
-              newItemsByArchiveId={newItemsByArchiveId}
-              handleMediaSelection={handleMediaSelection}
-              handleNewItemFieldChange={handleNewItemFieldChange}
-              submitNewItem={submitNewItem}
-              fetchArchive={fetchArchive}
-            />
           </div>
         ))}
-        <button type='button' onClick={goToNextPage} disabled={isLastPage}>
+        <button type='button' onClick={nextPage} disabled={currentPage === totalPages}>
           <img src={arrow} />
         </button>
       </div>
