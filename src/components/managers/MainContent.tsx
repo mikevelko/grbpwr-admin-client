@@ -27,6 +27,10 @@ export const Main: FC = () => {
     navigate({ to: ROUTES.archive, replace: true });
   };
 
+  const navigateSettings = () => {
+    navigate({ to: ROUTES.settings, replace: true });
+  };
+
   return (
     <Layout>
       <div className={styles.main}>
@@ -45,6 +49,9 @@ export const Main: FC = () => {
         </button>
         <button className={styles.btn} onClick={navigateArchive}>
           ARCHIVE
+        </button>
+        <button className={styles.btn} onClick={navigateSettings}>
+          SETTINGS
         </button>
       </div>
     </Layout>

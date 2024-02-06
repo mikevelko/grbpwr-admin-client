@@ -13,5 +13,6 @@ export enum ROUTES {
   getPromo = '/get-promo',
   archive = '/archive',
   createArchive = '/create-archive',
-  getArchive = '/get-archive'
+  getArchive = '/get-archive',
+  settings ='/settings'
 }
