@@ -1,5 +1,5 @@
 import { adminService } from "./admin";
-import { SetShipmentCarrierAllowanceRequest, SetShipmentCarrierAllowanceResponse, SetPaymentMethodAllowanceRequest, SetPaymentMethodAllowanceResponse, SetShipmentCarrierPriceRequest, SetShipmentCarrierPriceResponse } from "./proto-http/admin";
+import { SetShipmentCarrierAllowanceRequest, SetShipmentCarrierAllowanceResponse, SetPaymentMethodAllowanceRequest, SetPaymentMethodAllowanceResponse, SetShipmentCarrierPriceRequest, SetShipmentCarrierPriceResponse, SetSiteAvailabilityRequest, SetSiteAvailabilityResponse } from "./proto-http/admin";
 
 export function setShipmentCarrier(request: SetShipmentCarrierAllowanceRequest): Promise<SetShipmentCarrierAllowanceResponse> {
     return adminService.SetShipmentCarrierAllowance(request)
@@ -11,6 +11,10 @@ export function setPaymentMethod(request: SetPaymentMethodAllowanceRequest): Pro
 
 export function setShipmentCarrierPrice(request: SetShipmentCarrierPriceRequest): Promise<SetShipmentCarrierPriceResponse> {
     return adminService.SetShipmentCarrierPrice(request)
+}
+
+export function setSiteAvailability(request: SetSiteAvailabilityRequest): Promise<SetSiteAvailabilityResponse> {
+    return adminService.SetSiteAvailability(request)
 }
 
 

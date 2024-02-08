@@ -6,12 +6,19 @@ import {
   common_PaymentMethodNameEnum,
   common_ShipmentCarrierInsert,
 } from 'api/proto-http/admin';
-import { setPaymentMethod, setShipmentCarrier, setShipmentCarrierPrice } from 'api/settings';
+import {
+  setPaymentMethod,
+  setShipmentCarrier,
+  setShipmentCarrierPrice,
+  setSiteAvailability,
+} from 'api/settings';
+import styles from 'styles/settings.scss';
 
 export const Settings: FC = () => {
   const [payment, setPayment] = useState<common_PaymentMethod[] | undefined>([]);
   const [carrier, setCarrier] = useState<common_ShipmentCarrierInsert[]>([]);
   const [price, setPrice] = useState<{ [name: string]: string }>({});
+  const [siteEnabled, setSiteEnabled] = useState<boolean>();
 
   useEffect(() => {
     const fetchDictionary = async () => {
@@ -23,6 +30,7 @@ export const Settings: FC = () => {
         ).filter((c): c is common_ShipmentCarrierInsert => c !== undefined);
 
         setCarrier(carrierData);
+        setSiteEnabled(response.dictionary?.siteEnabled);
       } catch (error) {
         console.error(error);
       }
@@ -81,40 +89,70 @@ export const Settings: FC = () => {
     }
   };
 
+  const handleSiteAvailability = async (available: boolean) => {
+    try {
+      const response = await setSiteAvailability({
+        available,
+      });
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const cutUnusedPartOfPaymentName = (name: string | undefined) => {
     return name?.replace('PAYMENT_METHOD_NAME_ENUM_', '');
   };
   return (
     <Layout>
-      <div>
-        {payment?.map((m, id) => (
-          <div key={id}>
-            <h3>{cutUnusedPartOfPaymentName(m.name)}</h3>
-            <input
-              type='checkbox'
-              onChange={(e) => handlerPaymentMethod(m.name, e.target.checked)}
-            />
-          </div>
-        ))}
+      <div className={styles.container}>
+        <div className={styles.payment_methods}>
+          <h2>payment methods</h2>
+          {payment?.map((m, id) => (
+            <div key={id} className={styles.payment_wrapper}>
+              <h3>{cutUnusedPartOfPaymentName(m.name)}</h3>
+              <input
+                type='checkbox'
+                onChange={(e) => handlerPaymentMethod(m.name, e.target.checked)}
+              />
+            </div>
+          ))}
+        </div>
 
-        {carrier.map((c, id) => (
-          <div key={id}>
-            <h3>{c.carrier}</h3>
-            <input
-              type='checkbox'
-              checked={c.allowed}
-              onChange={(e) => handleShipmentCarrier(c.carrier, e.target.checked)}
-            />
-            <input
-              type='number'
-              defaultValue={c.price?.value}
-              onChange={(e) => handlePriceChange(c.carrier, e.target.value)}
-            />
-            <button type='button' onClick={() => handleShipmentCarrierPrice(c.carrier)}>
-              upload
-            </button>
-          </div>
-        ))}
+        <div className={styles.carrier_container}>
+          <h2>shipment carrier</h2>
+          {carrier.map((c, id) => (
+            <div key={id} className={styles.carrier_wrapper}>
+              <div className={styles.carrier_allowance}>
+                <h3>{c.carrier}</h3>
+                <input
+                  type='checkbox'
+                  checked={c.allowed}
+                  onChange={(e) => handleShipmentCarrier(c.carrier, e.target.checked)}
+                />
+              </div>
+              <div className={styles.carrier_price}>
+                <input
+                  type='number'
+                  defaultValue={c.price?.value}
+                  onChange={(e) => handlePriceChange(c.carrier, e.target.value)}
+                />
+                <button type='button' onClick={() => handleShipmentCarrierPrice(c.carrier)}>
+                  upload
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.site}>
+          <h2>site available</h2>
+          <input
+            type='checkbox'
+            checked={siteEnabled}
+            onChange={(e) => handleSiteAvailability(e.target.checked)}
+          />
+        </div>
       </div>
     </Layout>
   );
