@@ -6,11 +6,12 @@ import {
   common_PaymentMethodNameEnum,
   common_ShipmentCarrierInsert,
 } from 'api/proto-http/admin';
-import { setPaymentMethod } from 'api/settings';
+import { setPaymentMethod, setShipmentCarrier, setShipmentCarrierPrice } from 'api/settings';
 
 export const Settings: FC = () => {
   const [payment, setPayment] = useState<common_PaymentMethod[] | undefined>([]);
   const [carrier, setCarrier] = useState<common_ShipmentCarrierInsert[]>([]);
+  const [price, setPrice] = useState<{ [name: string]: string }>({});
 
   useEffect(() => {
     const fetchDictionary = async () => {
@@ -41,6 +42,45 @@ export const Settings: FC = () => {
     }
   };
 
+  const handleShipmentCarrier = async (carrier: string | undefined, allow: boolean) => {
+    try {
+      const response = await setShipmentCarrier({
+        carrier: carrier,
+        allow,
+      });
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleShipmentCarrierPrice = async (carrier: string | undefined) => {
+    if (!carrier) {
+      console.log('error');
+      return;
+    }
+    const newPrice = price[carrier];
+    if (newPrice) {
+      try {
+        const response = await setShipmentCarrierPrice({
+          carrier: carrier,
+          price: { value: newPrice },
+        });
+        console.log(response);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const handlePriceChange = (carrier: string | undefined, price: string) => {
+    if (carrier) {
+      setPrice((prev) => ({ ...prev, [carrier]: price }));
+    } else {
+      console.log('carrier not founf');
+    }
+  };
+
   const cutUnusedPartOfPaymentName = (name: string | undefined) => {
     return name?.replace('PAYMENT_METHOD_NAME_ENUM_', '');
   };
@@ -60,6 +100,19 @@ export const Settings: FC = () => {
         {carrier.map((c, id) => (
           <div key={id}>
             <h3>{c.carrier}</h3>
+            <input
+              type='checkbox'
+              checked={c.allowed}
+              onChange={(e) => handleShipmentCarrier(c.carrier, e.target.checked)}
+            />
+            <input
+              type='number'
+              defaultValue={c.price?.value}
+              onChange={(e) => handlePriceChange(c.carrier, e.target.value)}
+            />
+            <button type='button' onClick={() => handleShipmentCarrierPrice(c.carrier)}>
+              upload
+            </button>
           </div>
         ))}
       </div>
