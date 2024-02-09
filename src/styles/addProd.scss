@@ -1,19 +1,33 @@
 .form {
   display: grid;
-  grid-template-columns: repeat(1);
   align-items: center;
   justify-content: center;
-  gap: 72px;
+  gap: 20px;
   position: relative;
+
+  .submit {
+    border: none;
+    background-color: black;
+    color: #fff;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    text-transform: uppercase;
+    justify-self: center;
+    padding: 10px;
+    cursor: pointer;
+  }
 
   .product_container {
     display: grid;
+    gap: 5px;
 
     .title {
       justify-self: flex-start;
       color: #fff;
       background-color: black;
-      font-size: 35px;
+      font-size: 15px;
       font-style: normal;
       font-weight: 600;
       line-height: normal;
@@ -21,8 +35,8 @@
     }
 
     .product_input {
-      height: 69px;
-      width: 334px;
+      height: 29px;
+      width: 150px;
     }
   }
 }

@@ -167,8 +167,9 @@ export const AddProducts: FC = () => {
             name='description'
             id='descrip'
             value={product.product?.description}
-            cols={30}
-            rows={10}
+            cols={1}
+            rows={2}
+            style={{ width: '150px' }}
             onChange={handleInputChange}
           ></textarea>
         </div>
@@ -204,7 +205,9 @@ export const AddProducts: FC = () => {
 
         <Tags updateTags={updateTags} />
 
-        <button type='submit'>SUBMIT</button>
+        <button type='submit' className={styles.submit}>
+          SUBMIT
+        </button>
       </form>
     </Layout>
   );

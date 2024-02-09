@@ -1,135 +1,162 @@
 .hero {
     display: grid;
-    gap: 30px;
-    .section { 
-        width: 360px;
-        height: 360px;
+    gap: 50px;
+    margin: 70px 0 0 50px;
+
+    .main_container {
         display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 15px;
-        border: 2px solid #000000;
+        gap: 50px;
 
-        .btn {
-            color: #FFF;
-            background-color: #000000;
-            border: none;
-            font-family: Inter;
-            font-size: 35px;
-            font-style: normal;
-            font-weight: 600;
-            line-height: normal;
-            text-transform: uppercase;
-        }
-    }
-    
+        .section {
+            display: grid;
+            gap: 25px;
+            padding: 70px;
+            border: 1px solid black;
 
-    .files_list {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        border: 1px solid black;
-        position: relative;
 
-        button {
-            border: none;
-            background-color: white;
-        }
-
-        .add {
-            position: absolute;
-            top: 0;
-            right: 0;
-
-            button {
+            .btn {
+                border: none;
+                background-color: black;
+                color: white;
+                font-size: 25px;
                 text-transform: uppercase;
-                background-color: #000000;
-                color: #FFF;
+                justify-self: center;
             }
         }
 
-        li {
-            width: 157px;
-            height: 216px;
+        .files_list {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+
+            .arrow_wrapper {
+                .arrow_btn{
+                    background-color: white;
+                    border: none;
+                    cursor: pointer;
+
+                    .arrow {
+                        width: 30px;
+                        height: 30px;
+                    }
+                }
+            }
+
+            li {
+                width: 150px;
+                height: 270px;
+                border: 1px solid black;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+
+                img {
+                    height: 270px;
+                    width: 148px;
+                    object-fit:scale-down;
+                    object-position: center;
+                }
+
+                .transparent {
+                    opacity: 0.3;
+                }
+
+                button {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    border: none;
+                    background-color: black;
+                    color: white;
+                }
+            }
+        }
+    }
+
+    .ads_container {
+        display: flex;
+        gap: 50px;
+
+        .section{
+            display: grid;
+            gap: 25px;
+            padding: 70px;
             border: 1px solid black;
+
+
+            .btn {
+                border: none;
+                background-color: black;
+                color: white;
+                font-size: 25px;
+                text-transform: uppercase;
+                justify-self: center;
+            }
+        }
+
+        .files_list {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
             position: relative;
 
-            img {
-                object-fit: scale-down;
-                width: 155px;
-                height: 215px;
-            }
-            .transparent {
-                opacity: 0.2;;
-            }
-
-            button {
+            .add {
                 position: absolute;
-                display: none;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-            }
-
-            span {
-                position: absolute;
-                left: 0;
-                top: 0;
-            }
-            
-            .input_container {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-
-                input {
-                    width: 155px;
-                }
-            }
-
-            &:hover {
+                bottom: -20px;
+                left: 48%;
+                
                 button {
-                    display: block;
                     border: none;
+                    color: white;
+                    background-color: black;
+                    font-size: 15px;
                     text-transform: uppercase;
-                    background-color:black;
-                    color: #FFF;
                 }
             }
-        }
-    }
 
-    .page {
-        display: grid;
-        gap: 10px;
+            .arrow_wrapper {
+                .arrow_btn{
+                    background-color: white;
+                    border: none;
+                    cursor: pointer;
 
-        .products_carousel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+                    .arrow {
+                        width: 30px;
+                        height: 30px;
+                    }
+                }
+            }
 
-            .product_list {
+            li {
+                width: 150px;
+                height: 270px;
+                border: 1px solid black;
                 display: flex;
-                gap: 50px;
+                justify-content: center;
+                align-items: center;
+                position: relative;
 
-                li {
-                    width: 157px;
-                    height: 216px;
-                    border: 1px solid black;
-                    position: relative;
+                img {
+                    height: 270px;
+                    width: 148px;
+                    object-fit:scale-down;
+                    object-position: center;
+                }
 
-                    img {
-                        object-fit: scale-down;
-                        width: 155px;
-                        height: 200px;
-                    }
+                .transparent {
+                    opacity: 0.3;
+                }
 
-                    h5 {
-                        position: absolute;
-                        right: 0;
-                        bottom: 0;
-                    }
+                button {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    border: none;
+                    background-color: black;
+                    color: white;
                 }
             }
         }

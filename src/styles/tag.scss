@@ -1,10 +1,11 @@
 .tag_wrapper {
     display: grid;
+    gap: 5px;
 
     .tag_title {
         color: #FFF;
         background-color: black;
-        font-size: 35px;
+        font-size: 15px;
         font-style: normal;
         font-weight: 600;
         line-height: normal;
@@ -16,19 +17,19 @@
         display: flex;
 
         .tag_input {
-            width: 334px;
-            height: 69px;
+            width: 150px;
+            height: 29px;
             flex-shrink: 0;
             margin-right: 15px;
-            font-size: 35px;
+            font-size: 15px;
         }
 
         .tag_container_btn {
-            align-self: center;
-            padding: 10px;
+            border: none;
+            padding: 0 5px 0 5px;
             color: #FFF;
             background-color: black;
-            font-size: 35px;
+            font-size: 15px;
             font-style: normal;
             font-weight: 600;
             line-height: normal;
@@ -37,12 +38,12 @@
     }
 
     .tags_popup {
-        margin-top: 15px;
+        // margin-top: 15px;
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: 1fr 1fr;
         gap: 15px;
-        width: 465px;
+        width: 265px;
         height: 135px;
         overflow-y: scroll;
         border: 2px solid black;

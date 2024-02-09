@@ -1,12 +1,13 @@
 .thumbnail_wrapper {
     display: grid;
+    gap: 5px;
     position: relative;
 
     .thumbnail_title {
         justify-self: flex-start;
         color: #FFF;
         background-color: black;
-        font-size: 35px;
+        font-size: 15px;
         font-style: normal;
         font-weight: 600;
         line-height: normal;
@@ -14,55 +15,39 @@
     }
 
     .thumbnail_container {
-        border: 2px solid black;
-        padding: 118px 0;
-        width: 458px;
-        height: 458px;
-        display: grid;
-        justify-items: center;
-        align-items: center;
-        gap: 48px;
         position: relative;
+        width: 250px;
+        padding: 65px 0 65px 0;
+        display: grid;
+        gap: 15px;
+        justify-content: center;
+        border: 1px solid black;
 
         .thumbnail_btn {
             color: #FFF;
             background-color: black;
-            font-size: 35px;
+            font-size: 15px;
             font-style: normal;
             font-weight: 600;
             line-height: normal;
             text-transform: uppercase;
+            border: none;
+            justify-self: center;
 
-        }
-
-        .by_url_left {
-            transform: translateX(-150px);
-        }
-
-        .by_url_container {
-            top: 26%;
-            right: 10px;
-            position: absolute;
-
-            .by_url_input {
-                height: 45px;
-                width: 270px;
-                font-size: 25px;
-            }
         }
 
     }
 
     .thumbnail_uploaded_media_wrapper {
         position: absolute;
-        left: 120%;
+        left: 100%;
         top: 8%;
         width: 343px;
-        height: 460px;
+        height: 220px;
+        border: 1px solid black;
         padding: 5px;
-        border: 2px solid black;
-        display: grid;
-        grid-template-columns: repeat(1);
+        display: flex;
+        flex-wrap: nowrap;
 
         .media_selector_add {
             position: absolute;
@@ -85,7 +70,6 @@
         .thhumbnail_uploaded_media_container {
             display: flex;
             flex-wrap: wrap;
-            height: 450px;
             overflow-y: scroll;
             gap: 15px;
 

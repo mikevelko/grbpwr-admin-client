@@ -7,10 +7,11 @@ import { ListObjectsPagedRequest } from 'api/proto-http/admin';
 import { Layout } from 'components/login/layout';
 
 const fileExtensionToContentType: { [key: string]: string } = {
-  jpg: 'image/jpeg',
+  jpg: 'image/jpg',
   png: 'image/png',
   webm: 'video/webm',
   mp4: 'video/mp4',
+  jpeg: 'image/jpeg',
   // Add more mappings as needed
 };
 

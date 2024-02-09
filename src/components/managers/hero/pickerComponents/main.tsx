@@ -67,7 +67,7 @@ export const MainHero: FC<MainProps> = ({
     setUrl('');
   };
   return (
-    <div style={{ display: 'flex', gap: '20px' }}>
+    <div className={styles.main_container}>
       <div className={styles.section}>
         <button type='button' onClick={handleInputFieldVisibility} className={styles.btn}>
           by url
@@ -109,34 +109,26 @@ export const MainHero: FC<MainProps> = ({
           </div>
         )}
       </div>
-      {mediaSelectorVisibility && (
-        <>
-          <ul className={styles.files_list}>
-            <div>
-              <button type='button' onClick={prevPage}>
-                <img src={arrow} alt='' style={{ rotate: '180deg' }} />
-              </button>
-            </div>
-            {totalItems.map((media, index) => (
-              <li key={index}>
-                <img
-                  src={media}
-                  alt=''
-                  className={media === selectedImage ? styles.transparent : ''}
-                />
-                <button type='button' onClick={() => handleSelectImage(media)}>
-                  ok
-                </button>
-              </li>
-            ))}
-            <div>
-              <button type='button' onClick={nextPage}>
-                <img src={arrow} alt='' />
-              </button>
-            </div>
-          </ul>
-        </>
-      )}
+      <ul className={styles.files_list}>
+        <div className={styles.arrow_wrapper}>
+          <button type='button' onClick={prevPage} className={styles.arrow_btn}>
+            <img src={arrow} alt='' style={{ rotate: '180deg' }} className={styles.arrow} />
+          </button>
+        </div>
+        {totalItems.map((media, index) => (
+          <li key={index}>
+            <img src={media} alt='' className={media === selectedImage ? styles.transparent : ''} />
+            <button type='button' onClick={() => handleSelectImage(media)}>
+              ok
+            </button>
+          </li>
+        ))}
+        <div className={styles.arrow_wrapper}>
+          <button type='button' onClick={nextPage} className={styles.arrow_btn}>
+            <img src={arrow} alt='' className={styles.arrow} />
+          </button>
+        </div>
+      </ul>
     </div>
   );
 };

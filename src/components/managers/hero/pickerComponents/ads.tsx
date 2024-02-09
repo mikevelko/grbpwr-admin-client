@@ -58,7 +58,7 @@ export const Ads: FC<AdsProps> = ({
   };
 
   return (
-    <div style={{ display: 'flex', gap: '20px' }}>
+    <div className={styles.ads_container}>
       <div className={styles.section}>
         <button type='button' onClick={handleThumbnail} className={styles.btn}>
           by url
@@ -87,64 +87,59 @@ export const Ads: FC<AdsProps> = ({
         <button type='button' onClick={handleViewAll} className={styles.btn}>
           Media Selector
         </button>
+
+        <button type='button' className={styles.btn}>
+          upload new
+        </button>
       </div>
-      {showMediaSelector && (
-        <>
-          <ul className={styles.files_list}>
-            <div>
-              <button type='button' onClick={prevPage}>
-                <img src={arrow} alt='' style={{ rotate: '180deg' }} />
-              </button>
-            </div>
-            {files.map((url, index) => (
-              <li key={index}>
-                <input
-                  type='checkbox'
-                  checked={selectedImage.includes(url)}
-                  onChange={() => select(url)}
-                  id={`${index}`}
-                  style={{ display: 'none' }}
-                />
-                <label htmlFor={`${index}`}>
-                  {selectedImage.includes(url) ? (
-                    <span>{selectedImage.indexOf(url) + 1}</span>
-                  ) : null}
-                  <img key={index} src={url} alt={url} />
-                  {selectedImage.includes(url) && (
-                    <div className={styles.input_container}>
-                      <input
-                        type='text'
-                        placeholder='explore text'
-                        value={exploreTextMap[url] || ''}
-                        onChange={(e) => handleExploreTextChange(url, e.target.value)}
-                      />
-                      <input
-                        type='text'
-                        placeholder='explore link'
-                        value={exploreLinkMap[url] || ''}
-                        onChange={(e) => handleExploreLinkChange(url, e.target.value)}
-                      />
-                    </div>
-                  )}
-                </label>
-              </li>
-            ))}
-            <div>
-              <button type='button' onClick={nextPage}>
-                <img src={arrow} alt='' />
-              </button>
-            </div>
-            <div className={styles.add}>
-              <button type='button' onClick={handleAddToAds}>
-                add
-              </button>
-            </div>
-          </ul>
-        </>
-      )}
-      {/* <button type='button' onClick={addNewHero}>
-        ok
-      </button> */}
+      <ul className={styles.files_list}>
+        <div className={styles.arrow_wrapper}>
+          <button type='button' onClick={prevPage} className={styles.arrow_btn}>
+            <img src={arrow} alt='' style={{ rotate: '180deg' }} className={styles.arrow} />
+          </button>
+        </div>
+        {files.map((url, index) => (
+          <li key={index}>
+            <input
+              type='checkbox'
+              checked={selectedImage.includes(url)}
+              onChange={() => select(url)}
+              id={`${index}`}
+              style={{ display: 'none' }}
+            />
+            <label htmlFor={`${index}`}>
+              {selectedImage.includes(url) ? <span>{selectedImage.indexOf(url) + 1}</span> : null}
+              <img key={index} src={url} alt={url} />
+              {selectedImage.includes(url) && (
+                <div className={styles.input_container}>
+                  <input
+                    type='text'
+                    placeholder='explore text'
+                    value={exploreTextMap[url] || ''}
+                    onChange={(e) => handleExploreTextChange(url, e.target.value)}
+                  />
+                  <input
+                    type='text'
+                    placeholder='explore link'
+                    value={exploreLinkMap[url] || ''}
+                    onChange={(e) => handleExploreLinkChange(url, e.target.value)}
+                  />
+                </div>
+              )}
+            </label>
+          </li>
+        ))}
+        <div className={styles.arrow_wrapper}>
+          <button type='button' onClick={nextPage} className={styles.arrow_btn}>
+            <img src={arrow} alt='' className={styles.arrow} />
+          </button>
+        </div>
+        <div className={styles.add}>
+          <button type='button' onClick={handleAddToAds}>
+            add
+          </button>
+        </div>
+      </ul>
     </div>
   );
 };

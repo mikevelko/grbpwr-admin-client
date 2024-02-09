@@ -7,20 +7,20 @@ import { HeroProducts } from './page/heroProducts';
 import styles from 'styles/hero.scss';
 
 interface HeroProductsProps {
-  //   addNewHero: () => void;
   productIds: number[];
   setProductIds: (value: number[]) => void;
 }
 
-export const HeroPageProduct: FC<HeroProductsProps> = ({
-  //   addNewHero,
-  productIds,
-  setProductIds,
-}) => {
+export const HeroPageProduct: FC<HeroProductsProps> = ({ productIds, setProductIds }) => {
   const [products, setProducts] = useState<common_Product[] | undefined>([]);
+  const [showProduct, setShowProducts] = useState(false);
   const [filter, setFilter] = useState<GetProductsPagedRequest>(initialFilter);
   const [currentPage, setCurrentPage] = useState(1);
   const calculateOffset = (page: number, limit: number) => (page - 1) * limit;
+
+  const handleProductVisibility = () => {
+    setShowProducts(!showProduct);
+  };
 
   useEffect(() => {
     fetchData();
@@ -52,17 +52,26 @@ export const HeroPageProduct: FC<HeroProductsProps> = ({
     <div className={styles.page}>
       <div className={styles.products_carousel}>
         <div>
-          <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage <= 1}>
-            1
+          <button type='button' onClick={handleProductVisibility}>
+            list products
           </button>
-        </div>
-        <HeroProducts
-          products={products}
-          productClick={handleProductClick}
-          showHidden={filter.showHidden}
-        />
-        <div>
-          <button onClick={() => setCurrentPage(currentPage + 1)}>2</button>
+          {showProduct && (
+            <div>
+              <div>
+                <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage <= 1}>
+                  1
+                </button>
+              </div>
+              <HeroProducts
+                products={products}
+                productClick={handleProductClick}
+                showHidden={filter.showHidden}
+              />
+              <div>
+                <button onClick={() => setCurrentPage(currentPage + 1)}>2</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
