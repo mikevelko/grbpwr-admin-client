@@ -162,11 +162,6 @@ export const MediaPicker: FC = () => {
   const handleThumbnail = () => {
     setThumbnailInput(!thumbnailInput);
   };
-
-  const watchHero = () => {
-    navigate({ to: ROUTES.fullHero, replace: true });
-  };
-
   return (
     <form onSubmit={addNewHero} className={styles.hero}>
       <MainHero
@@ -201,9 +196,6 @@ export const MediaPicker: FC = () => {
       <HeroPageProduct productIds={productIds} setProductIds={setProductIds} />
       <button type='submit' style={{ justifySelf: 'center' }}>
         add hero
-      </button>
-      <button type='button' onClick={watchHero}>
-        get hero
       </button>
     </form>
   );

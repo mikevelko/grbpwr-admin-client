@@ -146,10 +146,6 @@
                     object-position: center;
                 }
 
-                .transparent {
-                    opacity: 0.3;
-                }
-
                 button {
                     position: absolute;
                     top: 0;
@@ -157,6 +153,25 @@
                     border: none;
                     background-color: black;
                     color: white;
+                }
+
+                label {
+                    span {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                    }
+
+                    .input_container {
+                        position: absolute;
+                        bottom: 0;
+                        display: grid;
+                        gap: 5px;
+
+                        input {
+                            width: 149px;
+                        }
+                    }
                 }
             }
         }

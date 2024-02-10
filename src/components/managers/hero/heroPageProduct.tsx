@@ -14,12 +14,26 @@ interface HeroProductsProps {
 export const HeroPageProduct: FC<HeroProductsProps> = ({ productIds, setProductIds }) => {
   const [products, setProducts] = useState<common_Product[] | undefined>([]);
   const [showProduct, setShowProducts] = useState(false);
+  const [showIdInput, setShowIdInput] = useState(false);
+  const [idInput, setIdInput] = useState('');
   const [filter, setFilter] = useState<GetProductsPagedRequest>(initialFilter);
   const [currentPage, setCurrentPage] = useState(1);
   const calculateOffset = (page: number, limit: number) => (page - 1) * limit;
 
+  const handleIdInput = () => {
+    const productId = parseInt(idInput, 10);
+    if (!isNaN(productId) && !productIds.includes(productId)) {
+      setProductIds([...productIds, productId]);
+      setIdInput('');
+    }
+  };
+
   const handleProductVisibility = () => {
     setShowProducts(!showProduct);
+  };
+
+  const handleIdInputVisibility = () => {
+    setShowIdInput(!showIdInput);
   };
 
   useEffect(() => {
@@ -49,8 +63,8 @@ export const HeroPageProduct: FC<HeroProductsProps> = ({ productIds, setProductI
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.products_carousel}>
+    <div className={styles.list_product_by_ids}>
+      <div className={styles.products_container}>
         <div>
           <button type='button' onClick={handleProductVisibility}>
             list products
@@ -70,6 +84,24 @@ export const HeroPageProduct: FC<HeroProductsProps> = ({ productIds, setProductI
               <div>
                 <button onClick={() => setCurrentPage(currentPage + 1)}>2</button>
               </div>
+            </div>
+          )}
+        </div>
+        <div>
+          <button type='button' onClick={handleIdInputVisibility}>
+            add by id
+          </button>
+          {showIdInput && (
+            <div>
+              <input
+                type='text'
+                placeholder='enter id'
+                value={idInput}
+                onChange={(e) => setIdInput(e.target.value)}
+              />
+              <button type='button' onClick={handleIdInput}>
+                add
+              </button>
             </div>
           )}
         </div>
