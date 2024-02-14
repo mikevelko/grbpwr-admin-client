@@ -19,18 +19,36 @@ export const MediaManager: FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState<boolean>(false); // Added state for dragging
   const navigate = useNavigate();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>,
+  ) => {
+    let files;
+    if ('dataTransfer' in event) {
+      event.preventDefault();
+      setIsDragging(false);
+      if (event.dataTransfer) {
+        files = event.dataTransfer.files;
+      }
+    } else {
+      files = (event.target as HTMLInputElement).files;
+    }
+
+    if (files && files.length > 0) {
       const selectedFile = files[0];
       setSelectedFiles(Array.from(files));
 
-      // Create a URL for the selected file and set it in state
       const fileUrl = URL.createObjectURL(selectedFile);
       setSelectedFileUrl(fileUrl);
     }
+  };
+
+  const handleDrag = (event: React.DragEvent<HTMLDivElement>, dragging: boolean) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(dragging);
   };
 
   const handleViewAll = async () => {
@@ -72,7 +90,6 @@ export const MediaManager: FC = () => {
       navigate({ to: `${ROUTES.all}?${queryParams.toString()}`, replace: true });
 
       setUploadedFiles(filesFromResponse);
-      navigate({ to: ROUTES.all, replace: true });
     } catch (error) {
       console.error('Error fetching uploaded files:', error);
     }
@@ -87,7 +104,6 @@ export const MediaManager: FC = () => {
   }
 
   const handleUpload = async () => {
-    // Check if there are selected files and a name entered
     if (selectedFiles.length === 0) {
       alert('Please select a file to upload.');
       return;
@@ -102,7 +118,6 @@ export const MediaManager: FC = () => {
 
     localStorage.setItem('name', fileName);
 
-    // Read the selected file as Base64 data
     const selectedFile = selectedFiles[0];
     const fileExtension = (selectedFile.name.split('.').pop() || '').toLowerCase();
     console.log('File extension:', fileExtension);
@@ -160,7 +175,13 @@ export const MediaManager: FC = () => {
       <div className={styles.media_wrapper}>
         <div className={styles.media_container}>
           <h2 className={styles.media_title}>MEDIA MANAGER</h2>
-          <div className={styles.drop_container}>
+          <div
+            className={`${styles.drop_container} ${isDragging ? styles.dragging : ''}`} // Conditional class for visual feedback
+            onDragOver={(e) => handleDrag(e, true)}
+            onDragEnter={(e) => handleDrag(e, true)}
+            onDragLeave={(e) => handleDrag(e, false)}
+            onDrop={handleFileChange} // Reuse the file change handler for the drop event
+          >
             {!selectedFileUrl && (
               <label htmlFor='files' className={styles.drop_title}>
                 DRAG AND DROP
@@ -173,6 +194,7 @@ export const MediaManager: FC = () => {
               onChange={handleFileChange}
               id='files'
               className={styles.files}
+              style={{ display: 'none' }} // Hide the input but keep it in the DOM for accessibility
             />
             {selectedFileUrl && selectedFileUrl.startsWith('blob:') && (
               <div className={styles.preview}>

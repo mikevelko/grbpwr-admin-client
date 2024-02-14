@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { getHero } from 'api/hero';
 import { common_HeroFull } from 'api/proto-http/admin';
-import { get } from 'jquery';
+import { Layout } from 'components/login/layout';
 
 export const GetHero: FC = () => {
   const [hero, setHero] = useState<common_HeroFull>();
@@ -18,25 +18,27 @@ export const GetHero: FC = () => {
     fetchHero();
   }, []);
   return (
-    <div>
+    <Layout>
       <div>
-        <h3>MAIN</h3>
-        <img src={hero?.main?.exploreLink} alt='' style={{ width: '100px', height: '100px' }} />
-        <p>{hero?.main?.exploreText}</p>
-        <p>{hero?.main?.exploreLink}</p>
+        <div>
+          <h3>MAIN</h3>
+          <img src={hero?.main?.exploreLink} alt='' style={{ width: '100px', height: '100px' }} />
+          <p>{hero?.main?.exploreText}</p>
+          <p>{hero?.main?.exploreLink}</p>
+        </div>
+        <div>
+          <h3>ADS</h3>
+          <ul>
+            {hero?.ads?.map((ad, id) => (
+              <li key={id}>
+                <img src={ad.contentLink} alt='' style={{ width: '100px', height: '100px' }} />
+                <p>{ad.exploreText}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>{hero?.createdAt}</div>
       </div>
-      <div>
-        <h3>ADS</h3>
-        <ul>
-          {hero?.ads?.map((ad, id) => (
-            <li key={id}>
-              <img src={ad.contentLink} alt='' style={{ width: '100px', height: '100px' }} />
-              <p>{ad.exploreText}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div>{hero?.createdAt}</div>
-    </div>
+    </Layout>
   );
 };

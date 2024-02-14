@@ -1,14 +1,14 @@
 import { getAllUploadedFiles } from 'api/admin';
 import { addHero } from 'api/hero';
-import { common_HeroFull, common_HeroInsert, common_Media } from 'api/proto-http/admin';
+import { common_HeroInsert, common_Media } from 'api/proto-http/admin';
 import { Ads } from './pickerComponents/ads';
 import { MainHero } from './pickerComponents/main';
 import { HeroPageProduct } from './heroPageProduct';
-import { useNavigate } from '@tanstack/react-location';
 import styles from 'styles/hero.scss';
+import { Layout } from 'components/login/layout';
 import React, { FC, useState, useEffect } from 'react';
-import { ROUTES } from 'constants/routes';
 
+// move in separate file ?
 const determineContentType = (link: string) => {
   const extension = link.split('.').pop()?.toLowerCase() ?? '';
   if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
@@ -20,16 +20,12 @@ const determineContentType = (link: string) => {
 };
 
 export const MediaPicker: FC = () => {
-  const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState<string[]>([]);
-  const [thumbnailInput, setThumbnailInput] = useState(false);
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
-  const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [mediaNumber, setMediaNumber] = useState<number[]>([]);
   const [exploreTextMap, setExploreTextMap] = useState<Record<string, string>>({});
   const [exploreLinkMap, setExploreLinktMap] = useState<Record<string, string>>({});
   const [productIds, setProductIds] = useState<number[]>([]);
-  const [hero, setHero] = useState<common_HeroFull>();
 
   const [main, setMain] = useState<common_HeroInsert>({
     contentLink: '',
@@ -52,7 +48,6 @@ export const MediaPicker: FC = () => {
     setAds((prevAds) => [...prevAds, newAd]);
     setNewAdUrl('');
     setNewExploreText('');
-    setThumbnailInput(false);
   };
 
   const handleMainExploreTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,10 +129,6 @@ export const MediaPicker: FC = () => {
     }
   };
 
-  const handleViewAll = () => {
-    setShowMediaSelector(!showMediaSelector);
-  };
-
   useEffect(() => {
     const fetchUploadedFiles = async () => {
       try {
@@ -159,44 +150,40 @@ export const MediaPicker: FC = () => {
     fetchUploadedFiles();
   }, []);
 
-  const handleThumbnail = () => {
-    setThumbnailInput(!thumbnailInput);
-  };
+  // remove
   return (
-    <form onSubmit={addNewHero} className={styles.hero}>
-      <MainHero
-        filesUrl={filesUrl}
-        handleMainByUrlOrFile={handleMainByUrlOrFile}
-        handleMainExploreText={handleMainExploreTextChange}
-        exploreText={main.exploreText}
-        handleMainExploreLink={handleMainExploreLinkChange}
-        exploreLink={main.exploreLink}
-      />
-      {/* TODO: remove unnessary properties in ads file */}
-      <Ads
-        filesUrl={filesUrl}
-        selectedImage={selectedImage}
-        handleThumbnail={handleThumbnail}
-        thumbnailInput={thumbnailInput}
-        newAdUrl={newAdUrl}
-        setNewAdUrl={setNewAdUrl}
-        newExploreText={newExploreText}
-        setNewExploreText={setNewExploreText}
-        handleAddByUrl={handleAddByUrl}
-        handleViewAll={handleViewAll}
-        showMediaSelector={showMediaSelector}
-        select={select}
-        exploreTextMap={exploreTextMap}
-        exploreLinkMap={exploreLinkMap}
-        handleExploreLinkChange={handleExploreLinkChange}
-        handleExploreTextChange={handleExploreTextChange}
-        handleAddToAds={handleAddToAds}
-      />
+    <Layout>
+      <form onSubmit={addNewHero} className={styles.hero}>
+        <MainHero
+          filesUrl={filesUrl}
+          handleMainByUrlOrFile={handleMainByUrlOrFile}
+          handleMainExploreText={handleMainExploreTextChange}
+          exploreText={main.exploreText}
+          handleMainExploreLink={handleMainExploreLinkChange}
+          exploreLink={main.exploreLink}
+        />
+        {/* TODO: remove unnessary properties in ads file */}
+        <Ads
+          filesUrl={filesUrl}
+          selectedImage={selectedImage}
+          newAdUrl={newAdUrl}
+          setNewAdUrl={setNewAdUrl}
+          newExploreText={newExploreText}
+          setNewExploreText={setNewExploreText}
+          handleAddByUrl={handleAddByUrl}
+          select={select}
+          exploreTextMap={exploreTextMap}
+          exploreLinkMap={exploreLinkMap}
+          handleExploreLinkChange={handleExploreLinkChange}
+          handleExploreTextChange={handleExploreTextChange}
+          handleAddToAds={handleAddToAds}
+        />
 
-      <HeroPageProduct productIds={productIds} setProductIds={setProductIds} />
-      <button type='submit' style={{ justifySelf: 'center' }}>
-        add hero
-      </button>
-    </form>
+        <HeroPageProduct productIds={productIds} setProductIds={setProductIds} />
+        <button type='submit' className={styles.add_btn}>
+          add hero
+        </button>
+      </form>
+    </Layout>
   );
 };

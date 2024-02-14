@@ -54,13 +54,6 @@ export function addProduct(product: AddProductRequest): Promise<AddProductRespon
 export function getProductsPaged(
   request: GetProductsPagedRequest,
 ): Promise<GetProductsPagedResponse> {
-  // Object.keys(request).forEach((key) => {
-  //   const typedKey = key as keyof GetProductsPagedRequest;
-  //   if (request[typedKey] === undefined) {
-  //     console.log('test', typedKey);
-  //     delete request[typedKey];
-  //   }
-  // });
   return adminService.GetProductsPaged(request);
 }
 

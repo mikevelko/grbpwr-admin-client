@@ -9,17 +9,26 @@ interface ProductProps {
 }
 
 export const HeroProducts: FC<ProductProps> = ({ products, productClick, showHidden }) => {
-  const [hoveredProductId, setHoveredProductId] = useState<number | undefined>(undefined);
+  const [selectedProductId, setSelectedProductId] = useState<number | undefined>(undefined);
+
+  const handleProductClick = (productId: number | undefined) => {
+    if (selectedProductId === productId) {
+      setSelectedProductId(undefined);
+    } else {
+      setSelectedProductId(productId);
+    }
+    productClick(productId);
+  };
 
   return (
     <ul className={styles.product_list}>
       {products?.map((product) => (
         <li
           key={product.id}
-          onMouseEnter={() => setHoveredProductId(product.id)}
-          onMouseLeave={() => setHoveredProductId(undefined)}
-          onClick={() => productClick(product.id)}
-          className={`${product.productInsert?.hidden && showHidden ? styles.hidden_product : ''}`}
+          onClick={() => handleProductClick(product.id)}
+          className={`${product.productInsert?.hidden && showHidden ? styles.hidden_product : ''} ${
+            selectedProductId === product.id ? styles.selected_product : ''
+          }`}
         >
           <img src={product.productInsert?.thumbnail} alt='Product Image' />
           <h5>

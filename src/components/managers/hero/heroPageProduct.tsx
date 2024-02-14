@@ -5,6 +5,7 @@ import { initialFilter } from '../product/componentsOfPageProduct/initialFilterS
 import { GetProductsPagedResponse } from 'api/proto-http/admin';
 import { HeroProducts } from './page/heroProducts';
 import styles from 'styles/hero.scss';
+import arrow from 'img/arrow-right.jpg';
 
 interface HeroProductsProps {
   productIds: number[];
@@ -63,32 +64,14 @@ export const HeroPageProduct: FC<HeroProductsProps> = ({ productIds, setProductI
   };
 
   return (
-    <div className={styles.list_product_by_ids}>
-      <div className={styles.products_container}>
-        <div>
-          <button type='button' onClick={handleProductVisibility}>
+    <div className={styles.ids_container}>
+      <div className={styles.ids_wrapper}>
+        <h2 className={styles.ids_title}>ids</h2>
+        <div className={styles.ids}>
+          <button type='button' className={styles.btn} onClick={handleProductVisibility}>
             list products
           </button>
-          {showProduct && (
-            <div>
-              <div>
-                <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage <= 1}>
-                  1
-                </button>
-              </div>
-              <HeroProducts
-                products={products}
-                productClick={handleProductClick}
-                showHidden={filter.showHidden}
-              />
-              <div>
-                <button onClick={() => setCurrentPage(currentPage + 1)}>2</button>
-              </div>
-            </div>
-          )}
-        </div>
-        <div>
-          <button type='button' onClick={handleIdInputVisibility}>
+          <button type='button' className={styles.btn} onClick={handleIdInputVisibility}>
             add by id
           </button>
           {showIdInput && (
@@ -104,8 +87,30 @@ export const HeroPageProduct: FC<HeroProductsProps> = ({ productIds, setProductI
               </button>
             </div>
           )}
+          <button type='button' className={styles.btn}>
+            upload new
+          </button>
         </div>
       </div>
+      {showProduct && (
+        <div className={styles.pagination_wrapper}>
+          <div className={styles.pagination}>
+            <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage <= 1}>
+              <img src={arrow} alt='' style={{ rotate: '180deg' }} />
+            </button>
+          </div>
+          <HeroProducts
+            products={products}
+            productClick={handleProductClick}
+            showHidden={filter.showHidden}
+          />
+          <div className={styles.pagination}>
+            <button onClick={() => setCurrentPage(currentPage + 1)}>
+              <img src={arrow} alt='' />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

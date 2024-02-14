@@ -67,68 +67,77 @@ export const MainHero: FC<MainProps> = ({
     setUrl('');
   };
   return (
-    <div className={styles.main_container}>
-      <div className={styles.section}>
-        <button type='button' onClick={handleInputFieldVisibility} className={styles.btn}>
-          by url
-        </button>
-        {inputFieldVisibility && (
-          <div>
-            <input
-              type='text'
-              placeholder='by url'
-              name='contentLink'
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
-            <button type='button' onClick={handleMainByUrl}>
-              ok
+    <>
+      <div className={styles.main_container}>
+        <div className={styles.section_wrapper}>
+          <h2 className={styles.section_title}>main</h2>
+          <div className={styles.section}>
+            <button type='button' onClick={handleInputFieldVisibility} className={styles.btn}>
+              by url
+            </button>
+            {inputFieldVisibility && (
+              <div>
+                <input
+                  type='text'
+                  placeholder='by url'
+                  name='contentLink'
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                />
+                <button type='button' onClick={handleMainByUrl}>
+                  ok
+                </button>
+              </div>
+            )}
+            <button type='button' onClick={handleMediaSelectorVisibility} className={styles.btn}>
+              media selector
+            </button>
+            <button type='button' onClick={handleExploreVisibility} className={styles.btn}>
+              explore
+            </button>
+            {exploreVisibility && (
+              <div>
+                <input
+                  type='text'
+                  name='exploreText'
+                  value={exploreText}
+                  onChange={handleMainExploreText}
+                />
+                <input
+                  type='text'
+                  name='exploreLink'
+                  value={exploreLink}
+                  onChange={handleMainExploreLink}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+        <ul className={styles.files_list}>
+          <div className={styles.arrow_wrapper}>
+            <button type='button' onClick={prevPage} className={styles.arrow_btn}>
+              <img src={arrow} alt='' style={{ rotate: '180deg' }} className={styles.arrow} />
             </button>
           </div>
-        )}
-        <button type='button' onClick={handleMediaSelectorVisibility} className={styles.btn}>
-          media selector
-        </button>
-        <button type='button' onClick={handleExploreVisibility} className={styles.btn}>
-          explore
-        </button>
-        {exploreVisibility && (
-          <div>
-            <input
-              type='text'
-              name='exploreText'
-              value={exploreText}
-              onChange={handleMainExploreText}
-            />
-            <input
-              type='text'
-              name='exploreLink'
-              value={exploreLink}
-              onChange={handleMainExploreLink}
-            />
+          {totalItems.map((media, index) => (
+            <li key={index}>
+              <img
+                src={media}
+                alt=''
+                className={media === selectedImage ? styles.transparent : ''}
+              />
+              <button type='button' onClick={() => handleSelectImage(media)}>
+                ok
+              </button>
+            </li>
+          ))}
+          <div className={styles.arrow_wrapper}>
+            <button type='button' onClick={nextPage} className={styles.arrow_btn}>
+              <img src={arrow} alt='' className={styles.arrow} />
+            </button>
           </div>
-        )}
+        </ul>
       </div>
-      <ul className={styles.files_list}>
-        <div className={styles.arrow_wrapper}>
-          <button type='button' onClick={prevPage} className={styles.arrow_btn}>
-            <img src={arrow} alt='' style={{ rotate: '180deg' }} className={styles.arrow} />
-          </button>
-        </div>
-        {totalItems.map((media, index) => (
-          <li key={index}>
-            <img src={media} alt='' className={media === selectedImage ? styles.transparent : ''} />
-            <button type='button' onClick={() => handleSelectImage(media)}>
-              ok
-            </button>
-          </li>
-        ))}
-        <div className={styles.arrow_wrapper}>
-          <button type='button' onClick={nextPage} className={styles.arrow_btn}>
-            <img src={arrow} alt='' className={styles.arrow} />
-          </button>
-        </div>
-      </ul>
-    </div>
+    </>
   );
 };
