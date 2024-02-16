@@ -3,7 +3,7 @@
   justify-content: center;
   gap: 15px;
   position: relative;
-  height: 70vh;
+  // height: auto;
 
   h2 {
     justify-self: center;
@@ -15,9 +15,10 @@
 
   .media_main {
     display: grid;
-    justify-content: flex-start;
-    gap: 50px;
-    width: 800px;
+    align-items: center;
+    width: 100%;
+    // padding: 100px;
+    border: 1px solid black;
 
     .media_sort {
       position: absolute;
@@ -48,16 +49,23 @@
           font-size: 15px;
           text-transform: uppercase;
           justify-self: flex-start;
+          cursor: pointer;
         }
       }
     }
 
     .media_list {
-      display: flex;
-      justify-self: flex-start;
-      gap: 10px;
+      display: grid;
+      padding: 30px;
+      gap: 30px;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      overflow-y: auto; // Prevent vertical scrolling
+      justify-content: flex-start;
+      height: 520px;
 
       li {
+        flex: 0 0 auto;
         display: flex;
         justify-content: center;
         align-items: center;

@@ -12,24 +12,23 @@ interface ThumbnailProps {
 
 export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
   const navigate = useNavigate();
-  // const [product, setProduct] = useState<common_ProductNew>({ ...initialProductState, media: [] }); // to correct
   const [imageUrl, setImageUrl] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string[]>([]);
   const [displayedImage, setDisplayedImage] = useState<string>('');
   const [thumbnailInput, setThumbnailInput] = useState(false);
-  const [filesUrl, setFilesUrl] = useState<string[]>([]);
+  const [filesUrl, setFilesUrl] = useState<common_Media[] | undefined>([]);
   const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [mediaNumber, setMediaNumber] = useState<number[]>([]);
   const [imagesAdded, setImagesAdded] = useState(false);
 
-  const select = (imageUrl: string | number) => {
+  const select = (imageUrl: string | number | undefined) => {
     if (typeof imageUrl === 'string') {
-      if (selectedImage.includes(imageUrl)) {
+      if (selectedImage?.includes(imageUrl)) {
         setSelectedImage((prevSelectedImage) =>
-          prevSelectedImage.filter((image) => image !== imageUrl),
+          prevSelectedImage?.filter((image) => image !== imageUrl),
         );
       } else {
-        setSelectedImage([...selectedImage, imageUrl]);
+        setSelectedImage([...(selectedImage || []), imageUrl]);
       }
     } else if (typeof imageUrl === 'number') {
       if (mediaNumber.includes(imageUrl)) {
@@ -42,49 +41,14 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
     }
   };
 
-  function generateStringArray(input: string): string[] {
-    // Define a regular expression pattern to match the relevant part of the URL
-    const pattern = /https:\/\/files\.grbpwr\.com\/(.+?)(-og\.(jpg|mp4|webm))?$/;
-
-    // Use the regular expression to extract the matched parts of the URL
-    const match = input.match(pattern);
-
-    if (!match) {
-      // Return an empty array if the input doesn't match the expected pattern
-      return [];
-    }
-
-    const [, path, , extension] = match; // Note the additional comma to skip the second capturing group
-    const resultArray: string[] = [`${path}-og.${extension}`];
-
-    if (extension === 'jpg') {
-      // If the extension is 'jpg', add the '-compressed.jpg' version to the array
-      resultArray.push(`${path}-compressed.jpg`);
-    }
-    console.log(resultArray);
-    return resultArray;
-  }
-
-  const handleDeleteFile = async (fileIndex: number) => {
+  const handleDeleteFile = async (id: number | undefined) => {
     try {
-      const fileToDelete = filesUrl[fileIndex]; // Assuming filesUrl is an array of file URLs
-      const objectKeys = generateStringArray(fileToDelete);
-
-      if (objectKeys.length > 0) {
-        await deleteFiles({ id: fileIndex });
-        const updatedFiles = [...filesUrl];
-        updatedFiles.splice(fileIndex, 1);
-        setFilesUrl(updatedFiles);
-      } else {
-        console.error('Invalid file URL:', fileToDelete);
-      }
+      const response = await deleteFiles({ id });
+      console.log(response);
+      setFilesUrl((currentFiles) => currentFiles?.filter((file) => file.id !== id));
     } catch (error) {
-      console.error('Error deleting file:', error);
+      console.error(error);
     }
-  };
-
-  const filterUploadedFiles = (files: string[]) => {
-    return files.filter((file) => /\.(jpg|jpeg|png)$/i.test(file));
   };
 
   const handleViewAll = () => {
@@ -100,10 +64,9 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
           orderFactor: 'ORDER_FACTOR_ASC',
         });
 
-        const filesArray = response.list || [];
-        const urls = filesArray.map((file: common_Media) => file.media?.fullSize || '');
+        const url = response.list || [];
 
-        setFilesUrl(urls);
+        setFilesUrl(url);
       } catch (error) {
         console.error('Error fetching uploaded files:', error);
       }
@@ -121,10 +84,10 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
   };
 
   const handleImage = () => {
-    if (selectedImage.length > 0) {
+    if (selectedImage && selectedImage.length > 0) {
       const updatedMedia: common_ProductMediaInsert[] = [...(product.media || [])];
 
-      selectedImage.forEach((imageUrl) => {
+      selectedImage?.forEach((imageUrl) => {
         const compressedUrl = imageUrl.replace(/-og\.jpg$/, '-compressed.jpg');
 
         updatedMedia.push({
@@ -219,27 +182,34 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
       {showMediaSelector && (
         <div className={styles.thumbnail_uploaded_media_wrapper}>
           <ul className={styles.thhumbnail_uploaded_media_container}>
-            {filterUploadedFiles(filesUrl).map((url, index) => (
-              <li key={index}>
+            {filesUrl?.map((media) => (
+              <li key={media.id}>
                 <button
                   className={styles.delete_img}
                   type='button'
-                  onClick={() => handleDeleteFile(index)}
+                  onClick={() => handleDeleteFile(media.id)}
                 >
                   X
                 </button>
                 <input
                   type='checkbox'
-                  checked={selectedImage.includes(url)}
-                  onChange={() => select(url)}
-                  id={`${index}`}
+                  checked={selectedImage?.includes(media.media?.fullSize ?? '')}
+                  onChange={() => select(media.media?.fullSize ?? '')}
+                  id={`${media.id}`}
                   style={{ display: 'none' }}
                 />
-                <label htmlFor={`${index}`}>
-                  {selectedImage.includes(url) ? (
-                    <span className={styles.media_number}>{selectedImage.indexOf(url) + 1}</span>
+                <label htmlFor={`${media.id}`}>
+                  {selectedImage?.includes(media.media?.fullSize ?? '') ? (
+                    <span className={styles.media_number}>
+                      {selectedImage.indexOf(media.media?.fullSize ?? '') + 1}
+                    </span>
                   ) : null}
-                  <img key={index} src={url} alt={url} className={styles.uploaded_img} />
+                  <img
+                    key={media.id}
+                    src={media.media?.fullSize}
+                    alt='video'
+                    className={styles.uploaded_img}
+                  />
                 </label>
               </li>
             ))}

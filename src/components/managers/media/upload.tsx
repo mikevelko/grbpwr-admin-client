@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { getAllUploadedFiles, deleteFiles } from 'api/admin';
 import { common_Media } from 'api/proto-http/admin';
 import { Layout } from 'components/login/layout';
@@ -24,39 +24,55 @@ function formatDate(dateString: string | number | Date | undefined) {
 }
 
 export const UploadPage: FC = () => {
-  const [filesUrl, setFilesUrl] = useState<common_Media[] | undefined>([]);
+  const [filesUrl, setFilesUrl] = useState<common_Media[]>([]);
   const [order, setOrder] = useState<'plus' | 'minus'>('plus');
   const [filter, setFilter] = useState<'all' | 'image' | 'video'>('all');
-
-  const dateSorter = () => {
-    setOrder((prevOrder) => (prevOrder === 'plus' ? 'minus' : 'plus'));
-  };
-
-  const filteredFiles = filesUrl?.filter((file) => {
-    if (filter === 'all') return true;
-    return file.media?.fullSize === filter;
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     fetchData();
-  }, [order]);
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY + 300 >= document.documentElement.offsetHeight &&
+        !isLoading &&
+        hasMore
+      ) {
+        fetchData();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isLoading, hasMore]);
 
   const fetchData = async () => {
-    const orderFactor = order === 'plus' ? 'ORDER_FACTOR_ASC' : 'ORDER_FACTOR_DESC';
-    const response = await getAllUploadedFiles({
-      limit: 5,
-      offset: 0,
-      orderFactor,
-    });
-    const url = response.list || [];
-    setFilesUrl(url);
+    if (isLoading || !hasMore) return;
+    setIsLoading(true);
+    const limit = 2;
+    try {
+      const response = await getAllUploadedFiles({
+        limit: limit,
+        offset: offset,
+        orderFactor: 'ORDER_FACTOR_DESC',
+      });
+      const url = response.list || [];
+      setFilesUrl((prevUrls) => [...prevUrls, ...url]);
+      setOffset((prevOffset) => prevOffset + url.length);
+      setHasMore(url.length === limit);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const deleteFile = async (id: number | undefined) => {
     try {
       const response = await deleteFiles({ id });
       console.log(response);
-      fetchData();
+      setFilesUrl((currentFiles) => currentFiles.filter((file) => file.id !== id));
     } catch (error) {
       console.error(error);
     }
@@ -88,7 +104,7 @@ export const UploadPage: FC = () => {
             <h3>sort by</h3>
             <div className={styles.sort_wrapper}>
               <button
-                onClick={() => setOrder(order === 'plus' ? 'minus' : 'plus')}
+                onClick={() => setOrder(order === 'plus' ? 'minus' : 'minus')}
                 className={styles.sort_btn}
               >
                 DATE {order === 'plus' ? '-' : '+'}
@@ -103,7 +119,7 @@ export const UploadPage: FC = () => {
           </div>
           <ul className={styles.media_list}>
             {filteredAndPaginatedFiles?.map((file) => (
-              <li key={file.id}>
+              <li key={file.id || file.media?.fullSize}>
                 {file.media?.fullSize?.toLowerCase().endsWith('.mp4') ||
                 file.media?.fullSize?.toLowerCase().endsWith('.webm') ? (
                   <video controls>
@@ -121,6 +137,7 @@ export const UploadPage: FC = () => {
               </li>
             ))}
           </ul>
+          {isLoading && <div>Loading more items...</div>}
           {/* pagination here */}
         </div>
       </div>
