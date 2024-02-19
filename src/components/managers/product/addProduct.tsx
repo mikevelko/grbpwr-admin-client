@@ -1,8 +1,8 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import update from 'immutability-helper';
 import { Layout } from 'components/login/layout';
-import { common_ProductNew, AddProductRequest, common_GenderEnum } from 'api/proto-http/admin';
-import { addProduct } from 'api/admin';
+import { common_ProductNew, AddProductRequest, common_Dictionary } from 'api/proto-http/admin';
+import { addProduct, getDictionary } from 'api/admin';
 import { Thumbnail } from './componentsOfProduct/thumbnail';
 import { Sizes } from './componentsOfProduct/sizes';
 import { Tags } from './componentsOfProduct/tag';
@@ -61,7 +61,20 @@ export const AddProducts: FC = () => {
     handleChange(e, setProduct);
   };
 
-  const [gender, setGender] = useState<common_GenderEnum[] | undefined>([]);
+  // const [gender, setGender] = useState<common_Genders[] | undefined>([]);
+  const [dictionary, setDictionary] = useState<common_Dictionary>();
+
+  useEffect(() => {
+    const fetchDictionary = async () => {
+      try {
+        const response = await getDictionary({});
+        setDictionary(response.dictionary);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchDictionary();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,10 +165,12 @@ export const AddProducts: FC = () => {
             onChange={handleInputChange}
             className={styles.product_input}
           >
-            {/* TODO: how do it dynamically */}
-            <option value='GENDER_ENUM_MALE'>Male</option>
-            <option value='GENDER_ENUM_FEMALE'>Female</option>
-            <option value='GENDER_ENUM_UNISEX'>Unisex</option>
+            <option value=''>select gender</option>
+            {dictionary?.genders?.map((gender) => (
+              <option value={gender.id} key={gender.id}>
+                {gender.name?.replace('GENDER_ENUM_', '')}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -199,9 +214,9 @@ export const AddProducts: FC = () => {
 
         <Thumbnail product={product} setProduct={setProduct} />
 
-        <Categories product={product} setProduct={setProduct} />
+        <Categories product={product} setProduct={setProduct} dictionary={dictionary} />
 
-        <Sizes product={product} setProduct={setProduct} />
+        <Sizes setProduct={setProduct} dictionary={dictionary} />
 
         <Tags updateTags={updateTags} />
 

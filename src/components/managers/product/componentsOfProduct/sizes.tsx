@@ -5,29 +5,40 @@ import {
   common_ProductSizeInsert,
   googletype_Decimal,
   common_ProductNew,
+  common_Dictionary,
 } from 'api/proto-http/admin';
-import { getDictionary, addMediaByID } from 'api/admin';
+import { getDictionary } from 'api/admin';
 import styles from 'styles/addProd.scss';
 
 interface sizeProps {
-  product: common_ProductNew;
+  // product: common_ProductNew;
   setProduct: React.Dispatch<React.SetStateAction<common_ProductNew>>;
+  dictionary: common_Dictionary | undefined;
 }
 
 interface SelectedMeasurements {
-  [sizeIndex: number]: number;
+  [sizeIndex: number]: number | undefined;
 }
 
-export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
-  const [sizeDictionary, setSizeDictionary] = useState<common_Size[]>([]);
-  const [measurementEnum, setMeasurementEnum] = useState<common_MeasurementName[]>([]);
+export const Sizes: FC<sizeProps> = ({ setProduct, dictionary }) => {
+  // const [sizeDictionary, setSizeDictionary] = useState<common_Size[]>([]);
+  // const [measurementEnum, setMeasurementEnum] = useState<common_MeasurementName[]>([]);
   const [selectedMeasurements, setSelectedMeasurements] = useState<SelectedMeasurements>({});
 
-  const handleMeasurementSelection = (sizeIndex: any, measurementId: any) => {
+  const handleMeasurementSelection = (sizeIndex: number | undefined, measurementId: number) => {
+    if (typeof sizeIndex === 'undefined') {
+      return;
+    }
     setSelectedMeasurements((prev) => ({ ...prev, [sizeIndex]: measurementId }));
   };
-
-  const handleMeasurementValueChange = (sizeIndex: any, measurementId: any, value: any) => {
+  const handleMeasurementValueChange = (
+    sizeIndex: number | undefined,
+    measurementId: number | undefined,
+    value: number,
+  ) => {
+    if (typeof sizeIndex === 'undefined') {
+      return;
+    }
     setProduct((prevProduct) => {
       const updatedProduct = JSON.parse(JSON.stringify(prevProduct));
 
@@ -59,21 +70,26 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
     });
   };
 
-  const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>, sizeIndex: number) => {
-    const { name, value } = e.target;
+  const handleSizeChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    sizeIndex: number | undefined,
+  ) => {
+    if (typeof sizeIndex === 'undefined') {
+      // Handle the undefined case
+      return;
+    }
 
+    const { name, value } = e.target;
     setProduct((prevProduct) => {
       const updatedSizeMeasurements = [...(prevProduct.sizeMeasurements || [])];
       const sizeQuantity: googletype_Decimal = { value: value };
 
       if (!updatedSizeMeasurements[sizeIndex]) {
         const sizeId = sizeIndex;
-
         const productSize: common_ProductSizeInsert = {
           quantity: sizeQuantity,
-          sizeId: sizeId + 1,
+          sizeId: sizeId,
         };
-
         updatedSizeMeasurements[sizeIndex] = {
           productSize: productSize,
           measurements: [],
@@ -92,27 +108,8 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
     });
   };
 
-  useEffect(() => {
-    const fetchDictionary = async () => {
-      try {
-        const response = await getDictionary({});
-        const size = response.dictionary?.sizes || [];
-        const measurement = response.dictionary?.measurements || [];
-        const sortedSizes = size.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
-        const sortedMeasurement = measurement.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
-        setSizeDictionary(sortedSizes);
-        setMeasurementEnum(sortedMeasurement);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchDictionary();
-  }, []);
-
-  // TODO: create separate file for 2 functions
-
   const getSizeName = (sizeId: number | undefined): string => {
-    const size = sizeDictionary.find((s) => s.id === sizeId);
+    const size = dictionary?.sizes?.find((s) => s.id === sizeId);
     if (size && size.name) {
       return size.name.replace('SIZE_ENUM_', '');
     }
@@ -120,7 +117,7 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
   };
 
   const getMeasurementName = (id: number | undefined): string => {
-    const measurement = measurementEnum.find((m) => m.id === id);
+    const measurement = dictionary?.measurements?.find((m) => m.id === id);
     if (measurement && measurement.name) {
       return measurement.name.replace('MEASUREMENT_NAME_ENUM_', '');
     }
@@ -131,35 +128,36 @@ export const Sizes: FC<sizeProps> = ({ product, setProduct }) => {
     <div className={styles.product_container}>
       <label className={styles.title}>Sizes</label>
       <ul>
-        {sizeDictionary.map((size, sizeIndex) => (
-          <li key={sizeIndex}>
+        {dictionary?.sizes?.map((size) => (
+          <li key={size.id}>
             <strong>{getSizeName(size.id)}</strong>
             <input
               type='number'
               id={size.name}
               name='quantity'
-              onChange={(e) => handleSizeChange(e, sizeIndex)}
+              onChange={(e) => handleSizeChange(e, size.id)}
             />
             <div className={styles.sizeMeasurement}>
               <select
                 className={styles.measurementSelect}
-                onChange={(e) => handleMeasurementSelection(sizeIndex, e.target.value)}
+                onChange={(e) => handleMeasurementSelection(size.id, parseInt(e.target.value, 10))}
               >
-                {measurementEnum.map((measurement, measurementIndex) => (
-                  <option key={measurementIndex} value={measurement.id}>
+                <option value=''>select measurement</option>
+                {dictionary.measurements?.map((measurement) => (
+                  <option key={measurement.id} value={measurement.id}>
                     {getMeasurementName(measurement.id)}
                   </option>
                 ))}
               </select>
-              {selectedMeasurements[sizeIndex] && (
+              {selectedMeasurements[size.id as number] && (
                 <input
                   type='number'
                   className={styles.measurementInput}
                   onChange={(e) =>
                     handleMeasurementValueChange(
-                      sizeIndex,
-                      selectedMeasurements[sizeIndex],
-                      e.target.value,
+                      size.id,
+                      selectedMeasurements[size.id as number],
+                      parseInt(e.target.value, 10),
                     )
                   }
                 />

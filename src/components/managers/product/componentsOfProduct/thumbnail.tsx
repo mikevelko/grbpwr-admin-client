@@ -16,10 +16,13 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
   const [selectedImage, setSelectedImage] = useState<string[]>([]);
   const [displayedImage, setDisplayedImage] = useState<string>('');
   const [thumbnailInput, setThumbnailInput] = useState(false);
-  const [filesUrl, setFilesUrl] = useState<common_Media[] | undefined>([]);
+  const [filesUrl, setFilesUrl] = useState<common_Media[]>([]);
   const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [mediaNumber, setMediaNumber] = useState<number[]>([]);
   const [imagesAdded, setImagesAdded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
   const select = (imageUrl: string | number | undefined) => {
     if (typeof imageUrl === 'string') {
@@ -56,24 +59,41 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
   };
 
   useEffect(() => {
-    const fetchUploadedFiles = async () => {
-      try {
-        const response = await getAllUploadedFiles({
-          limit: 5,
-          offset: 0,
-          orderFactor: 'ORDER_FACTOR_ASC',
-        });
-
-        const url = response.list || [];
-
-        setFilesUrl(url);
-      } catch (error) {
-        console.error('Error fetching uploaded files:', error);
+    fetchUploadedFiles();
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY + 300 >= document.documentElement.offsetHeight &&
+        !isLoading &&
+        hasMore
+      ) {
+        fetchUploadedFiles();
       }
     };
 
-    fetchUploadedFiles();
-  }, []);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isLoading, hasMore]);
+
+  const fetchUploadedFiles = async () => {
+    if (isLoading || !hasMore) return;
+    setIsLoading(true);
+    const limit = 1;
+    try {
+      const response = await getAllUploadedFiles({
+        limit: limit,
+        offset: offset,
+        orderFactor: 'ORDER_FACTOR_ASC',
+      });
+      const url = response.list || [];
+      setFilesUrl((prevUrls) => [...prevUrls, ...url]);
+      setOffset((prevOffset) => prevOffset + url.length);
+      setHasMore(url.length === limit);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleThumbnail = () => {
     setThumbnailInput(!thumbnailInput);
@@ -214,6 +234,7 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
               </li>
             ))}
           </ul>
+          {isLoading && <div>Loading more items...</div>}
           <div className={styles.media_selector_add}>
             <button className={styles.add_btn} type='button' onClick={handleImage}>
               add

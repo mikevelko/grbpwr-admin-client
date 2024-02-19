@@ -55,7 +55,7 @@ export const UploadPage: FC = () => {
       const response = await getAllUploadedFiles({
         limit: limit,
         offset: offset,
-        orderFactor: 'ORDER_FACTOR_DESC',
+        orderFactor: 'ORDER_FACTOR_ASC',
       });
       const url = response.list || [];
       setFilesUrl((prevUrls) => [...prevUrls, ...url]);
@@ -95,6 +95,20 @@ export const UploadPage: FC = () => {
     }
   });
 
+  const sortedFiles = React.useMemo(() => {
+    return filteredAndPaginatedFiles.sort((a, b) => {
+      const dateA = new Date(a.createdAt || 0).getTime();
+      const dateB = new Date(b.createdAt || 0).getTime();
+
+      // Ascending order (older files first, 'minus')
+      if (order === 'minus') {
+        return dateA - dateB;
+      }
+      // Descending order (newer files first, 'plus')
+      return dateB - dateA;
+    });
+  }, [filteredAndPaginatedFiles, order]);
+
   return (
     <Layout>
       <div className={styles.media_container}>
@@ -104,7 +118,7 @@ export const UploadPage: FC = () => {
             <h3>sort by</h3>
             <div className={styles.sort_wrapper}>
               <button
-                onClick={() => setOrder(order === 'plus' ? 'minus' : 'minus')}
+                onClick={() => setOrder(order === 'plus' ? 'minus' : 'plus')}
                 className={styles.sort_btn}
               >
                 DATE {order === 'plus' ? '-' : '+'}
@@ -118,15 +132,19 @@ export const UploadPage: FC = () => {
             </div>
           </div>
           <ul className={styles.media_list}>
-            {filteredAndPaginatedFiles?.map((file) => (
+            {sortedFiles?.map((file) => (
               <li key={file.id || file.media?.fullSize}>
                 {file.media?.fullSize?.toLowerCase().endsWith('.mp4') ||
                 file.media?.fullSize?.toLowerCase().endsWith('.webm') ? (
-                  <video controls>
-                    <source src={file.media?.fullSize} type='video/mp4' />
-                  </video>
+                  <a href={file.media.compressed} rel='noreferrer' target='_blank'>
+                    <video controls>
+                      <source src={file.media?.fullSize} type='video/mp4' />
+                    </video>
+                  </a>
                 ) : (
-                  <img src={file.media?.fullSize} alt='' />
+                  <a href={file.media?.compressed} target='_blank' rel='noreferrer'>
+                    <img src={file.media?.fullSize} alt='' />
+                  </a>
                 )}
                 <div>
                   <button type='button' onClick={() => deleteFile(file.id)}>

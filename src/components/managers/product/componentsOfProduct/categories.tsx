@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import { common_Category, common_ProductNew } from 'api/proto-http/admin';
+import { common_Category, common_Dictionary, common_ProductNew } from 'api/proto-http/admin';
 import update from 'immutability-helper';
 import { getDictionary } from 'api/admin';
 import styles from 'styles/addProd.scss';
@@ -7,9 +7,10 @@ import styles from 'styles/addProd.scss';
 interface categoriesProps {
   product: common_ProductNew;
   setProduct: React.Dispatch<React.SetStateAction<common_ProductNew>>;
+  dictionary: common_Dictionary | undefined;
 }
 
-export const Categories: FC<categoriesProps> = ({ product, setProduct }) => {
+export const Categories: FC<categoriesProps> = ({ product, setProduct, dictionary }) => {
   const [categoriesEnum, setCategoriesEnum] = useState<common_Category[] | undefined>();
 
   const handleCategorySelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -22,20 +23,6 @@ export const Categories: FC<categoriesProps> = ({ product, setProduct }) => {
       });
     });
   };
-
-  useEffect(() => {
-    const fetchDictionary = async () => {
-      try {
-        const response = await getDictionary({});
-        const categories = response.dictionary?.categories;
-
-        setCategoriesEnum(categories);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchDictionary();
-  }, []);
 
   return (
     <div className={styles.product_container}>
@@ -50,9 +37,9 @@ export const Categories: FC<categoriesProps> = ({ product, setProduct }) => {
         className={styles.product_input}
       >
         <option value=''>Select category</option>
-        {categoriesEnum?.map((category, categoryIndex) => (
-          <option value={categoryIndex + 1} key={categoryIndex}>
-            {category.name}
+        {dictionary?.categories?.map((category) => (
+          <option value={category.id} key={category.id}>
+            {category.name?.replace('CATEGORY_ENUM_', '')}
           </option>
         ))}
       </select>
