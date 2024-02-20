@@ -5,6 +5,7 @@ import { getDictionary } from 'api/admin';
 import { common_OrderFull, common_OrderStatus, common_OrderStatusEnum } from 'api/proto-http/admin';
 import { useNavigate } from '@tanstack/react-location';
 import { ROUTES } from 'constants/routes';
+import styles from 'styles/order.scss';
 
 export const Orders: FC = () => {
   const [status, setStatus] = useState<common_OrderStatus[] | undefined>([]);
@@ -64,40 +65,52 @@ export const Orders: FC = () => {
   };
   return (
     <Layout>
-      <div>
-        <div>
-          <h3>filter by status</h3>
-          <select onChange={handleStatusChange}>
-            <option value=''>select</option>
-            {status?.map((s) => (
-              <option value={s.id} key={s.id}>
-                {s.name?.replace('ORDER_STATUS_ENUM_', '')}
-              </option>
-            ))}
-          </select>
+      <div className={styles.order_main}>
+        <div className={styles.order_by}>
+          <div className={styles.filter_status}>
+            <h3>filter by status</h3>
+            <select onChange={handleStatusChange}>
+              <option value=''>select</option>
+              {status?.map((s) => (
+                <option value={s.id} key={s.id}>
+                  {s.name?.replace('ORDER_STATUS_ENUM_', '')}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.filter_email}>
+            <input type='text' value={email} onChange={(e) => setEmail(e.target.value)} />
+            <button type='button' onClick={orderByEmailFunction}>
+              ok
+            </button>
+          </div>
         </div>
-        <div>
-          <input type='text' value={email} onChange={(e) => setEmail(e.target.value)} />
-          <button type='button' onClick={orderByEmailFunction}>
-            ok
-          </button>
-        </div>
-      </div>
 
-      {orders?.map((order) => (
-        <div key={order.order?.id}>
-          {order.orderItems?.map((item) => (
-            <div
-              key={item.id}
-              style={{ border: '1px solid black' }}
-              onClick={() => navigateOrderId(item.orderId)}
-            >
-              <h3>{item.orderId}</h3>
-              <h3>{order.totalPrice?.value}</h3>
-            </div>
-          ))}
-        </div>
-      ))}
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Order Date</th>
+              <th>Payment Received</th>
+              <th>Payment Method</th>
+              <th>Total Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders?.flatMap((order) =>
+              order.orderItems?.map((item) => (
+                <tr key={item.orderId} onClick={() => navigateOrderId(item.orderId)}>
+                  <td>{item.orderId}</td>
+                  <td>{order.modified}</td>
+                  <td>{order.payment?.modifiedAt}</td>
+                  <td>{order.paymentMethod?.name?.replace('PAYMENT_METHOD_NAME_ENUM_', '')}</td>
+                  <td>{order.totalPrice?.value}</td>
+                </tr>
+              )),
+            )}
+          </tbody>
+        </table>
+      </div>
     </Layout>
   );
 };

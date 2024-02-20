@@ -30,10 +30,26 @@ export const OrderId: FC = () => {
   return (
     <div>
       <h4 onClick={back}>back</h4>
-      <div>
-        <h3>{orders?.order?.id}</h3>
-        <h3>{orders?.orderStatus?.name}</h3>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>product</th>
+            <th>quantity</th>
+            <th>size</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders?.orderItems?.map((item) => (
+            <tr key={item.orderId}>
+              <td>
+                <img src={item.thumbnail} alt='' style={{ width: '30px', height: '30px' }} />
+              </td>
+              <td>{item.orderItem?.quantity}</td>
+              <td>{item.orderItem?.sizeId}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
