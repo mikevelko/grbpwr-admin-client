@@ -31,6 +31,10 @@ export const Main: FC = () => {
     navigate({ to: ROUTES.settings, replace: true });
   };
 
+  const navigateOrders = () => {
+    navigate({ to: ROUTES.orders, replace: true });
+  };
+
   return (
     <Layout>
       <div className={styles.main}>
@@ -40,7 +44,9 @@ export const Main: FC = () => {
         <button onClick={navigateProductManager} className={styles.btn}>
           PRODUCTS
         </button>
-        <button className={styles.btn}>ORDERS</button>
+        <button className={styles.btn} onClick={navigateOrders}>
+          ORDERS
+        </button>
         <button className={styles.btn} onClick={navigateHero}>
           HERO
         </button>

@@ -23,6 +23,8 @@ import { MainArchive } from 'components/managers/archive/mainArchive';
 import { Archive } from 'components/managers/archive/archive';
 import { GetArchive } from 'components/managers/archive/getArchive';
 import { Settings } from 'components/managers/settings/settings';
+import { Orders } from 'components/managers/orders/orders';
+import { OrderId } from 'components/managers/orders/orderId';
 import 'styles/global.scss';
 
 const container = document.getElementById('root') ?? document.body;
@@ -49,6 +51,8 @@ const routes: Route<DefaultGenerics>[] = [
   { path: ROUTES.createArchive, element: <Archive /> },
   { path: ROUTES.getArchive, element: <GetArchive /> },
   { path: ROUTES.settings, element: <Settings /> },
+  { path: ROUTES.orders, element: <Orders /> },
+  { path: ROUTES.ordersById, element: <OrderId /> },
 ];
 
 root.render(

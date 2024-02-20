@@ -5,8 +5,6 @@ const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { BundleStatsWebpackPlugin } = require('bundle-stats-webpack-plugin');
 const webpackDev = require('./webpack.dev');
 const Dotenv = require('dotenv-webpack');
-
-// Define a variable to check if we're in production mode
 const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
