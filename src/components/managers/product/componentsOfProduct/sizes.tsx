@@ -21,8 +21,6 @@ interface SelectedMeasurements {
 }
 
 export const Sizes: FC<sizeProps> = ({ setProduct, dictionary }) => {
-  // const [sizeDictionary, setSizeDictionary] = useState<common_Size[]>([]);
-  // const [measurementEnum, setMeasurementEnum] = useState<common_MeasurementName[]>([]);
   const [selectedMeasurements, setSelectedMeasurements] = useState<SelectedMeasurements>({});
 
   const handleMeasurementSelection = (sizeIndex: number | undefined, measurementId: number) => {

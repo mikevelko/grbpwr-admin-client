@@ -40,34 +40,43 @@
     }
   }
 
-  table {
-    border: 1px solid black;
-    border-collapse: collapse;
-    width: 100%;
+  .table_container {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-    thead {
-      height: 70px;
+    table {
+      border: 1px solid black;
+      border-collapse: collapse;
+      width: 100%;
+      height: 500px;
 
-      th {
-        border: 1px solid black;
-      }
-    }
+      thead {
+        height: 70px;
+        position: static;
+        top: 0;
 
-    tbody {
-      tr {
-        border: 1px solid black;
-        &:nth-child(even) {
-          background-color: gray;
-        }
-        &:hover {
-          cursor: pointer;
-          opacity: 0.5;
-        }
-        td {
+        th {
           border: 1px solid black;
-          text-align: center;
-          height: 30px;
-          padding: 20px;
+        }
+      }
+
+      tbody {
+        tr {
+          border: 1px solid black;
+          &:nth-child(even) {
+            background-color: gray;
+          }
+          &:hover {
+            cursor: pointer;
+            opacity: 0.5;
+          }
+          td {
+            border: 1px solid black;
+            text-align: center;
+            height: 30px;
+            padding: 20px;
+          }
         }
       }
     }
