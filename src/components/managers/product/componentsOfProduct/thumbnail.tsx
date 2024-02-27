@@ -74,6 +74,20 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isLoading, hasMore]);
 
+  useEffect(() => {
+    // Disable scrolling on the body when media selector is open
+    if (showMediaSelector) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Clean up function to unset overflow when the component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showMediaSelector]);
+
   const fetchUploadedFiles = async () => {
     if (isLoading || !hasMore) return;
     setIsLoading(true);
@@ -93,14 +107,6 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleThumbnail = () => {
-    setThumbnailInput(!thumbnailInput);
-  };
-
-  const handleMediaManager = () => {
-    navigate({ to: ROUTES.media, replace: true });
   };
 
   const handleImage = () => {
@@ -162,83 +168,92 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
     }
   };
 
+  const handleCloseMediaSelector = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      setShowMediaSelector(false);
+    }
+  };
+
   return (
-    <div className={styles.thumbnail_wrapper}>
-      <label
-        htmlFor='thhumbnail'
-        className={`${styles.thumbnail_title} ${showMediaSelector ? styles.left : ''}`}
-      >
+    <div
+      className={`${styles.thumbnail_wrapper} ${showMediaSelector ? styles.disabled_overlay : ''}`}
+    >
+      <label htmlFor='thhumbnail' className={styles.thumbnail_title}>
         Media
       </label>
-      <div className={`${styles.thumbnail_container} ${showMediaSelector ? styles.left : ''}`}>
-        <button
-          className={`${styles.thumbnail_btn} ${thumbnailInput ? styles.by_url_left : ''}`}
-          type='button'
-          onClick={handleThumbnail}
-        >
-          By Url
-        </button>
-        {thumbnailInput && (
-          <div className={styles.by_url_container}>
-            <input
-              className={styles.by_url_input}
-              type='text'
-              name='media'
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
-            <button type='button' onClick={handleImage}>
-              OK
-            </button>
-          </div>
-        )}
+      <div className={styles.thumbnail_container}>
         <button className={styles.thumbnail_btn} type='button' onClick={handleViewAll}>
           Media Selector
         </button>
-        <button className={styles.thumbnail_btn} onClick={handleMediaManager}>
-          Upload New
-        </button>
       </div>
       {showMediaSelector && (
-        <div className={styles.thumbnail_uploaded_media_wrapper}>
-          <ul className={styles.thhumbnail_uploaded_media_container}>
-            {filesUrl?.map((media) => (
-              <li key={media.id}>
-                <button
-                  className={styles.delete_img}
-                  type='button'
-                  onClick={() => handleDeleteFile(media.id)}
-                >
-                  X
-                </button>
-                <input
-                  type='checkbox'
-                  checked={selectedImage?.includes(media.media?.fullSize ?? '')}
-                  onChange={() => select(media.media?.fullSize ?? '')}
-                  id={`${media.id}`}
-                  style={{ display: 'none' }}
-                />
-                <label htmlFor={`${media.id}`}>
-                  {selectedImage?.includes(media.media?.fullSize ?? '') ? (
-                    <span className={styles.media_number}>
-                      {selectedImage.indexOf(media.media?.fullSize ?? '') + 1}
-                    </span>
-                  ) : null}
-                  <img
-                    key={media.id}
-                    src={media.media?.fullSize}
-                    alt='video'
-                    className={styles.uploaded_img}
+        <div className={styles.overlay} onClick={handleCloseMediaSelector}>
+          <div
+            className={`${styles.thumbnail_uploaded_media_wrapper} ${styles.thumbnail_active_wrapper}`}
+          >
+            <div className={styles.media_selector_by_url_upload_new}>
+              <div className={styles.media_selector_by_url}>
+                <h3>By Url</h3>
+                <div className={styles.by_url_container}>
+                  <input
+                    type='text'
+                    name='media'
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    className={styles.by_url_input}
                   />
-                </label>
-              </li>
-            ))}
-          </ul>
-          {isLoading && <div>Loading more items...</div>}
-          <div className={styles.media_selector_add}>
-            <button className={styles.add_btn} type='button' onClick={handleImage}>
-              add
-            </button>
+                  <button
+                    type='button'
+                    onClick={handleImage}
+                    className={styles.media_selector_by_url_btn}
+                  >
+                    OK
+                  </button>
+                </div>
+              </div>
+              <div className={styles.media_selector_upload_new}>
+                <h3>upload new </h3>
+              </div>
+            </div>
+            <div className={styles.media_selector_container}>
+              <ul className={styles.media_selector_img_container}>
+                {filesUrl?.map((media) => (
+                  <li key={media.id} className={styles.media_selector_img_wrapper}>
+                    <button
+                      className={styles.media_selector_delete_img}
+                      type='button'
+                      onClick={() => handleDeleteFile(media.id)}
+                    >
+                      X
+                    </button>
+                    <input
+                      type='checkbox'
+                      checked={selectedImage?.includes(media.media?.fullSize ?? '')}
+                      onChange={() => select(media.media?.fullSize ?? '')}
+                      id={`${media.id}`}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor={`${media.id}`}>
+                      {selectedImage?.includes(media.media?.fullSize ?? '') ? (
+                        <span className={styles.media_selector_img_number}>
+                          {selectedImage.indexOf(media.media?.fullSize ?? '') + 1}
+                        </span>
+                      ) : null}
+                      <img
+                        key={media.id}
+                        src={media.media?.fullSize}
+                        alt='video'
+                        className={styles.media_selector_img}
+                      />
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              {isLoading && <div></div>}
+              <button className={styles.media_selector_add_btn} type='button' onClick={handleImage}>
+                add
+              </button>
+            </div>
           </div>
         </div>
       )}

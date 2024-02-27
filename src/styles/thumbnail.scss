@@ -1,7 +1,12 @@
+.disabled-overlay {
+  pointer-events: none;
+  opacity: 0.4;
+  background: rgba(0, 0, 0, 0.5); // This adds a dark overlay, remove if not needed
+}
+
 .thumbnail_wrapper {
   display: grid;
   gap: 5px;
-  position: relative;
 
   .thumbnail_title {
     justify-self: flex-start;
@@ -15,7 +20,7 @@
   }
 
   .thumbnail_container {
-    position: relative;
+    // position: relative;
     width: 250px;
     padding: 65px 0 65px 0;
     display: grid;
@@ -36,150 +41,155 @@
     }
   }
 
-  .thumbnail_uploaded_media_wrapper {
-    position: absolute;
-    left: 100%;
-    top: 8%;
-    width: 343px;
-    height: 220px;
-    border: 1px solid black;
-    padding: 5px;
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
-    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
 
-    .media_selector_add {
-      position: absolute;
-      bottom: 101%;
-      right: 0;
-
-      .add_btn {
-        color: #fff;
-        background-color: black;
-        border: none;
-        font-size: 15px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: normal;
-        text-transform: uppercase;
-        cursor: pointer;
-      }
+    .thumbnail_active_wrapper {
+      position: relative;
+      width: auto;
+      max-width: 85%;
+      max-height: 85%;
+      background: white;
+      z-index: 2000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .thhumbnail_uploaded_media_container {
-      display: flex;
-      flex-wrap: wrap;
-      overflow-y: scroll;
-      gap: 15px;
-
-      &::-webkit-scrollbar {
-        width: 0;
-      }
-
-      li {
-        border: 1px solid black;
-        width: 157px;
-        height: 216px;
-        text-align: center;
-        position: relative;
-
-        &:hover .delete_img {
-          display: block;
-        }
-
-        img {
-          width: 150px;
-          height: 216px;
-          object-fit: scale-down;
-        }
-
-        video {
-          width: 30px;
-          height: 30px;
-          object-fit: scale-down;
-          z-index: 0;
-        }
-
-        .delete_img {
-          display: none;
-          position: absolute;
-          top: 0;
-          right: 0;
-          background-color: black;
-          border: 1px solid black;
-          color: #fff;
-          text-align: center;
-          padding: 2px;
-          cursor: pointer;
-        }
-
-        .media_number {
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          background-color: black;
-          color: #fff;
-          padding: 3px;
-          font-weight: 100;
-          font-size: 10px;
-          z-index: 222;
-        }
-      }
-    }
-  }
-
-  .added_img_wrapper {
-    position: absolute;
-    left: 115%;
-    bottom: 23%;
-
-    .added_img_container {
-      padding: 12px 10px 0 10px;
+    .thumbnail_uploaded_media_wrapper {
+      width: 100%;
+      height: 100vh;
       border: 3px solid black;
       display: flex;
-      align-items: center;
-      width: 495px;
-      overflow-x: scroll;
-      overflow-y: hidden;
-      gap: 15px;
+      justify-self: center;
+      justify-content: space-between;
+      align-self: center;
+      padding: 15px;
 
-      &::-webkit-scrollbar {
-        width: 0;
+      .media_selector_by_url_upload_new {
+        display: grid;
+        // gap: 30px;
+
+        .media_selector_by_url {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          h3 {
+            background-color: #000;
+            color: #fff;
+            text-transform: uppercase;
+            padding: 5px;
+            align-self: flex-start;
+            font-size: 20px;
+          }
+
+          .by_url_container {
+            display: flex;
+            gap: 5px;
+
+            .by_url_input {
+              width: 150px;
+              height: 35px;
+              border: 2px solid #000;
+              font-weight: 900;
+              font-size: 20px;
+              padding: 2px;
+
+              &:focus {
+                outline: none;
+              }
+            }
+
+            .media_selector_by_url_btn {
+              border: none;
+              background-color: #000;
+              color: #fff;
+              cursor: pointer;
+              padding: 8px;
+              font-size: 15px;
+
+              &:hover {
+                opacity: 0.5;
+              }
+            }
+          }
+        }
       }
 
-      li {
-        border: 1px solid black;
-        width: 157px;
-        height: 216px;
-        text-align: center;
-        position: relative;
+      .media_selector_container {
+        display: grid;
+        gap: 20px;
 
-        &:hover .delete_img {
-          display: block;
+        .media_selector_img_container {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          border: 2px solid black;
+          gap: 10px;
+          padding: 20px;
+          overflow-y: scroll;
+
+          .media_selector_img_wrapper {
+            width: 150px;
+            height: 230px;
+            border: 1px solid black;
+            position: relative;
+
+            &:hover {
+              .media_selector_delete_img {
+                display: block;
+              }
+            }
+
+            .media_selector_img {
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
+            }
+
+            .media_selector_delete_img {
+              position: absolute;
+              display: none;
+              top: 0;
+              right: 0;
+              border: none;
+              background-color: #000;
+              color: #fff;
+              text-align: center;
+              padding: 2px;
+              font-size: 10px;
+            }
+
+            .media_selector_img_number {
+              position: absolute;
+              background-color: #000;
+              color: #fff;
+              padding: 2px;
+              text-align: center;
+              font-size: 10px;
+              bottom: 0;
+            }
+          }
         }
 
-        img {
-          width: 150px;
-          height: 216px;
-          object-fit: scale-down;
-        }
-
-        video {
-          width: 150px;
-          height: 216px;
-          object-fit: scale-down;
-        }
-
-        .delete_img {
-          display: none;
-          position: absolute;
-          top: 0;
-          right: 0;
-          background-color: black;
-          border: 1px solid black;
+        .media_selector_add_btn {
+          border: none;
+          background-color: #000;
           color: #fff;
-          text-align: center;
-          padding: 2px;
+          text-transform: uppercase;
+          padding: 5px;
+          justify-self: center;
           cursor: pointer;
+
+          &:hover {
+            opacity: 0.5;
+          }
         }
       }
     }
