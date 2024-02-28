@@ -121,6 +121,17 @@
             }
           }
         }
+
+        .media_selector_upload_new {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          .drag_drop_naming {
+            display: flex;
+            gap: 5px;
+          }
+        }
       }
 
       .media_selector_container {

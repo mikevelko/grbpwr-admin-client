@@ -2,8 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 import styles from 'styles/thumbnail.scss';
 import { deleteFiles, getAllUploadedFiles } from 'api/admin';
 import { common_ProductNew, common_ProductMediaInsert, common_Media } from 'api/proto-http/admin';
-import { useNavigate } from '@tanstack/react-location';
-import { ROUTES } from 'constants/routes';
+import { DragDrop } from './dragDrop';
 
 interface ThumbnailProps {
   product: common_ProductNew;
@@ -11,11 +10,9 @@ interface ThumbnailProps {
 }
 
 export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
-  const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string[]>([]);
   const [displayedImage, setDisplayedImage] = useState<string>('');
-  const [thumbnailInput, setThumbnailInput] = useState(false);
   const [filesUrl, setFilesUrl] = useState<common_Media[]>([]);
   const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [mediaNumber, setMediaNumber] = useState<number[]>([]);
@@ -75,14 +72,11 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
   }, [isLoading, hasMore]);
 
   useEffect(() => {
-    // Disable scrolling on the body when media selector is open
     if (showMediaSelector) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
-
-    // Clean up function to unset overflow when the component unmounts
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -102,6 +96,27 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
       setFilesUrl((prevUrls) => [...prevUrls, ...url]);
       setOffset((prevOffset) => prevOffset + url.length);
       setHasMore(url.length === limit);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const reloadFiles = async () => {
+    setIsLoading(true);
+    setOffset(0);
+    setHasMore(true);
+    try {
+      const response = await getAllUploadedFiles({
+        limit: 1,
+        offset: 0,
+        orderFactor: 'ORDER_FACTOR_ASC',
+      });
+      const newFiles = response.list || [];
+      setFilesUrl(newFiles);
+      setOffset(newFiles.length);
+      setHasMore(newFiles.length > 0);
     } catch (error) {
       console.error(error);
     } finally {
@@ -212,10 +227,13 @@ export const Thumbnail: FC<ThumbnailProps> = ({ product, setProduct }) => {
                 </div>
               </div>
               <div className={styles.media_selector_upload_new}>
-                <h3>upload new </h3>
+                <DragDrop />
               </div>
             </div>
             <div className={styles.media_selector_container}>
+              <button type='button' onClick={reloadFiles}>
+                reload
+              </button>
               <ul className={styles.media_selector_img_container}>
                 {filesUrl?.map((media) => (
                   <li key={media.id} className={styles.media_selector_img_wrapper}>
