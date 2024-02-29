@@ -84,6 +84,7 @@ export const DragDrop: FC = () => {
         onDragEnter={(e) => handleDrag(e, true)}
         onDragLeave={(e) => handleDrag(e, false)}
         onDrop={handleFileChange}
+        className={`${styles.drag_drop_label_wrapper} ${isDragging ? styles.drag_drop_label : ''}`}
       >
         {!selectedFileUrl && <label htmlFor='files'>DRAG AND DROP FILES HERE</label>}
         <input
@@ -97,8 +98,15 @@ export const DragDrop: FC = () => {
         {selectedFileUrl && <h3>image is selected</h3>}
       </div>
       <div className={styles.drag_drop_naming}>
-        <input id='file_name' type='text' placeholder='Enter file name' />
-        <button onClick={handleUpload}>UPLOAD</button>
+        <input
+          id='file_name'
+          type='text'
+          placeholder='Enter file name'
+          className={styles.drag_drop_input}
+        />
+        <button type='button' onClick={handleUpload} className={styles.drag_drop_btn}>
+          UPLOAD
+        </button>
       </div>
     </>
   );

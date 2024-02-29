@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 // import { StrictMode } from 'react'; -- TODO: what is it used for
 import { createRoot } from 'react-dom/client';
@@ -56,6 +56,7 @@ const routes: Route<DefaultGenerics>[] = [
 ];
 
 root.render(
+  // <StrictMode>
   <ContextProvider>
     <QueryClientProvider client={queryClient}>
       <Router location={location} routes={routes}>
@@ -63,4 +64,5 @@ root.render(
       </Router>
     </QueryClientProvider>
   </ContextProvider>,
+  // </StrictMode>,
 );

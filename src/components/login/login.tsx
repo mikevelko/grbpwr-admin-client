@@ -37,7 +37,7 @@ export const LoginBlock: FC = () => {
       localStorage.setItem('authToken', authToken);
 
       navigate({ to: ROUTES.main, replace: true });
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
     }
   };
