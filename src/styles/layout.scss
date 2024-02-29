@@ -1,0 +1,35 @@
+.layout {
+  position: relative;
+  margin: 20px;
+  display: grid;
+  grid-template-areas:
+    'logo content'
+    'logout content';
+  grid-template-columns: 40px 1fr;
+  grid-template-rows: 1fr auto;
+  //   height: 200vh;
+
+  .layout_logo {
+    grid-area: logo;
+    position: fixed;
+  }
+
+  .layout_content {
+    grid-area: content;
+  }
+
+  .layout_logout {
+    grid-area: logout;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    text-align: right;
+
+    .logout_btn {
+      background-color: black;
+      color: white;
+      border: none;
+      font-size: 25px;
+    }
+  }
+}
