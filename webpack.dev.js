@@ -11,13 +11,14 @@ module.exports = {
     },
     compress: true,
     port: 4040,
-    proxy: {
-      '/api': {
+    proxy: [
+      {
+        context: ['/api'],
         secure: false,
         changeOrigin: true,
         target: 'http://backend.grbpwr.com:8081',
         router: () => process.env.REACT_APP_API_BASE_URL || 'http://localhost:3999',
-      },
-    },
+      }
+    ],
   },
 };
