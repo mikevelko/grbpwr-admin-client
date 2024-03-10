@@ -17,7 +17,7 @@ axiosInstance.interceptors.request.use(
       config.headers = config.headers || {};
       config.headers['Grpc-Metadata-Authorization'] = `Bearer ${authToken}`;
     }
-        return config;
+    return config;
   },
   (error) => {
     return Promise.reject(error);
@@ -43,14 +43,10 @@ interface AxiosRequestConfig {
 }
 
 export const axiosRequestHandler = async ({ path, method, body }: AxiosRequestConfig) => {
-  try {
-    const response = await axiosInstance({
-      method: method as 'GET' | 'POST' | 'PUT' | 'DELETE',
-      url: path,
-      data: body,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await axiosInstance({
+    method: method as 'GET' | 'POST' | 'PUT' | 'DELETE',
+    url: path,
+    data: body,
+  });
+  return response.data;
 };

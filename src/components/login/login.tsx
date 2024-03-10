@@ -76,7 +76,9 @@ export const LoginBlock: FC = () => {
               placeholder='PASSWORD'
             />
           </div>
-          <button type='submit' disabled={!username || !password}>Login</button>
+          <button type='submit' disabled={!username || !password}>
+            Login
+          </button>
         </form>
       </div>
     </div>
