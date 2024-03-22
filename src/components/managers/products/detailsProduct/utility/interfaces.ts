@@ -7,12 +7,14 @@ export interface ProductIdProps {
 }
 
 export interface MediaViewComponentsProps {
-    product: common_ProductFull | undefined
-    url: string
-    setUrl: React.Dispatch<React.SetStateAction<string>>
-    updateMediaByUrl: () => void
-    handleSelectedMedia: () => void
-    selectedMedia: string[]
-    select: (imageUrl: string, allowMultiple: boolean) => void
-    fetchProduct?: () => void
+    link: string | undefined
+    saveSelectedMedia: (newSelectedMedia: string[]) => void
 }
+
+
+export interface MediaListProps {
+    product: common_ProductFull | undefined
+    saveSelectedMedia: (newSelectedMedia: string[]) => void
+    fetchProduct: () => void
+}
+

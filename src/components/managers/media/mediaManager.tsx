@@ -35,10 +35,10 @@ export const MediaManager: FC = () => {
     }
 
     if (files && files.length > 0) {
-      const fileList = Array.from(files); // Convert FileList to an array
-      setSelectedFiles(fileList); // Clear previous files and set the newly selected file
-      const fileUrl = URL.createObjectURL(fileList[0]); // Create URL for the first selected file
-      setSelectedFileUrl(fileUrl); // Update selectedFileUrl to display the preview
+      const fileList = Array.from(files);
+      setSelectedFiles(fileList);
+      const fileUrl = URL.createObjectURL(fileList[0]);
+      setSelectedFileUrl(fileUrl);
     }
   };
 
