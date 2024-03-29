@@ -1,4 +1,8 @@
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import { IconButton, Typography } from '@mui/material';
 import { common_Product } from 'api/proto-http/admin';
+import { isVideo } from 'features/utilitty/filterContentType';
 import React, { FC, useState } from 'react';
 import styles from 'styles/paged.scss';
 
@@ -32,18 +36,20 @@ export const ListProducts: FC<ProductProps> = ({
           className={`${product.productInsert?.hidden && showHidden ? styles.hidden_product : ''}`}
         >
           {hoveredProductId === product.id && (
-            <button
+            <IconButton
               onClick={(e) => {
                 e.stopPropagation();
                 deleteProduct(e, product.id);
               }}
-              style={{ backgroundColor: confirmDeleteProductId === product.id ? 'red' : 'initial' }}
+              className={styles.delete_btn}
             >
-              {confirmDeleteProductId === product.id ? 'Sure?' : 'X'}
-            </button>
+              {confirmDeleteProductId === product.id ? <CheckIcon /> : <CloseIcon />}
+            </IconButton>
           )}
           {deletingProductId === product.id ? (
-            <div>OK</div>
+            <Typography variant='h4'>product removed</Typography>
+          ) : isVideo(product.productInsert?.thumbnail) ? (
+            <video src={product.productInsert?.thumbnail} controls />
           ) : (
             <img src={product.productInsert?.thumbnail} alt='Product Image' />
           )}
