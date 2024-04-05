@@ -11,6 +11,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { getDictionary } from 'api/admin';
 import { common_Dictionary, common_ProductInsert } from 'api/proto-http/admin';
 import { updateProductById } from 'api/updateProductsById';
 import { findInDictionary } from 'components/managers/orders/utility';
@@ -28,10 +29,11 @@ export const BasicProductIformation: FC<ProductIdProps> = ({ product, id, fetchP
   const [dict, setDict] = useState<common_Dictionary>();
 
   useEffect(() => {
-    const data = localStorage.getItem('dictionary');
-    if (data) {
-      setDict(JSON.parse(data));
-    }
+    const fetchDictionary = async () => {
+      const response = await getDictionary({});
+      setDict(response.dictionary);
+    };
+    fetchDictionary();
   }, []);
 
   const enableEditMode = () => {
