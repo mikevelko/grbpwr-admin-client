@@ -150,11 +150,11 @@ export const Orders: FC = () => {
   }
 
   const columns = [
-    { field: 'id', headerName: 'Order ID', width: 150 },
+    { field: 'id', headerName: 'Order ID', width: 300 },
     {
       field: 'placed',
       headerName: 'Placed',
-      width: 300,
+      width: 400,
       renderCell: (params: any) => {
         const date = new Date(params.value);
         const formattedDate = date.toLocaleDateString('en-US', {
@@ -173,7 +173,7 @@ export const Orders: FC = () => {
     {
       field: 'modified',
       headerName: 'Modified',
-      width: 300,
+      width: 400,
       renderCell: (params: any) => {
         const date = new Date(params.value);
         const formattedDate = date.toLocaleDateString('en-US', {
@@ -187,17 +187,6 @@ export const Orders: FC = () => {
           second: '2-digit',
         });
         return `${formattedDate}, ${formattedTime}`;
-      },
-    },
-    {
-      field: 'paymentId',
-      headerName: 'Payment method',
-      width: 300,
-      renderCell: (params: any) => {
-        return dictionary?.paymentMethods
-          ?.find((x) => x.id === params.value)
-          ?.name?.replace('PAYMENT_METHOD_NAME_ENUM_', '')
-          .replace('_', ' ');
       },
     },
     {
@@ -238,7 +227,7 @@ export const Orders: FC = () => {
 
   return (
     <Layout>
-      <div style={{ margin: '5% 5%', textAlign: 'center', alignItems: 'center' }}>
+      <div style={{ margin: '5% 5%' }}>
         <Grid container spacing={2} sx={{ mb: 4 }}>
           <Grid item xs={3}>
             <FormControl fullWidth>
