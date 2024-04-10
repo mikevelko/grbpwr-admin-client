@@ -1,6 +1,7 @@
 import SearchIcon from '@mui/icons-material/Search';
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import { useNavigate } from '@tanstack/react-location';
 import { getDictionary } from 'api/admin';
 import { getOrdersList } from 'api/orders';
 import {
@@ -10,7 +11,9 @@ import {
   common_PaymentMethodNameEnum,
 } from 'api/proto-http/admin';
 import { Layout } from 'components/login/layout';
+import { ROUTES } from 'constants/routes';
 import { FC, useEffect, useState } from 'react';
+import { formatDateTime } from './utility';
 
 interface SearchFilters {
   status: common_OrderStatusEnum | undefined;
@@ -156,18 +159,7 @@ export const Orders: FC = () => {
       headerName: 'Placed',
       width: 400,
       renderCell: (params: any) => {
-        const date = new Date(params.value);
-        const formattedDate = date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        });
-        const formattedTime = date.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        });
-        return `${formattedDate}, ${formattedTime}`;
+        return formatDateTime(params.value);
       },
     },
     {
@@ -175,18 +167,7 @@ export const Orders: FC = () => {
       headerName: 'Modified',
       width: 400,
       renderCell: (params: any) => {
-        const date = new Date(params.value);
-        const formattedDate = date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        });
-        const formattedTime = date.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        });
-        return `${formattedDate}, ${formattedTime}`;
+        return formatDateTime(params.value);
       },
     },
     {
@@ -223,6 +204,12 @@ export const Orders: FC = () => {
 
   const handleEmailChange = (event: any) => {
     setEmail(event.target.value);
+  };
+
+  const navigate = useNavigate();
+
+  const handleRowClick = (params: any) => {
+    navigate({ to: `${ROUTES.orders}/${params.id}` });
   };
 
   return (
@@ -285,6 +272,7 @@ export const Orders: FC = () => {
           loading={loading}
           rowSelection={false}
           pageSizeOptions={[]}
+          onRowClick={handleRowClick}
         />
 
         {loadMoreVisible && (

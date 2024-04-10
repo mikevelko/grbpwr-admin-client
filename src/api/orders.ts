@@ -10,6 +10,6 @@ export function getOrdersList(request: ListOrdersRequest): Promise<ListOrdersRes
   return adminService.ListOrders(request);
 }
 
-export function orderById(request: GetOrderByIdRequest): Promise<GetOrderByIdResponse> {
+export function getOrderById(request: GetOrderByIdRequest): Promise<GetOrderByIdResponse> {
   return adminService.GetOrderById(request);
 }

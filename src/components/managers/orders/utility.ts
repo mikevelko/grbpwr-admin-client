@@ -8,7 +8,7 @@ type Pattern = {
 const pattern: Pattern = {
   size: /SIZE_ENUM_/,
   measurement: /MEASUREMENT_NAME_ENUM_/,
-  category: /CATEGORY_ENUM_/
+  category: /CATEGORY_ENUM_/,
 };
 
 type dictionaryTypes = 'size' | 'order' | 'carrier' | 'status' | 'measurement' | 'category';
@@ -24,7 +24,7 @@ export const findInDictionary = (
   switch (type) {
     case 'category':
       data = dictionary.categories?.find((s) => s.id === id)?.name?.replace(pattern[type], '');
-      break
+      break;
     case 'size':
       data = dictionary.sizes?.find((s) => s.id === id)?.name?.replace(pattern[type], '');
       break;
@@ -47,3 +47,21 @@ export const findInDictionary = (
 
   return data;
 };
+
+export function formatDateTime(value: string | undefined): string {
+  if (!value) {
+    return '';
+  }
+  const date = new Date(value);
+  const formattedDate = date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const formattedTime = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+  return `${formattedDate}, ${formattedTime}`;
+}
