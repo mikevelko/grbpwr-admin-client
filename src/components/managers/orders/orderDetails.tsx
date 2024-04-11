@@ -1,11 +1,14 @@
+import LaunchIcon from '@mui/icons-material/Launch';
 import { Grid } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
 import { DataGrid } from '@mui/x-data-grid';
-import { MakeGenerics, useMatch } from '@tanstack/react-location';
+import { MakeGenerics, useMatch, useNavigate } from '@tanstack/react-location';
 import { getDictionary } from 'api/admin';
 import { getOrderById } from 'api/orders';
 import { common_Dictionary, common_OrderFull } from 'api/proto-http/admin';
 import { Layout } from 'components/login/layout';
+import { ROUTES } from 'constants/routes';
 import { useEffect, useState } from 'react';
 import { formatDateTime } from './utility';
 
@@ -46,13 +49,15 @@ export const OrderDetails = () => {
     fetchDictionary();
   }, [id]);
 
+  const navigate = useNavigate();
+
   const orderItemsColumns = [
     {
       field: 'thumbnail',
       headerName: '',
       width: 300,
       renderCell: (params: any) => (
-        <img src={params.value} alt='product' style={{ width: '100%', height: 'auto' }} />
+        <img src={params.value} alt='product' style={{ height: '100px', width: 'auto' }} />
       ),
     },
     {
@@ -82,7 +87,26 @@ export const OrderDetails = () => {
       field: 'productPrice',
       headerName: 'PRICE',
       width: 200,
-      valueGetter: (params: any) => `${params} ${dictionary?.baseCurrency}`,
+      valueGetter: (params: any, row: any) =>
+        `${params * row.orderItem.quantity} ${dictionary?.baseCurrency}`,
+    },
+    {
+      field: 'productLink',
+      headerName: 'LINK',
+      width: 100,
+      valueGetter: (_params: any, row: any) => {
+        return row.orderItem.productId;
+      },
+      renderCell: (params: any) => (
+        <IconButton
+          aria-label='explore product'
+          onClick={() => {
+            navigate({ to: `${ROUTES.singleProduct}/${params.value}` });
+          }}
+        >
+          <LaunchIcon />
+        </IconButton>
+      ),
     },
   ];
 
@@ -116,6 +140,7 @@ export const OrderDetails = () => {
           rowSelection={false}
           pageSizeOptions={[]}
           sx={{ marginTop: '2rem' }}
+          rowHeight={100}
         />
       </div>
     </Layout>
