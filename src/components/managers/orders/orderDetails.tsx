@@ -2,7 +2,7 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import { Grid } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridCallbackDetails, GridPaginationModel } from '@mui/x-data-grid';
 import { MakeGenerics, useMatch, useNavigate } from '@tanstack/react-location';
 import { getDictionary } from 'api/admin';
 import { getOrderById } from 'api/orders';
@@ -27,6 +27,8 @@ export const OrderDetails = () => {
   const [orderDetails, setOrderDetails] = useState<common_OrderFull | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const [dictionary, setDictionary] = useState<common_Dictionary>();
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(1);
 
   const fetchDictionary = async () => {
     const response = await getDictionary({});
@@ -110,6 +112,11 @@ export const OrderDetails = () => {
     },
   ];
 
+  const onPaginationChange = (model: GridPaginationModel, details: GridCallbackDetails) => {
+    setPage(model.page);
+    setPageSize(model.pageSize);
+  };
+
   if (isLoading)
     return (
       <div
@@ -136,9 +143,10 @@ export const OrderDetails = () => {
         <DataGrid
           rows={orderDetails?.orderItems || []}
           columns={orderItemsColumns}
-          autoHeight
           rowSelection={false}
-          pageSizeOptions={[]}
+          paginationModel={{ page: page, pageSize: pageSize }}
+          onPaginationModelChange={onPaginationChange}
+          pageSizeOptions={[1, 5, 10]}
           sx={{ marginTop: '2rem' }}
           rowHeight={100}
         />
