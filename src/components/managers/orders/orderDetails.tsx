@@ -1,7 +1,4 @@
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import DoneIcon from '@mui/icons-material/Done';
 import LaunchIcon from '@mui/icons-material/Launch';
-import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { Button, Grid, TextField } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
@@ -188,12 +185,12 @@ export const OrderDetails = () => {
       payment && (
         <div>
           <div>PAYMENT:</div>
-          <div>
-            STATUS:{' '}
+          <div style={{ display: 'flex' }}>
+            STATUS:&nbsp;
             {payment.paymentInsert?.isTransactionDone ? (
-              <DoneIcon style={{ color: 'green', verticalAlign: 'bottom' }} />
+              <div style={{ backgroundColor: '#008f0080' }}>PAYED</div>
             ) : (
-              <AccessTimeIcon style={{ color: 'deepskyblue', verticalAlign: 'bottom' }} />
+              <div style={{ backgroundColor: '#fc000080' }}>UNPAYED</div>
             )}
           </div>
           {payment.modifiedAt && <div>MADE AT: {formatDateTime(payment.modifiedAt)}</div>}
@@ -266,12 +263,12 @@ export const OrderDetails = () => {
                 {buyer?.firstName && <div>FIRST NAME: {buyer.firstName}</div>}
                 {buyer?.lastName && <div>LAST NAME: {buyer.lastName}</div>}
                 {buyer?.phone && <div>PHONE: {buyer.phone}</div>}
-                <div>
-                  RECIEVE PROMO EMAILS:{' '}
+                <div style={{ display: 'flex' }}>
+                  RECIEVE PROMO EMAILS:&nbsp;
                   {buyer?.receivePromoEmails ? (
-                    <DoneIcon style={{ color: 'green', verticalAlign: 'bottom' }} />
+                    <div style={{ backgroundColor: '#008f0080' }}>YES</div>
                   ) : (
-                    <NotInterestedIcon style={{ color: 'red', verticalAlign: 'bottom' }} />
+                    <div style={{ backgroundColor: '#fc000080' }}>NO</div>
                   )}
                 </div>
               </div>
@@ -313,7 +310,7 @@ export const OrderDetails = () => {
 
   let trackingNumberSection = (() => {
     return (
-      orderStatus === 'SHIPPED' &&
+      orderStatus === 'CONFIRMED' &&
       !orderDetails?.shipment?.trackingCode && (
         <div>
           <TextField
@@ -347,8 +344,7 @@ export const OrderDetails = () => {
   })();
 
   let refundOrderSection = (() => {
-    const criteriaMet =
-      orderStatus === 'CONFIRMED' || orderStatus === 'SHIPPED' || orderStatus === 'DELIVERED';
+    const criteriaMet = orderStatus === 'CONFIRMED' || orderStatus === 'DELIVERED';
     return (
       criteriaMet && (
         <Button onClick={refundOrder} variant='contained'>
