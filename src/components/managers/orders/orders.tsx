@@ -13,7 +13,7 @@ import {
 import { Layout } from 'components/login/layout';
 import { ROUTES } from 'constants/routes';
 import { FC, useEffect, useState } from 'react';
-import { formatDateTime } from './utility';
+import { formatDateTime, getOrderStatusName, getStatusColor } from './utility';
 
 interface SearchFilters {
   status: common_OrderStatusEnum | undefined;
@@ -120,7 +120,7 @@ export const Orders: FC = () => {
   useEffect(() => {
     const setDataFromDictionary = () => {
       setStatusOptions(
-        dictionary?.orderStatuses?.map((x) => (x.name ? x.name.toString() : '')) || [],
+        dictionary?.orderStatuses?.map((x) => getOrderStatusName(dictionary, x.id)!) || [],
       );
 
       setPaymentOptions(
@@ -130,27 +130,6 @@ export const Orders: FC = () => {
 
     setDataFromDictionary();
   }, [dictionary]);
-
-  function getStatusColor(status: string | undefined) {
-    switch (status) {
-      case 'PLACED':
-        return '#ffffff';
-      case 'AWAITING PAYMENT':
-        return '#73eaff80';
-      case 'CONFIRMED':
-        return '#0800ff80';
-      case 'SHIPPED':
-        return '#00ffa280';
-      case 'DELIVERED':
-        return '#008f0080';
-      case 'CANCELLED':
-        return '#fc000080';
-      case 'REFUNDED':
-        return '#29292980';
-      default:
-        return '#ffffff'; // Default color if status doesn't match
-    }
-  }
 
   const columns = [
     { field: 'id', headerName: 'Order ID', width: 300 },
@@ -175,10 +154,7 @@ export const Orders: FC = () => {
       headerName: 'Order status',
       width: 300,
       renderCell: (params: any) => {
-        let status = dictionary?.orderStatuses
-          ?.find((x) => x.id === params.value)
-          ?.name?.replace('ORDER_STATUS_ENUM_', '')
-          .replace('_', ' ');
+        let status = getOrderStatusName(dictionary, params.value);
         return (
           <div style={{ backgroundColor: getStatusColor(status), width: '100%', height: '100%' }}>
             {status}
@@ -223,7 +199,7 @@ export const Orders: FC = () => {
                 <MenuItem value=''>ANY</MenuItem>
                 {statusOptions.map((option) => (
                   <MenuItem key={option} value={option}>
-                    {option.replace('ORDER_STATUS_ENUM_', '').replace('_', ' ')}
+                    {option}
                   </MenuItem>
                 ))}
               </Select>
